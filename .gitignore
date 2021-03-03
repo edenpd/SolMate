@@ -1,2 +1,3 @@
 # Dependency directories
 Server/SolMate/node_modules
+**/node_modules
