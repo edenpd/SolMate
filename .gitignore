@@ -1,2 +1,16 @@
 # Dependency directories
 Server/SolMate/node_modules
+
+Client/SolMate/node_modules/**/*
+Client/SolMate/.expo/*
+Client/SolMate/npm-debug.*
+Client/SolMate/*.jks
+Client/SolMate/*.p8
+Client/SolMate/*.p12
+Client/SolMate/*.key
+Client/SolMate/*.mobileprovision
+Client/SolMate/*.orig.*
+Client/SolMate/web-build/
+
+# macOS
+Client/SolMate/.DS_Store
