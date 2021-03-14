@@ -28,7 +28,6 @@ const MatchesRoute = () => {
 
     return (
         <View>
-            <Header />
             <View style={appbarStyle.matchesContainer}>
                 <Carousel
                 style={{marginBottom: 0, paddingBottom: 0}}

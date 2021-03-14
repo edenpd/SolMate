@@ -6,6 +6,7 @@ import ChatRoute from './routes/ChatRoute';
 import EventsRoute from './routes/EventsRoute';
 import ProfileRoute from './routes/ProfileRoute';
 import MatchesRoute from './routes/MatchesRoute';
+import Header from "./components/Header";
 
 export default function App() {
   const [index, setIndex] = React.useState(0);
@@ -28,12 +29,18 @@ export default function App() {
   }
 
   return (
-    <BottomNavigation
-      activeColor={'purple'}
-      barStyle={navigationStyle}
-      navigationState={{ index, routes }}
-      onIndexChange={setIndex}
-      renderScene={renderScene}
-    />
+    <View style={{
+      width: '100%',
+      height: '100%'
+    }}>
+      <Header />
+      <BottomNavigation
+        activeColor={'purple'}
+        barStyle={navigationStyle}
+        navigationState={{ index, routes }}
+        onIndexChange={setIndex}
+        renderScene={renderScene}
+      />
+    </View>
   );
 }
