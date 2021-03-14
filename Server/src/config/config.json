@@ -1,0 +1,4 @@
+{
+    "connectionString": "mongodb://localhost:27017/solmatemini",
+    "secret": "-- MINISOLMATE - MUSIC CONNECTS PEOPLE --"
+}
