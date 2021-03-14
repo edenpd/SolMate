@@ -32,15 +32,22 @@ export default function App() {
   };
   if (!isTokenSet) {
     return (
-      <BottomNavigation
-        activeColor={"purple"}
-        barStyle={navigationStyle}
-        navigationState={{ index, routes }}
-        onIndexChange={setIndex}
-        renderScene={renderScene}
-      />
+      <View style={{
+        width: '100%',
+        height: '100%'
+      }}>
+        <Header />
+        <BottomNavigation
+          activeColor={'purple'}
+          barStyle={navigationStyle}
+          navigationState={{ index, routes }}
+          onIndexChange={setIndex}
+          renderScene={renderScene}
+        />
+      </View>
     );
   } else {
     return <LoginRoute />;
   }
+
 }
