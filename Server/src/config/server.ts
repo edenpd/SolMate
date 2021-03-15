@@ -12,6 +12,7 @@ import chatRouter from "../routes/chatRoute";
 import messageRouter from "../routes/messageRoute";
 import songRouter from "../routes/songRoute";
 import eventRouter from "../routes/eventRoute";
+import spotifyRouter from '../routes/spotifyRoute';
 import cors from "cors";
 
 const app = express();
@@ -33,6 +34,7 @@ export const startServer = async () => {
   app.use("/message", messageRouter);
   app.use("/song", songRouter);
   app.use("/event", eventRouter);
+  app.use("/spotify",spotifyRouter)
 
   await new Promise((resolve, reject) => {
     const PORT = 3001;
