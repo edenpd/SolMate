@@ -7,7 +7,7 @@ export const addEvent = async (req: Request, res: Response) => {
     const eventBody: IEvent = req.body;
     const toAdd: IEvent = {
       EventId: eventBody.EventId,
-      location: eventBody.location,
+      // location: eventBody.location,
       UserId1: eventBody.UserId1,
       UserId2: eventBody.UserId2,
     };

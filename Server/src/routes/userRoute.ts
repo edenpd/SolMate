@@ -5,7 +5,7 @@ import {
   uploadProfile,
   getUserByEmail,
   updateUser,
-  getStatistics,
+  // getStatistics,
   deleteUser
 } from "../controllers/userController";
 import { response, Router } from "express";
@@ -45,7 +45,7 @@ router.get("/",authenticateJWT, getUserByEmail);
 router.post("/uploadProfile", authenticateJWT, upload, uploadProfile);
 router.post("/uploadMedia", authenticateJWT, upload, uploadMedia);
 router.put("/",authenticateJWT, updateUser);
-router.get("/statistic", getStatistics);
+// router.get("/statistic", getStatistics);
 router.delete("/", deleteUser);
 
 export default router;
