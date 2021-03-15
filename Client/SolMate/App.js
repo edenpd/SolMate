@@ -2,12 +2,26 @@ import { StatusBar } from "expo-status-bar";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { BottomNavigation, Appbar } from "react-native-paper";
+import { createAppContainer } from "react-navigation";
+import { createStackNavigator } from "react-navigation-stack";
 import ChatRoute from "./routes/ChatRoute";
 import EventsRoute from "./routes/EventsRoute";
 import ProfileRoute from "./routes/ProfileRoute";
 import MatchesRoute from "./routes/MatchesRoute";
 import LoginRoute from "./routes/LoginRoute";
 import useToken from "./hooks/useToken";
+import Register from "./routes/RegisterRoute";
+
+const RootStack = createStackNavigator(
+  {
+    Register: Register,
+    Login: LoginRoute,
+  },
+  {
+    initialRouteName: "Login",
+  }
+);
+const AppContainer = createAppContainer(RootStack);
 
 export default function App() {
   const [index, setIndex] = React.useState(0);
@@ -30,15 +44,16 @@ export default function App() {
   const navigationStyle = {
     backgroundColor: "white",
   };
-  if (!isTokenSet) {
+  if (isTokenSet) {
     return (
-      <View style={{
-        width: '100%',
-        height: '100%'
-      }}>
-        <Header />
+      <View
+        style={{
+          width: "100%",
+          height: "100%",
+        }}
+      >
         <BottomNavigation
-          activeColor={'purple'}
+          activeColor={"purple"}
           barStyle={navigationStyle}
           navigationState={{ index, routes }}
           onIndexChange={setIndex}
@@ -47,7 +62,11 @@ export default function App() {
       </View>
     );
   } else {
-    return <LoginRoute />;
+    return (
+      <View style={{ flex: 1 }}>
+        <AppContainer>
+          </AppContainer>
+      </View>
+    );
   }
-
 }
