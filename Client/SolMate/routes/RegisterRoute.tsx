@@ -7,9 +7,12 @@ import {
   TouchableOpacity,
   Linking,
   Alert,
+  ScrollView,
+  KeyboardAvoidingView,
+  Dimensions,
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
-import { Input, Button } from "react-native-elements";
+import { Input, Button, CheckBox } from "react-native-elements";
 import axios from "axios";
 import * as WebBrowser from "expo-web-browser";
 import {
@@ -18,6 +21,7 @@ import {
   ResponseType,
 } from "expo-auth-session";
 import useToken from "../hooks/useToken";
+import MultiSlider from 'react-native-multi-slider';
 
 export default function Register() {
   const [isLoading, setIsLoading] = useState(false);
@@ -85,21 +89,69 @@ export default function Register() {
   }, [response]);
 
   return (
-    <View style={registerStyle.registerContainer}>
-      <TouchableOpacity
-        style={registerStyle.SpotifyButton}
-        activeOpacity={0.5}
-        onPress={() => {
-          promptAsync();
-        }}
-      >
-        <Image
-          source={require("../assets/spotify-logo-white.png")}
-          style={registerStyle.buttonImageIconStyle}
+    <ScrollView
+      contentContainerStyle={{ flexGrow: 1, display: 'flex' }}
+    >
+      <View style={registerStyle.registerContainer}>
+        <Input
+          label="Email"
+          errorStyle={{ color: "red" }}
         />
-        <Text style={registerStyle.buttonTextStyle}> Login Using Spotify </Text>
-      </TouchableOpacity>
-    </View>
+        <Input
+          label="Password"
+          errorStyle={{ color: "red" }}
+        />
+        <Input
+          label="Confirm Password"
+          errorStyle={{ color: "red" }}
+        />
+        <Input
+          label="Full Name"
+          errorStyle={{ color: "red" }}
+        />
+
+        <Text style={{ width: "100%", alignSelf: "center", textAlign: "center" }}>Sex</Text>
+
+        <View style={{ flexDirection: "row" }}>
+          <CheckBox
+            center
+            title='Male'
+            checkedIcon='dot-circle-o'
+            uncheckedIcon='circle-o'
+            // checked={this.state.checked}
+            containerStyle={{ backgroundColor: "rgba(0, 0, 0, 0)", borderColor: "rgba(0, 0, 0, 0)" }}
+
+          />
+          <CheckBox
+            center
+            title='Female'
+            checkedIcon='dot-circle-o'
+            uncheckedIcon='circle-o'
+            // checked={this.state.checked}
+            containerStyle={{ backgroundColor: "rgba(0, 0, 0, 0)", borderColor: "rgba(0, 0, 0, 0)" }}
+          />
+        </View>
+        <View style={{ width: "80%" }}>
+          <MultiSlider
+  
+
+          />
+        </View>
+        <TouchableOpacity
+          style={registerStyle.SpotifyButton}
+          activeOpacity={0.5}
+          onPress={() => {
+            promptAsync();
+          }}
+        >
+          <Image
+            source={require("../assets/spotify-logo-white.png")}
+            style={registerStyle.buttonImageIconStyle}
+          />
+          <Text style={registerStyle.buttonTextStyle}> Login Using Spotify </Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
   );
 }
 const registerStyle = StyleSheet.create({
@@ -108,8 +160,8 @@ const registerStyle = StyleSheet.create({
     height: 100,
     color: "#fff",
     alignItems: "center",
-    display:"flex",
-    flex:1,
+    display: "flex",
+    flex: 1,
     justifyContent: "center",
     flexDirection: "column",
     maxHeight: 700,

@@ -64,7 +64,7 @@ export default function App() {
   } else {
     return (
       <View style={{ flex: 1 }}>
-        <AppContainer>
+        <AppContainer  style={{ flex: 1 }}>
           </AppContainer>
       </View>
     );
