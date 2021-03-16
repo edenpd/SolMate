@@ -22,7 +22,7 @@ const schema = new Schema({
     type: String,
     required: true,
   },
-  sender: {
+  user: {
     type: String,
     required: true,
   },
