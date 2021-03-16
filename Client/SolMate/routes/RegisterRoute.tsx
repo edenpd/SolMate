@@ -21,7 +21,6 @@ import {
   ResponseType,
 } from "expo-auth-session";
 import useToken from "../hooks/useToken";
-import MultiSlider from 'react-native-multi-slider';
 
 export default function Register() {
   const [isLoading, setIsLoading] = useState(false);
@@ -90,26 +89,29 @@ export default function Register() {
 
   return (
     <ScrollView
-      contentContainerStyle={{ flexGrow: 1, display: 'flex' }}
+      contentContainerStyle={{ flexGrow: 1, display: 'flex', }}
     >
       <View style={registerStyle.registerContainer}>
-        <Input
-          label="Email"
-          errorStyle={{ color: "red" }}
-        />
-        <Input
-          label="Password"
-          errorStyle={{ color: "red" }}
-        />
-        <Input
-          label="Confirm Password"
-          errorStyle={{ color: "red" }}
-        />
-        <Input
-          label="Full Name"
-          errorStyle={{ color: "red" }}
-        />
-
+        <View style={{ width: "80%", display:"flex",flex:1,alignItems: "center",marginTop:50 }}>
+          <Input
+            label="Email"
+            errorStyle={{ color: "red" }}
+          />
+          <Input
+            label="Password"
+            secureTextEntry={true}
+            errorStyle={{ color: "red" }}
+          />
+          <Input
+            label="Confirm Password"
+            errorStyle={{ color: "red" }}
+            secureTextEntry={true}
+          />
+          <Input
+            label="Full Name"
+            errorStyle={{ color: "red" }}
+          />
+        </View>
         <Text style={{ width: "100%", alignSelf: "center", textAlign: "center" }}>Sex</Text>
 
         <View style={{ flexDirection: "row" }}>
@@ -131,11 +133,30 @@ export default function Register() {
             containerStyle={{ backgroundColor: "rgba(0, 0, 0, 0)", borderColor: "rgba(0, 0, 0, 0)" }}
           />
         </View>
-        <View style={{ width: "80%" }}>
-          <MultiSlider
-  
+
+        <Text style={{ width: "100%", alignSelf: "center", textAlign: "center" }}>Intrested Sex</Text>
+
+        <View style={{ flexDirection: "row" }}>
+          <CheckBox
+            center
+            title='Male'
+            checkedIcon='dot-circle-o'
+            uncheckedIcon='circle-o'
+            // checked={this.state.checked}
+            containerStyle={{ backgroundColor: "rgba(0, 0, 0, 0)", borderColor: "rgba(0, 0, 0, 0)" }}
 
           />
+          <CheckBox
+            center
+            title='Female'
+            checkedIcon='dot-circle-o'
+            uncheckedIcon='circle-o'
+            // checked={this.state.checked}
+            containerStyle={{ backgroundColor: "rgba(0, 0, 0, 0)", borderColor: "rgba(0, 0, 0, 0)" }}
+          />
+        </View>
+        <View style={{ width: "80%" }}>
+
         </View>
         <TouchableOpacity
           style={registerStyle.SpotifyButton}
@@ -157,14 +178,16 @@ export default function Register() {
 const registerStyle = StyleSheet.create({
   registerContainer: {
     width: "100%",
-    height: 100,
+    // height: 100,
     color: "#fff",
+
     alignItems: "center",
+    alignContent: "center",
     display: "flex",
     flex: 1,
     justifyContent: "center",
     flexDirection: "column",
-    maxHeight: 700,
+    // maxHeight: 700,
   },
   SpotifyButton: {
     flexDirection: "row",
