@@ -1,72 +1,94 @@
-import { NavigationContainer } from '@react-navigation/native';
-import React from 'react';
+import { NavigationContainer, useFocusEffect } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
-// import { FlatList } from 'react-native-gesture-handler';
 import { FlatList } from 'react-native-gesture-handler';
 import { Container, Card, MessageText, PostTime, TextSection, UserImg, UserImgWrapper, UserInfo, UserInfoText, UserName } from '../styles/ChatStyles';
+import { io } from 'socket.io-client';
+import axios from 'axios';
+import { IChat, IUser, IMessage } from '../util/Types';
 
 const ChatList = ({navigation}) => {
 
-    interface Chat {
-        userName: String;
-        userImg: String;
-        messageTime: String;
-        messageText: String
-    }
-    const chats: Chat[] = [
-        {
-            userName: "Tomer",
-            userImg: 'https://api.time.com/wp-content/uploads/2017/12/terry-crews-person-of-year-2017-time-magazine-facebook-1.jpg?quality=85',
-            messageTime: '13:30',
-            messageText: 'Hello'
-        },
-        {
-            userName: "Adi",
-            userImg: 'https://upload.wikimedia.org/wikipedia/commons/c/ce/Sara_Netanyahu_%2840345853590%29_%28cropped%29.jpg',
-            messageTime: '13:30',
-            messageText: 'Hello'
-        },
-        {
-            userName: "Ron",
-            userImg: 'https://www.indiewire.com/wp-content/uploads/2015/04/dakota-fanning-by-daniel-bergeron.jpg?w=780',
-            messageTime: '13:30',
-            messageText: 'Hello'
-        },
-        {
-            userName: "Shiri",
-            userImg: 'https://caricom.org/wp-content/uploads/Floyd-Morris-Remake-1024x879-1.jpg',
-            messageTime: '13:30',
-            messageText: 'Hello'
-        },
-        {
-            userName: "Eden",
-            userImg: 'https://americanindependent.com/wp-content/uploads/2019/01/AP_19014569142266-1068x721.jpg',
-            messageTime: '13:30',
-            messageText: 'Hello'
-        }
-    ];
+    // TODO: Switch to actual user id.
+    const USER_ID = '604639ae4ad4fa1dcc6822e5';
+    const [chats, setChats] = useState<IChat[]>([])
 
+    // This works when connected via the QR code in LAN mode.
+    // Find your local IP address.
+    const socket = io('http://10.0.0.6:8999?_id=' + USER_ID, {
+        transports: [ 'websocket' ],
+	    upgrade: false,
+        rejectUnauthorized: false
+    });
+    socket.on('connect', () => {
+        console.log("The socket is connected");
+        console.log(socket.connected);
+    });
+
+    socket.on('chat_message', () => {
+        console.log("Received message on client");
+        getChats();
+    });
+
+    socket.on("reconnection_attempt", () => {
+        console.log("Attempting connection.");
+      });
+
+      socket.on("connect_error", (err) => {
+        console.log(err);
+      });
+
+    useEffect(() => {
+        getChats();
+        navigation.addListener('focus', () => {
+            console.log("focus");
+            getChats();
+        });
+    }, []);
+
+    // useFocusEffect(() => {
+    //     console.log("UseFocusEffect");
+    //     getChats();
+    // });
+
+
+    const getChats = () => {
+        console.log("Getting multiple chats");
+        axios.get('http://10.0.0.6:3001/chat?UserId=' + USER_ID)
+            .then((res) => {
+                setChats(res.data);
+            })
+            .catch((err) => {
+                console.log("Error");
+                console.log(err);
+            });
+    };
+
+    /* TODO: Switch the chats nav param to chat id and use it in single chat screen(also make a request for receiving a single chat on server side using the chat _id). */
     return (
         <Container>
             <FlatList
                 data={chats}
                 keyExtractor={(item) => (item.userName)}
-                renderItem={({item}) => (
-                    <Card onPress={() => navigation.navigate('Chat', { userName: item.userName })}>
+                renderItem={({item, index}) => {
+                    const otherUser: IUser = (item as IChat).UserId1['_id'] === "604639ae4ad4fa1dcc6822e5" ? (item as IChat).UserId2 : (item as IChat).UserId1;;
+                    const lastMessage: IMessage | undefined = (item as IChat).Messages[0];
+                    return (
+                    <Card onPress={() => navigation.navigate('Chat', { userName: item.userName, index: index, chatId: chats[index]['_id'] })}>
                         <UserInfo>
                             <UserImgWrapper>
-                                <UserImg source={{uri: item.userImg}} />
+                                <UserImg source={{uri: otherUser.picture}} />
                             </UserImgWrapper>
                             <TextSection>
                                 <UserInfoText>
-                                    <UserName>{item.userName}</UserName>
-                                    <PostTime>{item.messageTime}</PostTime>
+                                    <UserName>{`${otherUser.firstName} ${otherUser.lastName}`}</UserName>
+                                    <PostTime>{lastMessage?.msgDate}</PostTime>
                                 </UserInfoText>
-                                <MessageText>{item.messageText}</MessageText>
+                                <MessageText>{lastMessage?.text }</MessageText>
                             </TextSection>
                         </UserInfo>
                     </Card>
-                )} />
+                )}} />
         </Container>
     );
 };
