@@ -7,9 +7,12 @@ import {
   TouchableOpacity,
   Linking,
   Alert,
+  ScrollView,
+  KeyboardAvoidingView,
+  Dimensions,
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
-import { Input, Button } from "react-native-elements";
+import { Input, Button, CheckBox } from "react-native-elements";
 import axios from "axios";
 import * as WebBrowser from "expo-web-browser";
 import {
@@ -85,34 +88,106 @@ export default function Register() {
   }, [response]);
 
   return (
-    <View style={registerStyle.registerContainer}>
-      <TouchableOpacity
-        style={registerStyle.SpotifyButton}
-        activeOpacity={0.5}
-        onPress={() => {
-          promptAsync();
-        }}
-      >
-        <Image
-          source={require("../assets/spotify-logo-white.png")}
-          style={registerStyle.buttonImageIconStyle}
-        />
-        <Text style={registerStyle.buttonTextStyle}> Login Using Spotify </Text>
-      </TouchableOpacity>
-    </View>
+    <ScrollView
+      contentContainerStyle={{ flexGrow: 1, display: 'flex', }}
+    >
+      <View style={registerStyle.registerContainer}>
+        <View style={{ width: "80%", display:"flex",flex:1,alignItems: "center",marginTop:50 }}>
+          <Input
+            label="Email"
+            errorStyle={{ color: "red" }}
+          />
+          <Input
+            label="Password"
+            secureTextEntry={true}
+            errorStyle={{ color: "red" }}
+          />
+          <Input
+            label="Confirm Password"
+            errorStyle={{ color: "red" }}
+            secureTextEntry={true}
+          />
+          <Input
+            label="Full Name"
+            errorStyle={{ color: "red" }}
+          />
+        </View>
+        <Text style={{ width: "100%", alignSelf: "center", textAlign: "center" }}>Sex</Text>
+
+        <View style={{ flexDirection: "row" }}>
+          <CheckBox
+            center
+            title='Male'
+            checkedIcon='dot-circle-o'
+            uncheckedIcon='circle-o'
+            // checked={this.state.checked}
+            containerStyle={{ backgroundColor: "rgba(0, 0, 0, 0)", borderColor: "rgba(0, 0, 0, 0)" }}
+
+          />
+          <CheckBox
+            center
+            title='Female'
+            checkedIcon='dot-circle-o'
+            uncheckedIcon='circle-o'
+            // checked={this.state.checked}
+            containerStyle={{ backgroundColor: "rgba(0, 0, 0, 0)", borderColor: "rgba(0, 0, 0, 0)" }}
+          />
+        </View>
+
+        <Text style={{ width: "100%", alignSelf: "center", textAlign: "center" }}>Intrested Sex</Text>
+
+        <View style={{ flexDirection: "row" }}>
+          <CheckBox
+            center
+            title='Male'
+            checkedIcon='dot-circle-o'
+            uncheckedIcon='circle-o'
+            // checked={this.state.checked}
+            containerStyle={{ backgroundColor: "rgba(0, 0, 0, 0)", borderColor: "rgba(0, 0, 0, 0)" }}
+
+          />
+          <CheckBox
+            center
+            title='Female'
+            checkedIcon='dot-circle-o'
+            uncheckedIcon='circle-o'
+            // checked={this.state.checked}
+            containerStyle={{ backgroundColor: "rgba(0, 0, 0, 0)", borderColor: "rgba(0, 0, 0, 0)" }}
+          />
+        </View>
+        <View style={{ width: "80%" }}>
+
+        </View>
+        <TouchableOpacity
+          style={registerStyle.SpotifyButton}
+          activeOpacity={0.5}
+          onPress={() => {
+            promptAsync();
+          }}
+        >
+          <Image
+            source={require("../assets/spotify-logo-white.png")}
+            style={registerStyle.buttonImageIconStyle}
+          />
+          <Text style={registerStyle.buttonTextStyle}> Login Using Spotify </Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
   );
 }
 const registerStyle = StyleSheet.create({
   registerContainer: {
     width: "100%",
-    height: 100,
+    // height: 100,
     color: "#fff",
+
     alignItems: "center",
-    display:"flex",
-    flex:1,
+    alignContent: "center",
+    display: "flex",
+    flex: 1,
     justifyContent: "center",
     flexDirection: "column",
-    maxHeight: 700,
+    // maxHeight: 700,
   },
   SpotifyButton: {
     flexDirection: "row",
