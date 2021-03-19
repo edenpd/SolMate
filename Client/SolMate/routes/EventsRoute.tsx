@@ -1,18 +1,18 @@
-import { Text, StyleSheet, Linking } from 'react-native';
+import { Text, StyleSheet } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
-import React, { } from 'react';
-import { createStackNavigator } from '@react-navigation/stack';
+import React from 'react';
 import { Container } from '../styles/ChatStyles';
 import { Card, Paragraph } from 'react-native-paper';
+import A from 'react-native-a'
+import Moment from 'moment';
 
-const EventsRoute = ({ Linking }) => {
-
+const EventsRoute = () => {
     const appbarStyle = StyleSheet.create({
         card: {
             alignItems: 'center',
             alignContent: 'center',
             width: 340,
-            margin: 20
+            margin: 15
         },
         cardTitle: {
             alignItems: 'center',
@@ -21,6 +21,7 @@ const EventsRoute = ({ Linking }) => {
             textAlign: 'center',
             alignSelf: 'center',
             fontSize: 25,
+            margin: 10
         },
         artistName: {
             alignItems: 'center',
@@ -34,14 +35,16 @@ const EventsRoute = ({ Linking }) => {
             alignItems: 'center',
             alignContent: 'center',
             width: 340,
-            margin: 10,
-            justifyContent: 'space-between',
-
+            marginTop: 20
         },
+
+        text: {
+            marginTop: 10
+        }
     });
 
     interface Event {
-        id: Number
+        id: String
         eventName: String;
         startDateTime: String;
         artistName: String
@@ -51,36 +54,36 @@ const EventsRoute = ({ Linking }) => {
     }
     const events: Event[] = [
         {
-            id: 11129128,
+            id: '11129128',
             eventName: "Wild Flag at The Fillmore",
-            startDateTime: '2012-04-18T20:00:00-0800',
+            startDateTime: '2012-04-18T20:00:00',
             artistName: 'Wild Flag',
             cityName: 'San Francisco, CA, US',
             venueName: 'The Fillmore',
             eventUrl: 'http://www.songkick.com/concerts/11129128-wild-flag-at-fillmore?utm_source=PARTNER_ID&utm_medium=partner'
         },
         {
-            id: 11129121,
+            id: '11129121',
             eventName: "Wild Flag at The Fillmore",
-            startDateTime: '2012-04-18T20:00:00-0800',
+            startDateTime: '2012-04-18T20:00:00',
             artistName: 'Wild Flag',
             cityName: 'San Francisco, CA, US',
             venueName: 'The Fillmore',
             eventUrl: 'http://www.songkick.com/concerts/11129128-wild-flag-at-fillmore?utm_source=PARTNER_ID&utm_medium=partner'
         },
         {
-            id: 11129122,
+            id: '11129122',
             eventName: "Wild Flag at The Fillmore",
-            startDateTime: '2012-04-18T20:00:00-0800',
+            startDateTime: '2012-04-18T20:00:00',
             artistName: 'Wild Flag',
             cityName: 'San Francisco, CA, US',
             venueName: 'The Fillmore',
             eventUrl: 'http://www.songkick.com/concerts/11129128-wild-flag-at-fillmore?utm_source=PARTNER_ID&utm_medium=partner'
         },
         {
-            id: 11129123,
+            id: '11129123',
             eventName: "Wild Flag at The Fillmore",
-            startDateTime: '2012-04-18T20:00:00-0800',
+            startDateTime: '2012-04-18T20:00:00',
             artistName: 'Wild Flag',
             cityName: 'San Francisco, CA, US',
             venueName: 'The Fillmore',
@@ -95,18 +98,20 @@ const EventsRoute = ({ Linking }) => {
 
                 data={events}
                 keyExtractor={(item) => (item.id)}
-                renderItem={({ item, index }) => {
+                renderItem={({ item }) => {
                     return (
-                        <Card style={appbarStyle.card} elevation={5}>
-                            <Card.Title style={appbarStyle.cardTitle} title={<Text style={appbarStyle.cardTitle}>{item.eventName}</Text>} />
-                            <Paragraph style={appbarStyle.artistName}>{item.artistName}</Paragraph>
+                        <A href={item.eventUrl} style={appbarStyle.card}>
+                            <Card elevation={5}>
+                                <Card.Title style={appbarStyle.cardTitle} title={<Text style={appbarStyle.cardTitle}>{item.eventName}</Text>} />
+                                <Paragraph style={appbarStyle.artistName}>{item.artistName}</Paragraph>
 
-                            <Card.Content style={appbarStyle.cardContent}>
-                                <Text>{item.cityName}</Text>
-                                <Text>{item.venueName}</Text>
-                                <Text>{item.startDateTime}</Text>
-                            </Card.Content>
-                        </Card>
+                                <Card.Content style={appbarStyle.cardContent}>
+                                    <Text style={appbarStyle.text}>{item.cityName}</Text>
+                                    <Text style={appbarStyle.text}>{item.venueName}</Text>
+                                    <Text style={appbarStyle.text}>{Moment(item.startDateTime).format('DD/MM/YYYY hh:mm A')}</Text>
+                                </Card.Content>
+                            </Card>
+                        </A>
                     )
                 }} />
         </Container>
