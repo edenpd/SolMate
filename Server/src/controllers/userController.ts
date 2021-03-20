@@ -186,6 +186,7 @@ export const getUsersForMatches = async (userId: String) => {
           {
             _id: { $ne: cuurentUser[0]._id },
             sex: cuurentUser[0].interestedSex,
+            interestedSex: cuurentUser[0].sex,
             meeting_purpose: cuurentUser[0].meeting_purpose,
           },
           (err: CallbackError, users: IUserModel[]) => {

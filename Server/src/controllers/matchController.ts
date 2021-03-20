@@ -150,7 +150,7 @@ export const MatcheAlgorithm = async (req: Request, res: Response) => {
       var artistsGrade = 0;
       var albumGrade = 0;
       var genereGrade = 0;
-      var finalGrade;
+      var finalGrade = 0;
 
       // similar songs amount
       var similarSongs = 0;
