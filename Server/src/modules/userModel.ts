@@ -20,6 +20,7 @@ export interface IUser {
   Chats: Array<number>;
   Songs: Array<string>;
   Media: Array<string>;
+  meeting_purpose: number;
 }
 export interface IUserModel extends IUser, Document {}
 const schema = new Schema({
@@ -96,6 +97,9 @@ const schema = new Schema({
       type: String,
     },
   ],
+  meeting_purpose: {
+    type: Number,
+  },
 });
 
 // schema.pre<IUser>("save", function save(next) {
