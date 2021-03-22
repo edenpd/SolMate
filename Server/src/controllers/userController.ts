@@ -8,7 +8,6 @@ import { CallbackError, MapReduceOptions } from "mongoose";
 import { deleteChatsOfUser } from "../controllers/chatController";
 import { deleteMatchesOfUser } from "../controllers/matchController";
 
-
 export const registerUser = async (req: Request, res: Response) => {
   const hashedPassword = bcrypt.hashSync(
     req.body.password,
@@ -175,15 +174,33 @@ export const getUserByEmail = async (req: Request, res: Response) => {
   }).populate("Songs");
 };
 
-export const getUsersForMatches = async () => {
-  const users = await User.find({}, (err: CallbackError, users: IUser[]) => {
-    if (err) {
-      console.log(err);
-    } else {
-      return users;
+export const getUsersForMatches = async (userId: String) => {
+  let usersToRet: IUserModel[] = [];
+  const cuurentUser = await User.find(
+    { _id: userId },
+    async (err: CallbackError, users: IUser[]) => {
+      if (err) {
+        console.log(err);
+      } else {
+        const users = await User.find(
+          {
+            _id: { $ne: cuurentUser[0]._id },
+            sex: cuurentUser[0].interestedSex,
+            interestedSex: cuurentUser[0].sex,
+            meeting_purpose: cuurentUser[0].meeting_purpose,
+          },
+          (err: CallbackError, users: IUserModel[]) => {
+            if (err) {
+              console.log(err);
+            } else {
+              return users;
+            }
+          }
+        );
+      }
     }
-  });
-  return users;
+  );
+  return usersToRet;
 };
 
 export const deleteUser = async (req: Request, res: Response) => {

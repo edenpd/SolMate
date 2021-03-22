@@ -5,7 +5,10 @@ import Chat, { IChatModel } from "../modules/chatModel";
 import { IUser } from "../modules/userModel";
 import { Types, ObjectId } from "mongoose";
 import { IChat } from "../modules/chatModel";
-import { getUsersForMatches } from "../controllers/userController";
+import {
+  getUserByEmail,
+  getUsersForMatches,
+} from "../controllers/userController";
 import { addChatAfterMatch } from "../controllers/chatController";
 
 export const addMatch = async (req: Request, res: Response) => {
@@ -123,105 +126,157 @@ export const getMatchesById = async (req: Request, res: Response) => {
   }
 };
 
-export const calcMatchesForUser = async (req: Request, res: Response) => {
+export const MatcheAlgorithm = async (req: Request, res: Response) => {
+  // TODO- location radius
   let userId = req.query.userId?.toString();
   console.log("Calculating matches for : " + userId);
-  let users = await getUsersForMatches();
+
+  // basic filter
+  let users = await getUsersForMatches(userId as String);
   let currentUser = users.find((user) => user._id == userId);
+  let currentUserSavedSongs: String[] = [];
+  let currentUserFollowArtists: String[] = [];
+  let currentUserAlbums: String[] = [];
+  let currentUserGenre: String[] = [];
 
-  if (currentUser !== undefined) {
-    users = users.filter((user) => user._id != currentUser?._id);
-    var newMatches = 0;
+  if (users && currentUser != undefined) {
+    users.filter((user) => {
+      var age = Date.now() - user.birthday.getTime();
+      let userSavedSongs: String[] = [];
+      let userFollowArtists: String[] = [];
+      let userAlbums: String[] = [];
+      let userGenre: String[] = [];
+      var songGrade = 0;
+      var artistsGrade = 0;
+      var albumGrade = 0;
+      var genereGrade = 0;
+      var finalGrade = 0;
 
-    const existsMatches = await Match.find(
-      {
-        $or: [
-          { firstUser: currentUser?._id },
-          { secondUser: currentUser?._id },
-        ],
-      },
-      (err: CallbackError, matches: IMatch[]) => {
-        if (err) {
-          console.log(err);
-          res.status(500).send(err);
-        } else {
-          return matches;
-        }
+      // similar songs amount
+      var similarSongs = 0;
+      if (currentUser?.Songs) {
+        similarSongs = currentUser?.Songs.filter(
+          (item) =>
+            user.Songs.findIndex((song) => {
+              return song === item;
+            }) !== -1
+        ).length;
       }
-    );
 
-    let potentialUsers = [];
-
-    //  Passes on exsiting matches
-    for (let match of existsMatches) {
-      try {
-        const chatDeleted = await Match.findOneAndDelete({ _id: match._id });
-        console.log("Match deleted: " + chatDeleted?._id);
-      } catch (e) {
-        console.log(e);
-        res.status(500).send(e);
+      // similar saved songs amount
+      var similarSavedSongs = 0;
+      if (currentUserSavedSongs) {
+        similarSavedSongs = currentUserSavedSongs.filter(
+          (item) =>
+            userSavedSongs.findIndex((song) => {
+              return song === item;
+            }) !== -1
+        ).length;
       }
-    }
 
-    // Passes on user
-    for (let user of users) {
-      var ageDifMs = Date.now() - user.birthday.getTime();
-      var ageDate = new Date(ageDifMs); // miliseconds from epoch
-      var age = Math.abs(ageDate.getUTCFullYear() - 1970);
-
-      var ageDifMs = Date.now() - currentUser.birthday.getTime();
-      var ageDate = new Date(ageDifMs); // miliseconds from epoch
-      var currentUserAge = Math.abs(ageDate.getUTCFullYear() - 1970);
-
-      //  If there isn't match with current user
+      // calc songs match grade
       if (
-        age >= currentUser.interestedAgeMin &&
-        age <= currentUser.interestedAgeMax &&
-        user.sex == currentUser.interestedSex &&
-        currentUserAge >= user.interestedAgeMin &&
-        currentUserAge <= user.interestedAgeMax &&
-        currentUser.sex == user.interestedSex
+        // @ts-ignore
+        currentUser?.Songs.length + user.Songs.length !== 0 &&
+        currentUserSavedSongs.length + userSavedSongs.length !== 0
       ) {
-        potentialUsers.push(user);
+        songGrade =
+          // @ts-ignore
+          similarSongs / (currentUser?.Songs.length + user.Songs.length) +
+          similarSavedSongs /
+            (currentUserSavedSongs.length + userSavedSongs.length);
       }
-    }
-    for (let matchedUser of potentialUsers) {
-      try {
-        const toAdd: IMatch = {
-          firstUser: currentUser._id,
-          secondUser: matchedUser._id,
-          Approve1: "waiting",
-          Approve2: "waiting",
-        };
 
-        for (let match of existsMatches) {
-          if (
-            match.firstUser == toAdd.firstUser &&
-            match.secondUser == toAdd.secondUser
-          ) {
-            toAdd.Approve1 = match.Approve1;
-            toAdd.Approve2 = match.Approve2;
-            break;
-          } else if (
-            match.secondUser == toAdd.firstUser &&
-            match.firstUser == toAdd.secondUser
-          ) {
-            toAdd.Approve2 = match.Approve1;
-            toAdd.Approve1 = match.Approve2;
-            break;
-          }
-        }
-
-        const matchAdded = await Match.create(toAdd);
-        console.log("Match added: " + matchAdded);
-        newMatches += 1;
-      } catch (e) {
-        console.log(e);
-        res.status(500).send(e);
+      // similar artists amount
+      var similarArtists = 0;
+      if (currentUser?.Artists) {
+        similarArtists = currentUser?.Artists.filter(
+          (item) =>
+            user.Artists.findIndex((artist) => {
+              return artist === item;
+            }) !== -1
+        ).length;
       }
-    }
-    res.status(200).send(newMatches + " Matches were added for user " + userId);
-  } else res.status(500).send("User " + userId + " not found");
+
+      // similar artists follow amount
+      var similarFollowArtists = 0;
+      if (currentUserFollowArtists) {
+        similarFollowArtists = currentUserFollowArtists.filter(
+          (item) =>
+            userFollowArtists.findIndex((artist) => {
+              return artist === item;
+            }) !== -1
+        ).length;
+      }
+
+      // calc artists match grade
+      if (
+        // @ts-ignore
+        currentUser?.Artists.length + user.Artists.length !== 0 &&
+        currentUserFollowArtists.length + userFollowArtists.length !== 0
+      ) {
+        artistsGrade =
+          // @ts-ignore
+          similarArtists / (currentUser?.Artists.length + user.Artists.length) +
+          similarFollowArtists /
+            (currentUserFollowArtists.length + userFollowArtists.length);
+      }
+
+      // similar album amount
+      var similarAlbums = 0;
+      if (currentUserAlbums) {
+        similarAlbums = currentUserAlbums.filter(
+          (item) =>
+            userAlbums.findIndex((album) => {
+              return album === item;
+            }) !== -1
+        ).length;
+      }
+
+      // calc album match grade
+      if (
+        // @ts-ignore
+        currentUserAlbums.length + userAlbums.length !==
+        0
+      ) {
+        albumGrade =
+          // @ts-ignore
+          similarAlbums / (currentUserAlbums.length + userAlbums.length);
+      }
+
+      // similar genre amount
+      var similarGenre = 0;
+      if (currentUserGenre) {
+        similarGenre = currentUserGenre.filter(
+          (item) =>
+            userGenre.findIndex((genre) => {
+              return genre === item;
+            }) !== -1
+        ).length;
+      }
+
+      // calc genre match grade
+      if (
+        // @ts-ignore
+        currentUserGenre.length + userGenre.length !==
+        0
+      ) {
+        genereGrade =
+          // @ts-ignore
+          similarGenre / (currentUserGenre.length + userGenre.length);
+      }
+
+      finalGrade =
+        (2 * songGrade + 2 * artistsGrade + albumGrade + genereGrade) / 6;
+
+      return (
+        // @ts-ignore
+        currentUser?.interestedAgeMin >= age &&
+        // @ts-ignore
+        currentUser?.interestedAgeMax <= age
+      );
+    });
+  }
 };
 
 export const deleteMatchesOfUser = async (req: Request, res: Response) => {
