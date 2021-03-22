@@ -69,7 +69,7 @@ const ChatList = ({navigation}) => {
         <Container>
             <FlatList
                 data={chats}
-                keyExtractor={(item) => (item.userName)}
+                keyExtractor={(item, index) => (index + "")}
                 renderItem={({item, index}) => {
                     const otherUser: IUser = (item as IChat).UserId1['_id'] === "604639ae4ad4fa1dcc6822e5" ? (item as IChat).UserId2 : (item as IChat).UserId1;;
                     const lastMessage: IMessage | undefined = (item as IChat).Messages[0];

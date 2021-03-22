@@ -9,20 +9,20 @@ import { getUsersForMatches } from "../controllers/userController";
 import { addChatAfterMatch } from "../controllers/chatController";
 
 export const addMatch = async (req: Request, res: Response) => {
-  // try {
-  //   const userBody: IMatch = req.body;
-  //   const toAdd: IMatch = {
-  //     firstUser: userBody.firstUser,
-  //     secondUser: userBody.secondUser,
-  //     Approve1: userBody.Approve1,
-  //     Approve2: userBody.Approve2,
-  //   };
-  //   const matchAdded = await Match.create(toAdd);
-  //   res.status(200).json({ message: "Match added", ...matchAdded });
-  // } catch (e) {
-  //   console.log(e);
-  //   res.status(500).send(e);
-  // }
+  try {
+    const userBody: IMatch = req.body;
+    const toAdd: IMatch = {
+      firstUser: userBody.firstUser,
+      secondUser: userBody.secondUser,
+      Approve1: userBody.Approve1,
+      Approve2: userBody.Approve2,
+    };
+    const matchAdded = await Match.create(toAdd);
+    res.status(200).json({ message: "Match added", ...matchAdded });
+  } catch (e) {
+    console.log(e);
+    res.status(500).send(e);
+  }
 };
 
 export const updateMatch = async (req: Request, res: Response) => {
@@ -71,7 +71,7 @@ export const getMatchesById = async (req: Request, res: Response) => {
 
   // Find matches in
   if (userID !== undefined) {
-    await Match.findOne({
+    await Match.find({
       $or: [
         {
           $and: [

@@ -20,7 +20,7 @@ const ChatRoute = () => {
                 <Stack.Screen name="Chat"
                     component={Chat}
                     options={({route}) => ({
-                        title: route.params.userName
+                        title: (route.params as { userName: string}).userName
                 })} />
             </Stack.Navigator>
         </NavigationContainer>
