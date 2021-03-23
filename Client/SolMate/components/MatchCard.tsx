@@ -92,27 +92,6 @@ const MatchCard = ({ user }: MatchCardProps) => {
                 resizeMode='cover'
                 source={{ uri: user.picture }} >
                 <Card.Title style={appbarStyle.cardTitle} title={<Text></Text>} />
-                {/* <Card.Cover style={appbarStyle.userImage} source={{ uri: user.picture }} /> */}
-                {/* <Card.Content style={appbarStyle.card}>
-                    <Paragraph>{user.description}</Paragraph>
-                    <Paragraph>
-                        <Text>Age: {calcAge(user.birthday)}</Text></Paragraph>
-                    <Paragraph>
-                        <Text>Distance: 3km</Text>
-                    </Paragraph>
-                    <View>
-                        <Title style={appbarStyle.cardTitle}>Mutual Artists:</Title>
-                        <View style={appbarStyle.artistList}>
-                            <Avatar.Image style={appbarStyle.artist} source={{ uri: 'https://picsum.photos/700' }} />
-                            <Avatar.Image style={appbarStyle.artist} source={{ uri: 'https://picsum.photos/700' }} />
-                            <Avatar.Image style={appbarStyle.artist} source={{ uri: 'https://picsum.photos/700' }} />
-                        </View>
-                    </View>
-                </Card.Content> */}
-                {/* <Card.Actions>
-                        <Button color="purple">Cancel</Button>
-                        <Button color="purple">Ok</Button>
-                    </Card.Actions> */}
                 <TouchableHighlight underlayColor={'transparent'} onPress={() => setShowNames(!showNames)}>
                     <View style={appbarStyle.artistList}>
                         <View style={appbarStyle.artist}>
@@ -148,13 +127,13 @@ const MatchCard = ({ user }: MatchCardProps) => {
                         <IconButton
                             icon="alpha-x-circle-outline"
                             color={Colors.white}
-                            size={70}
+                            size={65}
                             onPress={() => console.log('Pressed')}
                         />
                         <IconButton
                             icon="check-circle-outline"
                             color={Colors.white}
-                            size={70}
+                            size={65}
                             onPress={() => console.log('Pressed')}
                         />
                     </View>

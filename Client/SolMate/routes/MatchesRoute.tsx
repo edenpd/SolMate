@@ -32,13 +32,14 @@ const MatchesRoute = () => {
 
     const appbarStyle = StyleSheet.create({
         matchesContainer: {
-            paddingTop: 50,
-            marginBottom: 50,
+            paddingTop: 20,
+            paddingBottom: 20,
             alignContent: 'center',
             alignSelf: 'center',
             alignItems: 'center',
             flexDirection: 'column',
-            maxHeight: 700
+            maxHeight: 700,
+            backgroundColor: "#f6f6f6"
         }
     });
 

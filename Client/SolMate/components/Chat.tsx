@@ -19,8 +19,8 @@ const Chat = (props) => {
     const [chat, setChat] = useState({ Messages: [] } as IChat);
 
     const socket = io('http://10.0.0.6:8999?_id=' + USER_ID, {
-        transports: [ 'websocket' ],
-	    upgrade: false,
+        transports: ['websocket'],
+        upgrade: false,
         rejectUnauthorized: false
     });
 
@@ -120,11 +120,14 @@ const Chat = (props) => {
 
     return (
         <GiftedChat
+            // showUserAvatar={true}
+            // renderAvatarOnTop={true}
             messages={messages}
             onSend={onSend}
             user={user}
             renderBubble={renderBubble}
             renderSend={renderSend}
+            listViewProps={{style: { backgroundColor: '#f6f6f6' }}}
             renderComposer={renderComposer} />
     );
 }
