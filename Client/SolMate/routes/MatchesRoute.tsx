@@ -6,7 +6,6 @@ import Carousel from 'react-native-snap-carousel';
 import { Colors, IconButton } from 'react-native-paper';
 import axios from 'axios';
 import { IMatch } from '../util/Types';
-import Svg, { Path } from 'react-native-svg';
 
 const MatchesRoute = () => {
 
@@ -52,7 +51,7 @@ const MatchesRoute = () => {
     }
 
     return (
-        <View style={{height: '100%', width: '100%'}}>
+        <View style={{height: '100%', width: '100%', backgroundColor: 'transparent'}}>
             <View style={appbarStyle.matchesContainer}>
                 <Carousel
                     style={{ marginBottom: 0, paddingBottom: 0 }}
@@ -63,7 +62,7 @@ const MatchesRoute = () => {
                     sliderWidth={400}
                     layoutCardOffset={9}
                 />
-                <View style={{ flexDirection: "row", justifyContent: 'space-around', width: 250 }}>
+                {/* <View style={{ flexDirection: "row", justifyContent: 'space-around', width: 250 }}>
                     <IconButton
                         icon="alpha-x-circle-outline"
                         color={Colors.red500}
@@ -76,15 +75,9 @@ const MatchesRoute = () => {
                         size={70}
                         onPress={() => console.log('Pressed')}
                     />
-                </View>
+                </View> */}
 
             </View>
-            <Svg height="100%"
-                width="100%"
-                viewBox="0 0 1440 320"
-                style={{ position: 'relative', width: '100%', height: '100%', zIndex: -3, bottom: 0 }}>
-                <Path fill="#5000ca" fill-opacity="1" d="M0,192L48,197.3C96,203,192,213,288,229.3C384,245,480,267,576,250.7C672,235,768,181,864,181.3C960,181,1056,235,1152,234.7C1248,235,1344,181,1392,154.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></Path>
-            </Svg>
         </View>
     );
 }

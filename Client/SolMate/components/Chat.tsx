@@ -88,7 +88,7 @@ const Chat = (props) => {
                 }}
                 wrapperStyle={{
                     left: {
-                        backgroundColor: 'purple'
+                        backgroundColor: '#8860D0'
                     },
                     right: {
                         backgroundColor: 'lightgrey',
@@ -103,7 +103,7 @@ const Chat = (props) => {
             <Send
                 {...props}
                 textStyle={{
-                    color: 'purple'
+                    color: '#8860D0'
                 }} />
         );
     };
