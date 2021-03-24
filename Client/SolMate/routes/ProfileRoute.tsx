@@ -1,10 +1,12 @@
 import React from 'react';
 import { View, Text } from 'react-native';
+import Profile from '../components/Profile';
+
 
 const ProfileRoute = () => {
     return (
         <View>
-            <Text>Profile Route</Text>
+            <Profile/>
         </View>
     );
 }
