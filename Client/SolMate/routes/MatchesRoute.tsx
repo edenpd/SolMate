@@ -10,9 +10,6 @@ import { userContext } from "../contexts/userContext";
 import { SERVER_ADDRESS, SERVER_PORT } from '@env';
 
 const MatchesRoute = () => {
-    // TODO: Switch to actual user id.
-    // const USER_ID = "604639ae4ad4fa1dcc6822e5";
-
     const [matches, setMatches] = useState<IMatch[]>([]);
     const {state} = useContext(userContext);
 

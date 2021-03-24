@@ -18,9 +18,6 @@ interface MatchCardProps {
 
 const MatchCard = ({ match, user, onAfterRespond }: MatchCardProps) => {
 
-    // TODO: Switch to actual user id.
-    // const USER_ID = '604639ae4ad4fa1dcc6822e5';
-
     const [showNames, setShowNames] = useState<Boolean>(false);
     const [isDialogVisible, setIsDialogVisible] = useState<Boolean>(false);
     const {state} = useContext(userContext);
@@ -111,13 +108,13 @@ const MatchCard = ({ match, user, onAfterRespond }: MatchCardProps) => {
                 console.log("The res is:");
                 console.log(res.data);
                 const match = res.data.match;
-                // setMatches(res.data);
+                
                 if (match.Approve1 === 'accepted' && match.Approve2 === 'accepted') {
-                    // TODO: Show dialog.
+
+                    // Show dialog.
                     setIsDialogVisible(true);
                 }
 
-                // TODO: Remove the card.
                 onAfterRespond();
             })
             .catch((err) => {

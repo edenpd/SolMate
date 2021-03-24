@@ -10,13 +10,12 @@ import { SERVER_ADDRESS, SERVER_PORT } from "@env";
 
 const ChatList = ({navigation}) => {
 
-    // TODO: Switch to actual user id.
-    const USER_ID = '604639ae4ad4fa1dcc6822e5';
+    const {state} = useContext(userContext);
     const [chats, setChats] = useState<IChat[]>([])
 
     // This works when connected via the QR code in LAN mode.
     // Find your local IP address.
-    const socket = io(`${SERVER_ADDRESS}:${SERVER_PORT}?_id=${USER_ID}`, {
+    const socket = io(`${SERVER_ADDRESS}:${SERVER_PORT}?_id=${state.user._id}`, {
         transports: [ 'websocket' ],
 	    upgrade: false,
         rejectUnauthorized: false
@@ -89,3 +88,12 @@ const ChatList = ({navigation}) => {
 };
 
 export default ChatList;
+
+function useContext(userContext: any): { state: any; } {
+    throw new Error('Function not implemented.');
+}
+
+
+function userContext(userContext: any): { state: any; } {
+    throw new Error('Function not implemented.');
+}

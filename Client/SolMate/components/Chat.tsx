@@ -1,25 +1,24 @@
 import axios from 'axios';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useContext } from 'react';
 import { View, Text } from 'react-native';
 import { Bubble, Composer, GiftedChat, InputToolbar, Send } from 'react-native-gifted-chat';
 import { io } from 'socket.io-client';
 import { IMessage, IChat } from '../util/Types';
 import { SERVER_ADDRESS, SERVER_PORT  } from '@env';
+import { userContext } from '../contexts/userContext';
 
 const Chat = (props) => {
 
-    // TODO: Switch to actual user id.
-    const USER_ID = '604639ae4ad4fa1dcc6822e5';
-
     // State Declaration
+    const {state} = useContext(userContext);
     const [messages, setMessages] = useState<Array<any>>([]);
     const [chatId, setChatId] = useState(props.route.params.chatId);
     const [user, setUser] = useState({
-        _id: USER_ID,
+        _id: state.user._id,
     });
     const [chat, setChat] = useState({ Messages: [] } as IChat);
 
-    const socket = io(`${SERVER_ADDRESS}:${SERVER_PORT}?_id=${USER_ID}`, {
+    const socket = io(`${SERVER_ADDRESS}:${SERVER_PORT}?_id=${state.user._id}`, {
         transports: ['websocket'],
         upgrade: false,
         rejectUnauthorized: false
