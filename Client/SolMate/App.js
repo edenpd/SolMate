@@ -1,23 +1,30 @@
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View, Dimensions } from 'react-native';
-import { BottomNavigation, Appbar } from 'react-native-paper';
-import ChatRoute from './routes/ChatRoute';
-import EventsRoute from './routes/EventsRoute';
-import ProfileRoute from './routes/ProfileRoute';
-import MatchesRoute from './routes/MatchesRoute';
+import { StatusBar } from "expo-status-bar";
+import React from "react";
+import { StyleSheet, Text, View, Dimensions } from "react-native";
+import { BottomNavigation, Appbar } from "react-native-paper";
+import ChatRoute from "./routes/ChatRoute";
+import EventsRoute from "./routes/EventsRoute";
+import ProfileRoute from "./routes/ProfileRoute";
+import MatchesRoute from "./routes/MatchesRoute";
+import SettingRoute from "./routes/SettingsRoute";
 import Header from "./components/Header";
-import AppLoading from 'expo-app-loading';
+import AppLoading from "expo-app-loading";
 
-// import useFonts hook  
-import { useFonts, Poppins_100Thin, Poppins_700Bold, Poppins_500Medium_Italic, Poppins_300Light } from '@expo-google-fonts/poppins';
-import WavyHeader from './components/WavyHeader';
+// import useFonts hook
+import {
+  useFonts,
+  Poppins_100Thin,
+  Poppins_700Bold,
+  Poppins_500Medium_Italic,
+  Poppins_300Light,
+} from "@expo-google-fonts/poppins";
+import WavyHeader from "./components/WavyHeader";
 
 const customFonts = {
   Poppins_100Thin,
   Poppins_700Bold,
   Poppins_500Medium_Italic,
-  Poppins_300Light
+  Poppins_300Light,
 };
 
 export default function App() {
@@ -30,7 +37,7 @@ export default function App() {
     { key: "setting", title: "Setting", icon: "cog" },
   ]);
 
-  // the same as Font.loadAsync , the hook returns  true | error 
+  // the same as Font.loadAsync , the hook returns  true | error
   const [isLoaded] = useFonts(customFonts);
 
   const renderScene = BottomNavigation.SceneMap({
@@ -52,36 +59,38 @@ export default function App() {
   const styles = StyleSheet.create({
     // rest of the styles
     svgCurve: {
-      position: 'relative',
+      position: "relative",
       top: 0,
-      width: Dimensions.get('window').width,
+      width: Dimensions.get("window").width,
       height: 140,
-      backgroundColor: "#f6f6f6"
+      backgroundColor: "#f6f6f6",
     },
     headerText: {
       fontSize: 30,
       // fontWeight: 'bold',
       // change the color property for better output
-      color: '#fff',
-      textAlign: 'center',
+      color: "#fff",
+      textAlign: "center",
       marginTop: 40,
-      zIndex:1000,
-      fontFamily: 'Poppins_500Medium_Italic'
+      zIndex: 1000,
+      fontFamily: "Poppins_500Medium_Italic",
     },
     headerContainer: {
-      position: 'absolute',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      width: "100%"
-    }
+      position: "absolute",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      width: "100%",
+    },
   });
 
   return (
-    <View style={{
-      width: '100%',
-      height: '100%'
-    }}>
+    <View
+      style={{
+        width: "100%",
+        height: "100%",
+      }}
+    >
       {/* <StatusBar hidden={true} /> */}
       {/* <Header /> */}
       <WavyHeader
@@ -96,7 +105,7 @@ export default function App() {
       </View>
       <BottomNavigation
         backgroundColor
-        activeColor={'#8860D0'}
+        activeColor={"#8860D0"}
         barStyle={navigationStyle}
         navigationState={{ index, routes }}
         onIndexChange={setIndex}
