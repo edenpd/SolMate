@@ -15,7 +15,7 @@ const getIntialState = async (storageKey) => {
       if (!value) {
         return undefined;
       }
-      return value;
+      return JSON.parse(value);
     } catch (e) {
       return undefined;
     }
@@ -23,7 +23,7 @@ const getIntialState = async (storageKey) => {
 };
 
 const providerValue = {
-  token: "",
+  token: {token:"",spotifyToken:""},
   dispatchToken: (action) => {}, // << This will be overwritten
 };
 

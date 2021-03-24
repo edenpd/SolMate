@@ -22,12 +22,12 @@ const RootStack = createStackNavigator(
 const AppContainer = createAppContainer(RootStack);
 
 export default function authNavigator({ navigation }) {
-  const token = useContext(tokenContext);
+  const state = useContext(tokenContext);
   useEffect(() => {
-    if (token.token) {
+    if (state.token.token) {
       navigation.navigate("BottomNavigator");
     }
-  }, [token]);
+  }, [state]);
 
   return (
     <View

@@ -75,7 +75,7 @@ export default function Register({ navigation }) {
   const [noSpotify, setNoSpotify] = useState(false);
   const [errors, setErrors] = useState({});
   const { dispatch } = useContext(userContext);
-  const { dispatchToken } = useContext(tokenContext);
+  const { token,dispatchToken } = useContext(tokenContext);
 
   const [formData, setFormData] = useState<IUserForm>({
     email: "",
@@ -94,14 +94,6 @@ export default function Register({ navigation }) {
     Songs: [""],
   });
 
-  const {
-    spotifyToken,
-    setSpotifyToken,
-    isSpotifyTokenSet,
-    setToken,
-    token,
-    clearSpotifyToken,
-  } = useToken();
   WebBrowser.maybeCompleteAuthSession();
   // Endpoint
   const discovery = {
@@ -135,8 +127,8 @@ export default function Register({ navigation }) {
       if (response) {
         if (response?.type === "success") {
           const { access_token } = response.params;
-          setSpotifyToken(access_token);
           if (access_token) {
+            dispatchToken({ type: "SET_SPOTIFY_TOKEN", payload: access_token });
             axios
               .post(
                 "http://10.100.102.3:3001/spotify/auth",
