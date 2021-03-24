@@ -1,32 +1,46 @@
-import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  TouchableOpacity,
-  Linking,
-  Alert,
-} from "react-native";
+import React, { useContext, useEffect, useState } from "react";
+import { View, Text, Image, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { Input, Button } from "react-native-elements";
 import axios from "axios";
-import * as WebBrowser from "expo-web-browser";
-import {
-  makeRedirectUri,
-  useAuthRequest,
-  ResponseType,
-} from "expo-auth-session";
 import useToken from "../hooks/useToken";
+import { userContext } from "../contexts/userContext";
+import { tokenContext } from "../contexts/tokenContext";
 
-export default function LoginRoute({navigation}) {
+export default function LoginRoute({ navigation }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const {
-    spotifyToken,
-    isSpotifyTokenSet,
-    setToken,
-    token,
-  } = useToken();
+  const { spotifyToken, isSpotifyTokenSet, setToken, token } = useToken();
+  const { dispatch } = useContext(userContext);
+  const { dispatchToken } = useContext(tokenContext);
+
+  useEffect(() => {
+    navigation.popToTop();
+  }, [token]);
+
+
+
+ 
+  async function loginUser(credentials) {
+    console.log(credentials);
+    return axios
+      .post("http://10.100.102.15:3001/user/login", credentials, {
+        headers: { "Content-Type": "application/json" },
+      })
+      .then(async (response) => {
+        dispatch({ type: "SET_USER", payload: response.data.user });
+        dispatchToken({ type: "SET_TOKEN", payload: response.data.token });
+      })
+      .catch((error) => Alert.alert(error.message));
+  }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const res = await loginUser({
+      email,
+      password,
+    });
+  };
 
   return (
     <View
@@ -45,7 +59,8 @@ export default function LoginRoute({navigation}) {
       </View>
       <View
         style={{
-          paddingVertical: 50,
+          paddingTop: 50,
+          paddingBottom: 20,
           display: "flex",
           alignItems: "center",
           width: "80%",
@@ -54,25 +69,40 @@ export default function LoginRoute({navigation}) {
         <Input
           placeholder="Enter your Email"
           errorStyle={{ color: "red" }}
+          onChangeText={setEmail}
+          value={email}
           leftIcon={<Icon name="user" size={24} color="black" />}
         />
         <Input
           placeholder="Enter your password"
           errorStyle={{ color: "red" }}
           secureTextEntry={true}
+          onChangeText={setPassword}
+          value={password}
           leftIcon={<Icon name="lock" size={24} color="black" />}
         />
       </View>
-      <View style={{ width: "70%", minWidth: 200 }}>
+      <View style={{ width: "60%", minWidth: 200 }}>
         <Button
           title="Login"
+          titleStyle={{ fontSize: 20 }}
           loading={isLoading}
+          onPress={handleSubmit}
           buttonStyle={{ backgroundColor: "purple", borderRadius: 50 }}
         />
-        <Text style={{color: 'blue'}}
-      onPress={()=>{navigation.navigate('Register')}}>
-  Register now !
-</Text>
+        <View style={{ flexDirection: "row", marginVertical: 20 }}>
+          <Text style={{ paddingHorizontal: 10, fontSize: 16 }}>
+            I don't have a user -
+          </Text>
+          <Text
+            style={{ color: "blue", fontSize: 16 }}
+            onPress={() => {
+              navigation.navigate("Register");
+            }}
+          >
+            Register now !
+          </Text>
+        </View>
       </View>
     </View>
   );

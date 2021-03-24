@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { Alert } from "react-native";
-import * as SecureStore from 'expo-secure-store';
+import * as SecureStore from "expo-secure-store";
 
 export default function useToken() {
   // const initialTokenState = async () => {
-  //   const tokenString = await SecureStore.getItemAsync("token").then(    
-  //       return true      
+  //   const tokenString = await SecureStore.getItemAsync("token").then(
+  //       return true
   //       );
   //   Alert.alert(JSON.stringify(tokenString));
   //   if (tokenString) {
@@ -20,13 +20,13 @@ export default function useToken() {
   const getToken = async () => {
     const tokenString = await SecureStore.getItemAsync("token").then();
     if (tokenString) {
-      const userToken = JSON.parse(tokenString);
-      return userToken;
+      return tokenString;
     }
   };
 
   const saveToken = async (userToken) => {
     await SecureStore.setItemAsync("token", JSON.stringify(userToken));
+    Alert.alert(userToken)
     setIsTokenSet(true);
   };
 
@@ -43,15 +43,17 @@ export default function useToken() {
   const getSpotifyToken = async () => {
     const tokenString = await SecureStore.getItemAsync("spotifyToken");
     if (tokenString) {
-      const spotifyToken = JSON.parse(tokenString);
-      return spotifyToken;
+      return tokenString;
     }
   };
 
-  const saveSpotifyToken = async (spotifyToken) => {
-    await SecureStore.setItemAsync("spotifyToken", JSON.stringify(spotifyToken));
+  const saveSpotifyToken = async (spotifyToken: string) => {
+    await SecureStore.setItemAsync(
+      "spotifyToken",
+      JSON.stringify(spotifyToken)
+    );
     setIsSpotifyTokenSet(true);
-  }
+  };
 
   return {
     setToken: saveToken,
@@ -61,6 +63,6 @@ export default function useToken() {
     isTokenSet,
     isSpotifyTokenSet,
     clearToken,
-    clearSpotifyToken
+    clearSpotifyToken,
   };
 }
