@@ -124,6 +124,7 @@ export const getMatchesById = async (req: Request, res: Response) => {
 };
 
 export const calcMatchesForUser = async (req: Request, res: Response) => {
+  
   let userId = req.query.userId?.toString();
   console.log("Calculating matches for : " + userId);
   let users = await getUsersForMatches();
