@@ -7,6 +7,7 @@ import * as http from "http";
 import * as WebSocket from "ws";
 import { Server, Socket } from 'socket.io';
 import { createServer } from 'http';
+import { IMatch } from "../modules/matchModel";
 
 let clients = new Map<string, Socket>();
 const app = express();
@@ -69,30 +70,30 @@ httpServer.listen(process.env.PORT || 8999);
 
 
 
-export const addChatAfterMatch = async (req: Request, res: Response, newChat: IChat) => {
-  // try {
-  //   const maxChat = await Chat.findOne().sort({ ChatId: -1 }) as IChat
-  //   let chatId = 1;
-  //   if (maxChat != null)
-  //     chatId = maxChat.ChatId + 1;
+export const addChatAfterMatch = async (req: Request, res: Response, newChat: IChat, match: IMatch) => {
+  try {
+    const maxChat = await Chat.findOne().sort({ ChatId: -1 }) as IChat
+    let chatId = 1;
+    if (maxChat != null)
+      chatId = maxChat.ChatId + 1;
 
-  //   newChat.ChatId = chatId;
-  //   const chatAdded = await Chat.create(newChat);
-  //   console.log("chat added :" + chatAdded)
+    newChat.ChatId = chatId;
+    const chatAdded = await Chat.create(newChat);
+    console.log("chat added :" + chatAdded)
 
-  //   if (clients.has(newChat.UserId1)) {
-  //     var currWs = clients.get(newChat.UserId1) as WebSocket;
-  //     currWs.send(newChat.ChatId)
-  //   }
-  //   if (clients.has(newChat.UserId2)) {
-  //     var currWs = clients.get(newChat.UserId2) as WebSocket;
-  //     currWs.send(newChat.ChatId)
-  //   }
-  //   res.status(200).json({ message: "Match created and chat added" })
-  // } catch (e) {
-  //   console.log(e);
-  //   res.status(500).send("ERROR: Unable to create chat");
-  // }
+    if (clients.has(newChat.UserId1)) {
+      let currWs = clients.get(newChat.UserId1);
+      currWs?.send(newChat.ChatId)
+    }
+    if (clients.has(newChat.UserId2)) {
+      let currWs = clients.get(newChat.UserId2);
+      currWs?.send(newChat.ChatId)
+    }
+    res.status(200).json({ message: "Match created and chat added", match: match })
+  } catch (e) {
+    console.log(e);
+    res.status(500).send("ERROR: Unable to create chat");
+  }
 };
 
 export const addChat = async (req: Request, res: Response) => {

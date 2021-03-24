@@ -43,11 +43,15 @@ const MatchesRoute = () => {
         }
     });
 
+    const onAfterRespond = () => {
+        getMatches();
+    };
+
     const renderCard = ({ item, index }) => {
         const otherUser = (item as IMatch).firstUser['_id'] === USER_ID ? item.secondUser : item.firstUser;
 
         return (
-            <MatchCard user={otherUser} />
+            <MatchCard user={otherUser} match={item} onAfterRespond={onAfterRespond} />
         );
     }
 

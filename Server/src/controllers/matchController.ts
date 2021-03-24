@@ -1,9 +1,6 @@
 import { Request, Response } from "express";
 import { CallbackError } from "mongoose";
 import Match, { IMatch, IMatchModel } from "../modules/matchModel";
-import Chat, { IChatModel } from "../modules/chatModel";
-import { IUser } from "../modules/userModel";
-import { Types, ObjectId } from "mongoose";
 import { IChat } from "../modules/chatModel";
 import { getUsersForMatches } from "../controllers/userController";
 import { addChatAfterMatch } from "../controllers/chatController";
@@ -26,43 +23,58 @@ export const addMatch = async (req: Request, res: Response) => {
 };
 
 export const updateMatch = async (req: Request, res: Response) => {
-  let isApprove1 = req.body.Approve1;
-  let isApprove2 = req.body.Approve2;
-  let matchId = req.body._id;
+  const matchId = req.body.matchId;
+  const userId = req.body.userId;
+  const approve = req.body.approve;
 
-  await Match.updateOne(
-    { _id: matchId },
-    { $set: { Approve1: isApprove1, Approve2: isApprove2 } }
-  ).then((value: { ok: number; n: number; nModified: number }) => {
-    // Check if the update was successful and return an erorr if it wasn't
-    if (value.nModified < 1) {
-      res.status(500).send("ERROR: Unable to update match.");
+  let modCount = 0;
+  let updatedValue: IMatchModel | null = null;
 
-      return;
+  await Match.findOneAndUpdate(
+    { _id: matchId, firstUser: userId },
+    { $set: { Approve1: approve } },
+    { new: true }
+  ).then((val) => {
+    if (val) {
+      modCount++;
+      updatedValue = val;
     }
   });
 
+  await Match.findOneAndUpdate(
+    { _id: matchId, secondUser: approve },
+    { $set: { Approve2: approve } },
+    { new: true }
+  ).then((val) => {
+
+    // Check if the update was successful and return an erorr if it wasn't
+    if (val) {
+      modCount++;
+      updatedValue = val;
+    }
+  });
+
+  if (modCount < 1) {
+    res.status(500).send("ERROR: Unable to update match.");
+
+    return;
+  };
+
   // if both users approved, create a chat.
-  if (isApprove1 === "accepted" && isApprove2 === "accepted") {
+  if (updatedValue!.Approve1 === "accepted" && updatedValue!.Approve2 === "accepted") {
+
     // Prepare the chat parameters.
     const chat: IChat = {
       ChatId: 1,
       Messages: [],
-      UserId1: req.body.firstUser._id,
-      UserId2: req.body.secondUser._id,
+      UserId1: updatedValue!.firstUser + "",
+      UserId2: updatedValue!.secondUser + "",
     };
 
-    await addChatAfterMatch(req, res, chat);
-
-    // // Send a creation request to the database.
-    // await Chat.create(chat)
-    //   .then((val: IChatModel) => {
-    //     res.status(200).json({ message: "Match created and chat added" });
-    //   })
-    //   .catch((err) => {
-    //     res.status(500).json(err);
-    //   });
-  } else res.status(200).json({ message: "Match updated" });
+    await addChatAfterMatch(req, res, chat, updatedValue! as IMatch);
+  } else {
+    res.status(200).json({ message: "Match updated", match: updatedValue });
+  }
 };
 
 export const getMatchesById = async (req: Request, res: Response) => {
@@ -124,7 +136,7 @@ export const getMatchesById = async (req: Request, res: Response) => {
 };
 
 export const calcMatchesForUser = async (req: Request, res: Response) => {
-  
+
   let userId = req.query.userId?.toString();
   console.log("Calculating matches for : " + userId);
   let users = await getUsersForMatches();

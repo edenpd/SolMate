@@ -6,18 +6,21 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Colors, IconButton } from 'react-native-paper';
 import { TouchableHighlight } from 'react-native-gesture-handler';
 import axios from 'axios';
+import NewMatchDialog from './NewMatchDialog';
 
 interface MatchCardProps {
     match: IMatch;
     user: IUser;
+    onAfterRespond: () => void;
 };
 
-const MatchCard = ({ match, user }: MatchCardProps) => {
+const MatchCard = ({ match, user, onAfterRespond }: MatchCardProps) => {
 
     // TODO: Switch to actual user id.
     const USER_ID = '604639ae4ad4fa1dcc6822e5';
 
-    const [showNames, setShowNames] = useState<Boolean>(false)
+    const [showNames, setShowNames] = useState<Boolean>(false);
+    const [isDialogVisible, setIsDialogVisible] = useState<Boolean>(false);
     const appbarStyle = StyleSheet.create({
         userImage: {
             alignSelf: 'center',
@@ -91,21 +94,25 @@ const MatchCard = ({ match, user }: MatchCardProps) => {
     };
 
     const respondToMatch = (resp: String) => {
-        const uMatch = match.firstUser._id === USER_ID ? {
-            ...match,
-            Approve1: resp
-        } : {
-            ...match,
-            Approve2: resp
+        const uMatch = {
+            matchId: match['_id'],
+            userId: USER_ID,
+            approve: resp
         };
 
         axios.put('http://10.0.0.6:3001/match', uMatch)
             .then((res) => {
+                console.log("The res is:");
+                console.log(res.data);
+                const match = res.data.match;
                 // setMatches(res.data);
-
-                // Check response to see if both users accepted
+                if (match.Approve1 === 'accepted' && match.Approve2 === 'accepted') {
+                    // TODO: Show dialog.
+                    setIsDialogVisible(true);
+                }
 
                 // TODO: Remove the card.
+                onAfterRespond();
             })
             .catch((err) => {
                 console.log("Error");
@@ -165,11 +172,12 @@ const MatchCard = ({ match, user }: MatchCardProps) => {
                             icon="check-circle-outline"
                             color={Colors.white}
                             size={65}
-                            onPress={() => respondToMatch('declined')}
+                            onPress={() => respondToMatch('accepted')}
                         />
                     </View>
                 </View>
             </ImageBackground>
+            <NewMatchDialog visible={isDialogVisible} setIsVisible={setIsDialogVisible} />
         </Card >
     );
 }

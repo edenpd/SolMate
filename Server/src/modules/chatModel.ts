@@ -13,14 +13,14 @@ const schema = new Schema({
   ChatId: {
     type: Number,
     required: true,
-    unique: true,
+    // unique: true,
   },
   Messages: [
     {
       MsgId: {
         type: Number,
-        required: true,
-        unique: true,
+        // required: true,
+        // unique: true,
       },
       msgDate: {
         type: String,
