@@ -55,7 +55,7 @@ const SettingRoute = () => {
       />
       <Text style={settings.Title}>Adi Bigler</Text>
       <FieldsContainer>
-        <Fieldset label="Contact details">
+        {/* <Fieldset label="Contact details">
           <FormGroup>
             <Label>First name</Label>
             <Input placeholder="Esben" />
@@ -78,7 +78,7 @@ const SettingRoute = () => {
             <Label>Save my password</Label>
             <Switch />
           </FormGroup>
-        </Fieldset>
+        </Fieldset> */}
       </FieldsContainer>
     </View>
   );
