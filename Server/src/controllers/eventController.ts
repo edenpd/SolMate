@@ -2,6 +2,9 @@ import { Request, Response } from "express";
 import { CallbackError } from "mongoose";
 import Event, { IEvent } from "../modules/eventModel";
 
+const Songkick = require('songkick-api-node');
+const songkickApi = new Songkick('YourApiKey');
+
 export const addEvent = async (req: Request, res: Response) => {
   try {
     const eventBody: IEvent = req.body;
