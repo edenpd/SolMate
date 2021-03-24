@@ -4,6 +4,7 @@ import { View, Text } from 'react-native';
 import { Bubble, Composer, GiftedChat, InputToolbar, Send } from 'react-native-gifted-chat';
 import { io } from 'socket.io-client';
 import { IMessage, IChat } from '../util/Types';
+import { SERVER_ADDRESS, SERVER_PORT  } from '@env';
 
 const Chat = (props) => {
 
@@ -18,7 +19,7 @@ const Chat = (props) => {
     });
     const [chat, setChat] = useState({ Messages: [] } as IChat);
 
-    const socket = io('http://10.0.0.6:8999?_id=' + USER_ID, {
+    const socket = io(`${SERVER_ADDRESS}:${SERVER_PORT}?_id=${USER_ID}`, {
         transports: ['websocket'],
         upgrade: false,
         rejectUnauthorized: false
@@ -31,7 +32,7 @@ const Chat = (props) => {
     });
 
     const getChat = () => {
-        axios.get('http://10.0.0.6:3001/chat/single?chatId=' + chatId)
+        axios.get(`${SERVER_ADDRESS}:${SERVER_PORT}/chat/single?chatId=${chatId}`)
             .then((res) => {
                 setChat(res.data);
             })
@@ -54,7 +55,7 @@ const Chat = (props) => {
     }, [chat]);
 
     const onSend = useCallback((newMessages = []) => {
-        axios.put("http://10.0.0.6:3001/chat", {
+        axios.put(`${SERVER_ADDRESS}:${SERVER_PORT}/chat`, {
             ...chat,
             Messages: GiftedChat.append(messages, newMessages.map(msg => ({
                 ...msg,

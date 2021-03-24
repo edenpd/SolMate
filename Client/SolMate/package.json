@@ -31,10 +31,10 @@
     "react": "16.13.1",
     "react-dom": "16.13.1",
     "react-native": "https://github.com/expo/react-native/archive/sdk-40.0.1.tar.gz",
-    "react-native-dialog": "^6.2.0",
     "react-native-a": "^1.0.1",
     "react-native-clean-form": "^0.5.0",
     "react-native-date-picker": "^3.2.10",
+    "react-native-dialog": "^6.2.0",
     "react-native-elements": "^3.3.1",
     "react-native-encrypted-storage": "^4.0.2",
     "react-native-gesture-handler": "^1.10.3",
@@ -58,6 +58,7 @@
   "devDependencies": {
     "@babel/core": "~7.9.0",
     "@types/react-native-multi-slider": "^0.3.1",
+    "react-native-dotenv": "^2.5.3",
     "typescript": "~4.0.0"
   },
   "private": true

@@ -104,7 +104,6 @@ export default function App() {
         <Text style={styles.headerText}>SolMate</Text>
       </View>
       <BottomNavigation
-        backgroundColor
         activeColor={"#8860D0"}
         barStyle={navigationStyle}
         navigationState={{ index, routes }}

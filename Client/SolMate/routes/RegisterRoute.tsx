@@ -40,6 +40,7 @@ import RailSelected from "../components/RangeSlider/RailSelected";
 import useDate, { LOCALE } from "../hooks/useDate";
 import { userContext } from "../contexts/userContext";
 import { tokenContext } from "../contexts/tokenContext";
+import { SERVER_ADDRESS, SERVER_PORT } from '@env';
 
 export interface IUserForm {
   email: string;
@@ -131,7 +132,7 @@ export default function Register({ navigation }) {
             dispatchToken({ type: "SET_SPOTIFY_TOKEN", payload: access_token });
             axios
               .post(
-                "http://10.0.0.6:3001/spotify/auth",
+                `${SERVER_ADDRESS}:${SERVER_PORT}/spotify/auth`,
                 { token: access_token },
                 {
                   headers: { "Content-Type": "application/json" },
@@ -168,7 +169,7 @@ export default function Register({ navigation }) {
     };
     axios.defaults.headers.common["Authorization"] = "Bearer " + token;
     axios
-      .post("http://10.0.0.6:3001/user/uploadProfile", formData, config)
+      .post(`${SERVER_ADDRESS}:${SERVER_PORT}/user/uploadProfile`, formData, config)
       .then((response) => {
         return response;
       })
@@ -193,7 +194,7 @@ export default function Register({ navigation }) {
     // console.log(formData);
 
     await axios
-      .post("http://10.0.0.6:3001/user/register", formData, {
+      .post(`${SERVER_ADDRESS}:${SERVER_PORT}/user/register`, formData, {
         headers: { "Content-Type": "application/json" },
       })
       .then((response) => {

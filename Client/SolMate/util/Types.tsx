@@ -42,3 +42,10 @@ export interface IUser {
   Songs: Array<string>;
   Media: Array<string>;
 }
+
+export interface UserContextState {
+  user: {
+    _id: String;
+    email: String;
+  };
+}

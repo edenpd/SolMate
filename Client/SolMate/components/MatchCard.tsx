@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { ImageBackground, StyleSheet, Text, View } from 'react-native';
 import { Card, Paragraph, Title, Avatar, Button } from 'react-native-paper';
 import { IMatch, IUser } from '../util/Types';
@@ -7,6 +7,8 @@ import { Colors, IconButton } from 'react-native-paper';
 import { TouchableHighlight } from 'react-native-gesture-handler';
 import axios from 'axios';
 import NewMatchDialog from './NewMatchDialog';
+import { userContext } from '../contexts/userContext';
+import { SERVER_ADDRESS, SERVER_PORT } from '@env';
 
 interface MatchCardProps {
     match: IMatch;
@@ -17,10 +19,12 @@ interface MatchCardProps {
 const MatchCard = ({ match, user, onAfterRespond }: MatchCardProps) => {
 
     // TODO: Switch to actual user id.
-    const USER_ID = '604639ae4ad4fa1dcc6822e5';
+    // const USER_ID = '604639ae4ad4fa1dcc6822e5';
 
     const [showNames, setShowNames] = useState<Boolean>(false);
     const [isDialogVisible, setIsDialogVisible] = useState<Boolean>(false);
+    const {state} = useContext(userContext);
+    
     const appbarStyle = StyleSheet.create({
         userImage: {
             alignSelf: 'center',
@@ -98,11 +102,11 @@ const MatchCard = ({ match, user, onAfterRespond }: MatchCardProps) => {
     const respondToMatch = (resp: String) => {
         const uMatch = {
             matchId: match['_id'],
-            userId: USER_ID,
+            userId: state.user._id,
             approve: resp
         };
 
-        axios.put('http://10.0.0.6:3001/match', uMatch)
+        axios.put(`${SERVER_ADDRESS}:${SERVER_PORT}/match`, uMatch)
             .then((res) => {
                 console.log("The res is:");
                 console.log(res.data);

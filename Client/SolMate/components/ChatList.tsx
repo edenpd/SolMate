@@ -6,6 +6,7 @@ import { Container, Card, MessageText, PostTime, TextSection, UserImg, UserImgWr
 import { io } from 'socket.io-client';
 import axios from 'axios';
 import { IChat, IUser, IMessage } from '../util/Types';
+import { SERVER_ADDRESS, SERVER_PORT } from "@env";
 
 const ChatList = ({navigation}) => {
 
@@ -15,7 +16,7 @@ const ChatList = ({navigation}) => {
 
     // This works when connected via the QR code in LAN mode.
     // Find your local IP address.
-    const socket = io('http://10.0.0.6:8999?_id=' + USER_ID, {
+    const socket = io(`${SERVER_ADDRESS}:${SERVER_PORT}?_id=${USER_ID}`, {
         transports: [ 'websocket' ],
 	    upgrade: false,
         rejectUnauthorized: false
@@ -46,15 +47,9 @@ const ChatList = ({navigation}) => {
         });
     }, []);
 
-    // useFocusEffect(() => {
-    //     console.log("UseFocusEffect");
-    //     getChats();
-    // });
-
-
     const getChats = () => {
         console.log("Getting multiple chats");
-        axios.get('http://10.0.0.6:3001/chat?UserId=' + USER_ID)
+        axios.get(`${SERVER_ADDRESS}:${SERVER_PORT}/chat?UserId=${USER_ID}`)
             .then((res) => {
                 setChats(res.data);
             })

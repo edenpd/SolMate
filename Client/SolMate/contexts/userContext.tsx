@@ -2,6 +2,8 @@ import React, { useReducer, useEffect, useState } from "react";
 import axios from "axios";
 import useToken from "../hooks/useToken";
 import * as SecureStore from "expo-secure-store";
+import { UserContextState } from '../util/Types';
+import { SERVER_ADDRESS, SERVER_PORT } from '@env';
 
 const STORAGE_KEY = "userInfo";
 
@@ -21,7 +23,7 @@ const getIntialState = async (storageKey) => {
   }
 };
 
-const initialState = getIntialState(STORAGE_KEY) ?? {};
+const initialState: UserContextState = getIntialState(STORAGE_KEY) as unknown as UserContextState ?? {} as UserContextState;
 
 const providerValue = {
   state: initialState,
@@ -39,7 +41,7 @@ const StateProvider = ({ children }) => {
 
   const fetch = (id) => {
     axios.defaults.headers.common["Authorization"] = "Bearer " + token;
-    axios.get("http://localhost:3001/user?UserEmail=" + id).then((response) => {
+    axios.get(`${SERVER_ADDRESS}:${SERVER_PORT}/user?UserEmail=${id}`).then((response) => {
       if (response.data === null || response.data === undefined) return;
 
       setData(response.data[0]);
