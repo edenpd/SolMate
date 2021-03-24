@@ -19,10 +19,10 @@ export interface IMatch {
   Approve2: MatchStatus;
 }
 
-export type MatchStatus = 'waiting' | 'accepted' | 'declined';
+export type MatchStatus = "waiting" | "accepted" | "declined";
 
 export interface IUser {
-  '_id': string;
+  _id: string;
   email: string;
   password: string;
   firstName: string;
