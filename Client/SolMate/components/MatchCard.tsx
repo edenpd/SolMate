@@ -1,16 +1,22 @@
 import React, { useState } from 'react';
 import { ImageBackground, StyleSheet, Text, View } from 'react-native';
 import { Card, Paragraph, Title, Avatar, Button } from 'react-native-paper';
-import { IUser } from '../util/Types';
+import { IMatch, IUser } from '../util/Types';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Colors, IconButton } from 'react-native-paper';
 import { TouchableHighlight } from 'react-native-gesture-handler';
+import axios from 'axios';
 
 interface MatchCardProps {
+    match: IMatch;
     user: IUser;
 };
 
-const MatchCard = ({ user }: MatchCardProps) => {
+const MatchCard = ({ match, user }: MatchCardProps) => {
+
+    // TODO: Switch to actual user id.
+    const USER_ID = '604639ae4ad4fa1dcc6822e5';
+
     const [showNames, setShowNames] = useState<Boolean>(false)
     const appbarStyle = StyleSheet.create({
         userImage: {
@@ -82,7 +88,32 @@ const MatchCard = ({ user }: MatchCardProps) => {
 
     const calcAge = (date: Date) => {
         return new Number((new Date().getTime() - new Date(date).getTime()) / 31536000000).toFixed(0);
-    }
+    };
+
+    const respondToMatch = (resp: String) => {
+        const uMatch = match.firstUser._id === USER_ID ? {
+            ...match,
+            Approve1: resp
+        } : {
+            ...match,
+            Approve2: resp
+        };
+
+        axios.put('http://10.0.0.6:3001/match', uMatch)
+            .then((res) => {
+                // setMatches(res.data);
+
+                // Check response to see if both users accepted
+
+                // TODO: Remove the card.
+            })
+            .catch((err) => {
+                console.log("Error");
+                console.log(err);
+
+                // TODO: Show error message.
+            });
+    };
 
     return (
         <Card style={appbarStyle.card} elevation={5}>
@@ -128,13 +159,13 @@ const MatchCard = ({ user }: MatchCardProps) => {
                             icon="alpha-x-circle-outline"
                             color={Colors.white}
                             size={65}
-                            onPress={() => console.log('Pressed')}
+                            onPress={() => respondToMatch('declined')}
                         />
                         <IconButton
                             icon="check-circle-outline"
                             color={Colors.white}
                             size={65}
-                            onPress={() => console.log('Pressed')}
+                            onPress={() => respondToMatch('declined')}
                         />
                     </View>
                 </View>
