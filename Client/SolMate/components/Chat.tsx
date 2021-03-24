@@ -14,7 +14,7 @@ const Chat = (props) => {
     const [messages, setMessages] = useState<Array<any>>([]);
     const [chatId, setChatId] = useState(props.route.params.chatId);
     const [user, setUser] = useState({
-        _id: state.user._id,
+        _id: state.user._id + "",
     });
     const [chat, setChat] = useState({ Messages: [] } as IChat);
 
@@ -63,7 +63,7 @@ const Chat = (props) => {
                 MsgId: index + "",
                 msgDate: msg.msgDate,
                 text: msg.text,
-                user: USER_ID
+                user: state.user._id
             }))
         })
             .then(res => {

@@ -48,7 +48,7 @@ const ChatList = ({navigation}) => {
 
     const getChats = () => {
         console.log("Getting multiple chats");
-        axios.get(`${SERVER_ADDRESS}:${SERVER_PORT}/chat?UserId=${USER_ID}`)
+        axios.get(`${SERVER_ADDRESS}:${SERVER_PORT}/chat?UserId=${state.user._id}`)
             .then((res) => {
                 setChats(res.data);
             })
