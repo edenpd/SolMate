@@ -12,6 +12,8 @@ import {
   Label,
   Switch,
 } from "react-native-clean-form";
+import RangeSlider from "rn-range-slider";
+
 const settings = StyleSheet.create({
   userImage: {
     alignSelf: "center",
@@ -41,8 +43,12 @@ const settings = StyleSheet.create({
     marginBottom: 10,
   },
   label: {
-    flex: 1,
-    fontWeight: "bold",
+    color: "purple",
+    // flex: 1,
+    // fontWeight: "bold",
+  },
+  card: {
+    marginBottom: "78",
   },
 });
 
@@ -54,31 +60,36 @@ const SettingRoute = () => {
         source={{ uri: "https://picsum.photos/700" }}
       />
       <Text style={settings.Title}>Adi Bigler</Text>
-      <FieldsContainer>
-        {/* <Fieldset label="Contact details">
-          <FormGroup>
-            <Label>First name</Label>
-            <Input placeholder="Esben" />
-          </FormGroup>
-          <FormGroup>
-            <Label>Email</Label>
-            <Input placeholder="esbenspetersen@gmail.com" />
-          </FormGroup>
-        </Fieldset>
-        <Fieldset label="Password" last>
-          <FormGroup>
-            <Label>Password</Label>
-            <Input placeholder="Enter a password" />
-          </FormGroup>
-          <FormGroup>
-            <Label>Repeat password</Label>
-            <Input placeholder="Repeat your password" />
-          </FormGroup>
-          <FormGroup border={false}>
-            <Label>Save my password</Label>
-            <Switch />
-          </FormGroup>
-        </Fieldset> */}
+      <FieldsContainer style={settings.card}>
+        {/* <Fieldset label="Personal Details" style={settings.card}> */}
+        <FormGroup>
+          <Label>
+            <Text style={settings.label}>First name</Text>
+          </Label>
+          <Input placeholder="Adi" />
+
+          <Label>
+            <Text style={settings.label}>Last name</Text>
+          </Label>
+          <Input placeholder="Bigler" />
+        </FormGroup>
+        <FormGroup>
+          <Label>
+            <Text style={settings.label}>Email</Text>
+          </Label>
+          <Input placeholder="esbenspetersen@gmail.com" />
+        </FormGroup>
+        <FormGroup>
+          <Label>
+            <Text style={settings.label}>Description</Text>
+          </Label>
+          <Input placeholder="music is my life!" />
+        </FormGroup>
+        <FormGroup>
+          <Text style={settings.label}>Radius Search</Text>
+        </FormGroup>
+        <FormGroup></FormGroup>
+        {/* </Fieldset> */}
       </FieldsContainer>
     </View>
   );
