@@ -89,9 +89,11 @@ const MatchCard = ({ match, user, onAfterRespond }: MatchCardProps) => {
         },
     });
 
-    const calcAge = (date: Date) => {
-        return new Number((new Date().getTime() - new Date(date).getTime()) / 31536000000).toFixed(0);
-    };
+  const calcAge = (date: Date) => {
+    return new Number(
+      (new Date().getTime() - new Date(date).getTime()) / 31536000000
+    ).toFixed(0);
+  };
 
     const respondToMatch = (resp: String) => {
         const uMatch = {
