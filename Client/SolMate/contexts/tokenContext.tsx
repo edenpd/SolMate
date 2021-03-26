@@ -10,20 +10,23 @@ const persistState = async (storageKey, state) => {
 };
 
 const getIntialState = async (storageKey) => {
-  await SecureStore.getItemAsync(storageKey).then((value) => {
-    try {
+  let value;
+  const isAvaiable = await SecureStore.isAvailableAsync();
+  if (isAvaiable) {
+    value = await SecureStore.getItemAsync(storageKey).then((value) => {
+      console.log(value);
       if (!value) {
+        console.log("1");
         return undefined;
       }
-      return JSON.parse(value);
-    } catch (e) {
-      return undefined;
-    }
-  });
+      return value;
+    });
+  }
+  return value;
 };
 
 const providerValue = {
-  token: {token:"",spotifyToken:""},
+  token: { token: "", spotifyToken: "" },
   dispatchToken: (action) => {}, // << This will be overwritten
 };
 
@@ -31,31 +34,41 @@ const tokenContext = React.createContext(providerValue); // Create a context obj
 
 const { Provider } = tokenContext;
 const TokenStateProvider = ({ children }) => {
-  const [token, dispatchToken] = useReducer((state, action) => {
-    const currentState = { ...state };
+  const [token, dispatchToken] = useReducer(
+    (state, action) => {
+      const currentState = { ...state };
 
-    switch (action.type) {
-      case "SET_TOKEN":
-        currentState.token = action.payload;
-        return currentState;
-      case "SET_SPOTIFY_TOKEN":
-        currentState.spotifyToken = action.payload;
-        return currentState;
-      case "LOGOUT":
-        currentState.token = null;
-        currentState.spotifyToken = null;
-        return currentState;
-      default:
-        throw new Error();
+      switch (action.type) {
+        case "SET_TOKEN":
+          currentState.token = action.payload;
+          return currentState;
+        case "SET_SPOTIFY_TOKEN":
+          currentState.spotifyToken = action.payload;
+          return currentState;
+        case "LOGOUT":
+          currentState.token = null;
+          currentState.spotifyToken = null;
+          return currentState;
+        default:
+          throw new Error();
+      }
+    },
+    async function presist() {
+      const initialState = await getIntialState(STORAGE_KEY);
+      console.log(console.log(initialState));
+
+      dispatchToken({ type: "SET_TOKEN", payload: initialState });
     }
-  }, getIntialState(STORAGE_KEY));
+  );
 
-  const getInitialTokens = async () => {
-    const initialState = await getIntialState(STORAGE_KEY);
-    dispatchToken({ type: "SET_TOKEN", payload: initialState });
-  };
   useEffect(() => {
-    getInitialTokens();
+    async function presist() {
+      const initialState = await getIntialState(STORAGE_KEY);
+
+      dispatchToken({ type: "SET_TOKEN", payload: initialState });
+      console.log(console.log(initialState));
+    }
+    presist();
   }, []);
 
   useEffect(() => {
