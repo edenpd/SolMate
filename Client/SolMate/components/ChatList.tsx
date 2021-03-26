@@ -6,7 +6,7 @@ import { Container, Card, MessageText, PostTime, TextSection, UserImg, UserImgWr
 import { io } from 'socket.io-client';
 import axios from 'axios';
 import { IChat, IUser, IMessage } from '../util/Types';
-import { SERVER_ADDRESS, SERVER_PORT } from "@env";
+import { SERVER_PORT, SERVER_ADDRESS } from "@env";
 import { userContext } from '../contexts/userContext';
 
 const ChatList = ({navigation}) => {
@@ -16,6 +16,8 @@ const ChatList = ({navigation}) => {
 
     // This works when connected via the QR code in LAN mode.
     // Find your local IP address.
+    console.log("The web socket is:");
+    console.log(`${SERVER_ADDRESS}:${SERVER_PORT}?_id=${state.user._id}`);
     const socket = io(`${SERVER_ADDRESS}:${SERVER_PORT}?_id=${state.user._id}`, {
         transports: [ 'websocket' ],
 	    upgrade: false,
@@ -36,7 +38,7 @@ const ChatList = ({navigation}) => {
       });
 
       socket.on("connect_error", (err) => {
-        console.log(err);
+        // console.log(err);
       });
 
     useEffect(() => {
