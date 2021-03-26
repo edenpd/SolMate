@@ -6,7 +6,7 @@ import { Container, Card, MessageText, PostTime, TextSection, UserImg, UserImgWr
 import { io } from 'socket.io-client';
 import axios from 'axios';
 import { IChat, IUser, IMessage } from '../util/Types';
-import { SERVER_PORT, SERVER_ADDRESS } from "@env";
+import { SERVER_PORT, SERVER_ADDRESS, CHAT_SOCKET_PORT, CHAT_SOCKET_ADDRESS } from "@env";
 import { userContext } from '../contexts/userContext';
 
 const ChatList = ({navigation}) => {
@@ -17,8 +17,8 @@ const ChatList = ({navigation}) => {
     // This works when connected via the QR code in LAN mode.
     // Find your local IP address.
     console.log("The web socket is:");
-    console.log(`${SERVER_ADDRESS}:${SERVER_PORT}?_id=${state.user._id}`);
-    const socket = io(`${SERVER_ADDRESS}:${SERVER_PORT}?_id=${state.user._id}`, {
+    console.log(`${CHAT_SOCKET_ADDRESS}:${CHAT_SOCKET_PORT}?_id=${state.user._id}`);
+    const socket = io(`${CHAT_SOCKET_ADDRESS}:${CHAT_SOCKET_PORT}?_id=${state.user._id}`, {
         transports: [ 'websocket' ],
 	    upgrade: false,
         rejectUnauthorized: false
@@ -68,7 +68,7 @@ const ChatList = ({navigation}) => {
                 data={chats}
                 keyExtractor={(item, index) => (index + "")}
                 renderItem={({item, index}) => {
-                    const otherUser: IUser = (item as IChat).UserId1['_id'] === "604639ae4ad4fa1dcc6822e5" ? (item as IChat).UserId2 : (item as IChat).UserId1;;
+                    const otherUser: IUser = (item as IChat).UserId1['_id'] === state.user._id ? (item as IChat).UserId2 : (item as IChat).UserId1;;
                     const lastMessage: IMessage | undefined = (item as IChat).Messages[0];
                     return (
                     <Card onPress={() => navigation.navigate('Chat', { userName: item.userName, index: index, chatId: chats[index]['_id'] })}>
