@@ -7,11 +7,14 @@ interface Location {
 
 export interface IEvent {
   EventId: number;
-  // location: Location;
-  UserId1: string;
-  UserId2: string;
+  EventName: String;
+  StartDateTime: String;
+  ArtistName: String
+  CityName: String
+  VenueName: String
+  EventUrl: String
 }
-export interface IEventModel extends Document, IEvent {}
+export interface IEventModel extends Document, IEvent { }
 
 const schema = new Schema({
   EventId: {
@@ -19,15 +22,27 @@ const schema = new Schema({
     required: true,
     unique: true,
   },
-  // location: {
-  //   type: Location,
-  //   require: true,
-  // },
-  UserId1: {
+  EventName: {
     type: String,
     required: true,
   },
-  UserId2: {
+  StartDateTime: {
+    type: String,
+    required: true,
+  },
+  ArtistName: {
+    type: String,
+    required: true,
+  },
+  CityName: {
+    type: String,
+    required: true,
+  },
+  VenueName: {
+    type: String,
+    required: true,
+  },
+  EventUrl: {
     type: String,
     required: true,
   },
