@@ -1,5 +1,5 @@
 import { NavigationContainer, useFocusEffect } from '@react-navigation/native';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import { Container, Card, MessageText, PostTime, TextSection, UserImg, UserImgWrapper, UserInfo, UserInfoText, UserName } from '../styles/ChatStyles';
@@ -7,6 +7,7 @@ import { io } from 'socket.io-client';
 import axios from 'axios';
 import { IChat, IUser, IMessage } from '../util/Types';
 import { SERVER_ADDRESS, SERVER_PORT } from "@env";
+import { userContext } from '../contexts/userContext';
 
 const ChatList = ({navigation}) => {
 
@@ -88,12 +89,3 @@ const ChatList = ({navigation}) => {
 };
 
 export default ChatList;
-
-function useContext(userContext: any): { state: any; } {
-    throw new Error('Function not implemented.');
-}
-
-
-function userContext(userContext: any): { state: any; } {
-    throw new Error('Function not implemented.');
-}
