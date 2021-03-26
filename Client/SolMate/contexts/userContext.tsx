@@ -2,8 +2,8 @@ import React, { useReducer, useEffect, useState } from "react";
 import axios from "axios";
 import useToken from "../hooks/useToken";
 import * as SecureStore from "expo-secure-store";
-import { UserContextState } from '../util/Types';
-import { SERVER_ADDRESS, SERVER_PORT } from '@env';
+import { UserContextState } from "../util/Types";
+import { SERVER_ADDRESS, SERVER_PORT } from "@env";
 
 const STORAGE_KEY = "userInfo";
 
@@ -12,18 +12,20 @@ const persistState = async (storageKey, state) => {
 };
 
 const getIntialState = async (storageKey) => {
-  const savedState = await SecureStore.getItemAsync(storageKey);
-  try {
-    if (!savedState) {
-      return undefined;
-    }
-    return JSON.parse(savedState);
-  } catch (e) {
-    return undefined;
+  let value;
+  const isAvaiable = await SecureStore.isAvailableAsync();
+  if (isAvaiable) {
+    value = await SecureStore.getItemAsync(storageKey).then((value) => {
+      console.log(value);
+      if (!value) {
+        return undefined;
+      }
+      return value;
+    });
   }
+  return value;
 };
-
-const initialState: UserContextState = getIntialState(STORAGE_KEY) as unknown as UserContextState ?? {} as UserContextState;
+const initialState = getIntialState(STORAGE_KEY);
 
 const providerValue = {
   state: initialState,
@@ -41,11 +43,13 @@ const StateProvider = ({ children }) => {
 
   const fetch = (id) => {
     axios.defaults.headers.common["Authorization"] = "Bearer " + token;
-    axios.get(`${SERVER_ADDRESS}:${SERVER_PORT}/user?UserEmail=${id}`).then((response) => {
-      if (response.data === null || response.data === undefined) return;
+    axios
+      .get(`${SERVER_ADDRESS}:${SERVER_PORT}/user?UserEmail=${id}`)
+      .then((response) => {
+        if (response.data === null || response.data === undefined) return;
 
-      setData(response.data[0]);
-    });
+        setData(response.data[0]);
+      });
   };
 
   const [state, dispatch] = useReducer((state, action) => {
@@ -66,6 +70,15 @@ const StateProvider = ({ children }) => {
         throw new Error();
     }
   }, initialState);
+
+  useEffect(() => {
+    async function presist() {
+      const initialState = await getIntialState(STORAGE_KEY);
+
+      dispatch({ type: "SET_USER", payload: initialState });
+    }
+    presist();
+  }, []);
 
   useEffect(() => {
     async function presist() {
