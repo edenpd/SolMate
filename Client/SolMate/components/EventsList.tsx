@@ -34,7 +34,7 @@ const EventsList = ({ Linking }) => {
     });
 
     interface Event {
-        id: Number
+        id: string
         eventName: String;
         startDateTime: String;
         artistName: String
@@ -44,7 +44,7 @@ const EventsList = ({ Linking }) => {
     }
     const events: Event[] = [
         {
-            id: 11129128,
+            id: "11129128",
             eventName: "Wild Flag at The Fillmore",
             startDateTime: '2012-04-18T20:00:00-0800',
             artistName: 'Wild Flag',
@@ -53,7 +53,7 @@ const EventsList = ({ Linking }) => {
             eventUrl: 'http://www.songkick.com/concerts/11129128-wild-flag-at-fillmore?utm_source=PARTNER_ID&utm_medium=partner'
         },
         {
-            id: 11129128,
+            id: "11129121",
             eventName: "Wild Flag at The Fillmore",
             startDateTime: '2012-04-18T20:00:00-0800',
             artistName: 'Wild Flag',
@@ -62,7 +62,7 @@ const EventsList = ({ Linking }) => {
             eventUrl: 'http://www.songkick.com/concerts/11129128-wild-flag-at-fillmore?utm_source=PARTNER_ID&utm_medium=partner'
         },
         {
-            id: 11129128,
+            id: "11129122",
             eventName: "Wild Flag at The Fillmore",
             startDateTime: '2012-04-18T20:00:00-0800',
             artistName: 'Wild Flag',

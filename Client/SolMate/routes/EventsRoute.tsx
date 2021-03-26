@@ -1,10 +1,13 @@
 import { Text, StyleSheet } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
-import React from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Container } from "../styles/ChatStyles";
 import { Card, Paragraph } from "react-native-paper";
 import A from "react-native-a";
 import Moment from "moment";
+import axios from "axios";
+import { userContext } from "../contexts/userContext";
+import { SERVER_PORT, SERVER_ADDRESS } from '@env';
 
 const EventsRoute = () => {
   const appbarStyle = StyleSheet.create({
@@ -43,8 +46,8 @@ const EventsRoute = () => {
     },
   });
 
-  interface Event {
-    id: String;
+  interface IEvent {
+    id: string;
     eventName: String;
     startDateTime: String;
     artistName: String;
@@ -52,48 +55,65 @@ const EventsRoute = () => {
     venueName: String;
     eventUrl: String;
   }
-  const events: Event[] = [
-    {
-      id: "11129128",
-      eventName: "Wild Flag at The Fillmore",
-      startDateTime: "2012-04-18T20:00:00",
-      artistName: "Wild Flag",
-      cityName: "San Francisco, CA, US",
-      venueName: "The Fillmore",
-      eventUrl:
-        "http://www.songkick.com/concerts/11129128-wild-flag-at-fillmore?utm_source=PARTNER_ID&utm_medium=partner",
-    },
-    {
-      id: "11129121",
-      eventName: "Wild Flag at The Fillmore",
-      startDateTime: "2012-04-18T20:00:00",
-      artistName: "Wild Flag",
-      cityName: "San Francisco, CA, US",
-      venueName: "The Fillmore",
-      eventUrl:
-        "http://www.songkick.com/concerts/11129128-wild-flag-at-fillmore?utm_source=PARTNER_ID&utm_medium=partner",
-    },
-    {
-      id: "11129122",
-      eventName: "Wild Flag at The Fillmore",
-      startDateTime: "2012-04-18T20:00:00",
-      artistName: "Wild Flag",
-      cityName: "San Francisco, CA, US",
-      venueName: "The Fillmore",
-      eventUrl:
-        "http://www.songkick.com/concerts/11129128-wild-flag-at-fillmore?utm_source=PARTNER_ID&utm_medium=partner",
-    },
-    {
-      id: "11129123",
-      eventName: "Wild Flag at The Fillmore",
-      startDateTime: "2012-04-18T20:00:00",
-      artistName: "Wild Flag",
-      cityName: "San Francisco, CA, US",
-      venueName: "The Fillmore",
-      eventUrl:
-        "http://www.songkick.com/concerts/11129128-wild-flag-at-fillmore?utm_source=PARTNER_ID&utm_medium=partner",
-    },
-  ];
+
+  // const [events, setEvents] = useState<IEvent[]>([]);
+  const { state } = useContext(userContext);
+
+  useEffect(() => {
+    console.log("Getting multiple events");
+
+    getEvents();
+  }, []);
+
+  const getEvents = () => {
+    console.log("Getting multiple events");
+    axios
+      .get(`http://192.168.1.115:3001/event`, {
+        headers: { "Content-Type": "application/json" },
+      })
+      .then((res) => {
+        console.log(res.data)
+        events = res.data;
+        // setEvents(res.data);
+      })
+      .catch((err) => {
+        console.log("Error");
+        console.log(err);
+      });
+  };
+  let events: IEvent[] = [];
+  // const events: IEvent[] = [
+  //   {
+  //     id: "11129128",
+  //     eventName: "Wild Flag at The Fillmore",
+  //     startDateTime: "2012-04-18T20:00:00",
+  //     artistName: "Wild Flag",
+  //     cityName: "San Francisco, CA, US",
+  //     venueName: "The Fillmore",
+  //     eventUrl:
+  //       "http://www.songkick.com/concerts/11129128-wild-flag-at-fillmore?utm_source=PARTNER_ID&utm_medium=partner",
+  //   },
+  //   {
+  //     id: "11129121",
+  //     eventName: "Wild Flag at The Fillmore",
+  //     startDateTime: "2012-04-18T20:00:00",
+  //     artistName: "Wild Flag",
+  //     cityName: "San Francisco, CA, US",
+  //     venueName: "The Fillmore",
+  //     eventUrl:
+  //       "http://www.songkick.com/concerts/11129128-wild-flag-at-fillmore?utm_source=PARTNER_ID&utm_medium=partner",
+  //   },
+  //   {
+  //     id: "11129122",
+  //     eventName: "Wild Flag at The Fillmore",
+  //     startDateTime: "2012-04-18T20:00:00",
+  //     artistName: "Wild Flag",
+  //     cityName: "San Francisco, CA, US",
+  //     venueName: "The Fillmore",
+  //     eventUrl:
+  //       "http://www.songkick.com/concerts/11129128-wild-flag-at-fillmore?utm_source=PARTNER_ID&utm_medium=partner",
+  //   },
+  // ];
 
   return (
     <Container>
@@ -119,7 +139,7 @@ const EventsRoute = () => {
                   <Text style={appbarStyle.text}>{item.cityName}</Text>
                   <Text style={appbarStyle.text}>{item.venueName}</Text>
                   <Text style={appbarStyle.text}>
-                    {Moment(item.startDateTime).format("DD/MM/YYYY hh:mm A")}
+                    {Moment("2012-04-18T20:00:00").format("DD/MM/YYYY hh:mm A")}
                   </Text>
                 </Card.Content>
               </Card>
