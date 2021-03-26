@@ -7,13 +7,15 @@ interface NewMatchDialogProps {
     setIsVisible: React.Dispatch<React.SetStateAction<Boolean>>;
 };
 
+const DIALOG_DESC = "You both like each other!\n Perhaps you found your new SolMate.\nYou can now chat with your new match.";
+
 const NewMatchDialog = ({visible, setIsVisible}: NewMatchDialogProps) => {
     return (
         <View>
           <Dialog.Container visible={visible}>
             <Dialog.Title>Oh Wow!</Dialog.Title>
             <Dialog.Description>
-              You both like each other!{"\n"} Perhaps you found your new SolMate.{"\n"}You can now chat with your new match.
+              {DIALOG_DESC}
             </Dialog.Description>
             <Dialog.Button onPress={() => setIsVisible(false)} label="OK" />
           </Dialog.Container>

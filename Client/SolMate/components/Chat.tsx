@@ -4,7 +4,7 @@ import { View, Text } from 'react-native';
 import { Bubble, Composer, GiftedChat, InputToolbar, Send } from 'react-native-gifted-chat';
 import { io } from 'socket.io-client';
 import { IMessage, IChat } from '../util/Types';
-import { SERVER_ADDRESS, SERVER_PORT  } from '@env';
+import { SERVER_ADDRESS, SERVER_PORT, CHAT_SOCKET_ADDRESS, CHAT_SOCKET_PORT } from '@env';
 import { userContext } from '../contexts/userContext';
 
 const Chat = (props) => {
@@ -18,7 +18,7 @@ const Chat = (props) => {
     });
     const [chat, setChat] = useState({ Messages: [] } as IChat);
 
-    const socket = io(`${SERVER_ADDRESS}:${SERVER_PORT}?_id=${state.user._id}`, {
+    const socket = io(`${CHAT_SOCKET_ADDRESS}:${CHAT_SOCKET_PORT}?_id=${state.user._id}`, {
         transports: ['websocket'],
         upgrade: false,
         rejectUnauthorized: false

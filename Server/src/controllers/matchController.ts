@@ -115,18 +115,18 @@ export const getMatchesById = async (req: Request, res: Response) => {
       .populate({
         path: "firstUser",
         model: "users",
-        populate: {
-          path: "Songs",
-          model: "songs",
-        },
+        // populate: {
+        //   path: "Songs",
+        //   model: "songs",
+        // },
       })
       .populate({
         path: "secondUser",
         model: "users",
-        populate: {
-          path: "Songs",
-          model: "songs",
-        },
+        // populate: {
+        //   path: "Songs",
+        //   model: "songs",
+        // },
       })
       .exec((err: CallbackError, user: any) => {
         if (err) {
