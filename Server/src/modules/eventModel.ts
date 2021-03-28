@@ -13,6 +13,8 @@ export interface IEvent {
   CityName: String
   VenueName: String
   EventUrl: String
+  Image: String,
+  IsRecommended: boolean
 }
 export interface IEventModel extends Document, IEvent { }
 
@@ -44,6 +46,14 @@ const schema = new Schema({
   },
   EventUrl: {
     type: String,
+    required: true,
+  },
+  Image: {
+    type: String,
+    required: true,
+  },
+  IsRecommended: {
+    type: Boolean,
     required: true,
   },
 });

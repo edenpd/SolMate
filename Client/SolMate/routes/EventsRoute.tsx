@@ -1,4 +1,4 @@
-import { Text, StyleSheet } from "react-native";
+import { Text, StyleSheet, ActivityIndicator, Image } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 import React, { useState, useEffect, useContext } from "react";
 import { Container } from "../styles/ChatStyles";
@@ -24,7 +24,8 @@ const EventsRoute = () => {
       textAlign: "center",
       alignSelf: "center",
       fontSize: 25,
-      margin: 10,
+      padding: 30,
+      fontWeight: "bold"
     },
     artistName: {
       alignItems: "center",
@@ -41,23 +42,33 @@ const EventsRoute = () => {
       marginTop: 20,
     },
 
+    image: {
+      width: 250,
+      height: 250,
+      borderRadius: 10,
+      margin: 20,
+    },
+
     text: {
       marginTop: 10,
     },
   });
 
   interface IEvent {
-    id: string;
-    eventName: String;
-    startDateTime: String;
-    artistName: String;
-    cityName: String;
-    venueName: String;
-    eventUrl: String;
+    EventId: number;
+    EventName: String;
+    StartDateTime: String;
+    ArtistName: String
+    CityName: String
+    VenueName: String
+    EventUrl: String
+    Image: String,
+    IsRecommended: boolean
   }
 
-  // const [events, setEvents] = useState<IEvent[]>([]);
+  const [events, setEvents] = useState<IEvent[]>([]);
   const { state } = useContext(userContext);
+  const [isLoading, setLoading] = useState(true);
 
   useEffect(() => {
     console.log("Getting multiple events");
@@ -65,90 +76,72 @@ const EventsRoute = () => {
     getEvents();
   }, []);
 
-  const getEvents = () => {
+  const getEvents = async () => {
     console.log("Getting multiple events");
-    axios
-      .get(`http://192.168.1.115:3001/event`, {
+    await axios
+      .get(`${SERVER_ADDRESS}:${SERVER_PORT}/event?artists=maroon 5,Harry Styles`, {
         headers: { "Content-Type": "application/json" },
       })
       .then((res) => {
         console.log(res.data)
-        events = res.data;
-        // setEvents(res.data);
+        setEvents(res.data);
+        setLoading(false);
       })
       .catch((err) => {
         console.log("Error");
         console.log(err);
       });
   };
-  let events: IEvent[] = [];
-  // const events: IEvent[] = [
-  //   {
-  //     id: "11129128",
-  //     eventName: "Wild Flag at The Fillmore",
-  //     startDateTime: "2012-04-18T20:00:00",
-  //     artistName: "Wild Flag",
-  //     cityName: "San Francisco, CA, US",
-  //     venueName: "The Fillmore",
-  //     eventUrl:
-  //       "http://www.songkick.com/concerts/11129128-wild-flag-at-fillmore?utm_source=PARTNER_ID&utm_medium=partner",
-  //   },
-  //   {
-  //     id: "11129121",
-  //     eventName: "Wild Flag at The Fillmore",
-  //     startDateTime: "2012-04-18T20:00:00",
-  //     artistName: "Wild Flag",
-  //     cityName: "San Francisco, CA, US",
-  //     venueName: "The Fillmore",
-  //     eventUrl:
-  //       "http://www.songkick.com/concerts/11129128-wild-flag-at-fillmore?utm_source=PARTNER_ID&utm_medium=partner",
-  //   },
-  //   {
-  //     id: "11129122",
-  //     eventName: "Wild Flag at The Fillmore",
-  //     startDateTime: "2012-04-18T20:00:00",
-  //     artistName: "Wild Flag",
-  //     cityName: "San Francisco, CA, US",
-  //     venueName: "The Fillmore",
-  //     eventUrl:
-  //       "http://www.songkick.com/concerts/11129128-wild-flag-at-fillmore?utm_source=PARTNER_ID&utm_medium=partner",
-  //   },
-  // ];
+  // let events: IEvent[] = [];
 
   return (
     <Container>
-      <FlatList
-        showsHorizontalScrollIndicator={false}
-        data={events}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => {
-          return (
-            <A href={item.eventUrl} style={appbarStyle.card}>
-              <Card elevation={5}>
-                <Card.Title
-                  style={appbarStyle.cardTitle}
-                  title={
-                    <Text style={appbarStyle.cardTitle}>{item.eventName}</Text>
-                  }
-                />
-                <Paragraph style={appbarStyle.artistName}>
-                  {item.artistName}
-                </Paragraph>
+      {isLoading ? <ActivityIndicator /> : (
+        <FlatList
+          showsHorizontalScrollIndicator={false}
+          data={events}
+          keyExtractor={(item) => item.EventId.toString()}
+          renderItem={({ item }) => {
+            return (
+              <A href={item.EventUrl} style={appbarStyle.card}>
+                <Card elevation={5}>
 
-                <Card.Content style={appbarStyle.cardContent}>
-                  <Text style={appbarStyle.text}>{item.cityName}</Text>
-                  <Text style={appbarStyle.text}>{item.venueName}</Text>
-                  <Text style={appbarStyle.text}>
-                    {Moment("2012-04-18T20:00:00").format("DD/MM/YYYY hh:mm A")}
-                  </Text>
-                </Card.Content>
-              </Card>
-            </A>
-          );
-        }}
-      />
+                  <Paragraph style={appbarStyle.cardTitle}>
+                    {item.EventName}
+                  </Paragraph>
+                  <Paragraph style={appbarStyle.artistName}>
+                    {item.ArtistName}
+                  </Paragraph>
+
+                  <Card.Content style={appbarStyle.cardContent}>
+                    <Text style={appbarStyle.text}>{item.CityName}</Text>
+                    <Text style={appbarStyle.text}>{item.VenueName}</Text>
+                    <Text style={appbarStyle.text}>
+                      {Moment(item.StartDateTime.toString()).format("DD/MM/YYYY hh:mm A")}
+                    </Text>
+
+                    <Image
+                      style={appbarStyle.image}
+                      source={{ uri: item.Image.toString() }}
+                    />
+
+                  </Card.Content>
+                </Card>
+              </A>
+            );
+          }}
+        />
+      )}
     </Container>
-  );
+  )
 };
 
 export default EventsRoute;
+function render() {
+  throw new Error("Function not implemented.");
+}
+
+function componentDidMount() {
+  throw new Error("Function not implemented.");
+}
+
