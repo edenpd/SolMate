@@ -119,6 +119,12 @@ const EventsRoute = () => {
             recommendedEvents.push(event);
           else events.push(event);
         });
+        events.sort((a: IEvent, b: IEvent) => {
+          return new Date(a.StartDateTime.toString()).getTime() - new Date(b.StartDateTime.toString()).getTime();
+        });
+        recommendedEvents.sort((a: IEvent, b: IEvent) => {
+          return new Date(a.StartDateTime.toString()).getTime() - new Date(b.StartDateTime.toString()).getTime();
+        });
         setEvents(events);
         setRecommendedEvents(recommendedEvents);
         setLoading(false);
