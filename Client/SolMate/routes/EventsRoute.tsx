@@ -1,4 +1,4 @@
-import { Text, StyleSheet, ActivityIndicator, Image, View, Button, ScrollView } from "react-native";
+import { Text, StyleSheet, ActivityIndicator, Image, ScrollView, Platform, View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 import React, { useState, useEffect, useContext } from "react";
 import { Container } from "../styles/ChatStyles";
@@ -8,10 +8,17 @@ import Moment from "moment";
 import axios from "axios";
 import { userContext } from "../contexts/userContext";
 import { SERVER_PORT, SERVER_ADDRESS } from '@env';
-import { BackgroundImage } from "react-native-elements/dist/config";
+import { Searchbar } from 'react-native-paper';
 
 const EventsRoute = () => {
   const appbarStyle = StyleSheet.create({
+    searchBar: {
+      alignItems: "center",
+      alignContent: "center",
+      width: 350,
+      margin: 15,
+      borderRadius: 20,
+    },
     card: {
       alignItems: "center",
       alignContent: "center",
@@ -94,13 +101,29 @@ const EventsRoute = () => {
   }
 
   const [events, setEvents] = useState<IEvent[]>([]);
+  const [myEvents, setMyEvents] = useState<IEvent[]>([]);
   const [recommendedEvents, setRecommendedEvents] = useState<IEvent[]>([]);
   const { state } = useContext(userContext);
   const [isLoading, setLoading] = useState(true);
 
-  useEffect(() => {
-    console.log("Getting multiple events");
+  const [searchQuery, setSearchQuery] = React.useState('');
+  const onChangeSearch = query => {
+    setMyEvents([]);
+    let myEvents = [];
 
+    events.forEach(event => {
+      if (event.ArtistName.includes(query) ||
+        event.EventName.includes(query) ||
+        event.StartDateTime.includes(query) ||
+        event.CityName.includes(query))
+        myEvents.push(event);
+    });
+
+    setMyEvents(myEvents);
+    setSearchQuery(query);
+  };
+
+  useEffect(() => {
     getEvents();
   }, []);
 
@@ -111,10 +134,12 @@ const EventsRoute = () => {
         headers: { "Content-Type": "application/json" },
       })
       .then((res) => {
-        console.log(res.data)
+        console.log("Got " + res.data.length + " events");
+        // console.log(res.data)
         let events = [];
         let recommendedEvents = [];
         res.data.forEach(event => {
+          event.StartDateTime = Moment(event.StartDateTime.toString()).format("DD/MM/YYYY hh:mm A");
           if (event.IsRecommended)
             recommendedEvents.push(event);
           else events.push(event);
@@ -126,6 +151,7 @@ const EventsRoute = () => {
           return new Date(a.StartDateTime.toString()).getTime() - new Date(b.StartDateTime.toString()).getTime();
         });
         setEvents(events);
+        setMyEvents(events);
         setRecommendedEvents(recommendedEvents);
         setLoading(false);
       })
@@ -135,86 +161,96 @@ const EventsRoute = () => {
       });
   };
 
+
   return (
     <Container>
+
       {isLoading ? <ActivityIndicator /> : (
-        <ScrollView>
-          <FlatList
-            showsHorizontalScrollIndicator={false}
-            data={events}
-            keyExtractor={(item) => item.EventId.toString()}
-            renderItem={({ item }) => {
-              return (
-                <A href={item.EventUrl} style={appbarStyle.card}>
-                  <Card elevation={5} style={appbarStyle.card}>
-
-                    <Paragraph style={appbarStyle.cardTitle}>
-                      {item.EventName}
-                    </Paragraph>
-                    <Paragraph style={appbarStyle.artistName}>
-                      {item.ArtistName}
-                    </Paragraph>
-
-                    <Card.Content style={appbarStyle.cardContent}>
-                      <Text style={appbarStyle.text}>{item.CityName}</Text>
-                      <Text style={appbarStyle.text}>{item.VenueName}</Text>
-                      <Text style={appbarStyle.text}>
-                        {Moment(item.StartDateTime.toString()).format("DD/MM/YYYY hh:mm A")}
-                      </Text>
-
-                      <Image
-                        style={appbarStyle.image}
-                        source={{ uri: item.Image.toString() }}
-                      />
-
-                    </Card.Content>
-                  </Card>
-                </A>
-              );
-            }}
+        <View>
+          <Searchbar
+            style={appbarStyle.searchBar}
+            placeholder="Search"
+            onChangeText={onChangeSearch}
+            value={searchQuery}
           />
-          <Card elevation={5} style={appbarStyle.recommendedCard}>
-            <Paragraph style={appbarStyle.recommendedCardText}>
-              Recommended for you
+          <ScrollView>
+            <FlatList
+              showsHorizontalScrollIndicator={false}
+              data={myEvents}
+              keyExtractor={(item) => item.EventId.toString()}
+              renderItem={({ item }) => {
+                return (
+                  <A href={item.EventUrl} style={appbarStyle.card}>
+                    <Card elevation={5} style={appbarStyle.card}>
+
+                      <Paragraph style={appbarStyle.cardTitle}>
+                        {item.EventName}
+                      </Paragraph>
+                      <Paragraph style={appbarStyle.artistName}>
+                        {item.ArtistName}
+                      </Paragraph>
+
+                      <Card.Content style={appbarStyle.cardContent}>
+                        <Text style={appbarStyle.text}>{item.CityName}</Text>
+                        <Text style={appbarStyle.text}>{item.VenueName}</Text>
+                        <Text style={appbarStyle.text}>
+                          {item.StartDateTime}
+                        </Text>
+
+                        <Image
+                          style={appbarStyle.image}
+                          source={{ uri: item.Image.toString() }}
+                        />
+
+                      </Card.Content>
+                    </Card>
+                  </A>
+                );
+              }}
+            />
+            <Card elevation={5} style={appbarStyle.recommendedCard}>
+              <Paragraph style={appbarStyle.recommendedCardText}>
+                Recommended for you
             </Paragraph>
-          </Card>
+            </Card>
 
-          <FlatList
-            showsHorizontalScrollIndicator={false}
-            data={recommendedEvents}
-            keyExtractor={(item) => item.EventId.toString()}
-            renderItem={({ item }) => {
-              return (
-                <A href={item.EventUrl} style={appbarStyle.card}>
-                  <Card elevation={5} style={appbarStyle.card}>
+            <FlatList
+              showsHorizontalScrollIndicator={false}
+              data={recommendedEvents}
+              keyExtractor={(item) => item.EventId.toString()}
+              renderItem={({ item }) => {
+                return (
+                  <A href={item.EventUrl} style={appbarStyle.card}>
+                    <Card elevation={5} style={appbarStyle.card}>
 
-                    <Paragraph style={appbarStyle.cardTitle}>
-                      {item.EventName}
-                    </Paragraph>
-                    <Paragraph style={appbarStyle.artistName}>
-                      {item.ArtistName}
-                    </Paragraph>
+                      <Paragraph style={appbarStyle.cardTitle}>
+                        {item.EventName}
+                      </Paragraph>
+                      <Paragraph style={appbarStyle.artistName}>
+                        {item.ArtistName}
+                      </Paragraph>
 
-                    <Card.Content style={appbarStyle.cardContent}>
-                      <Text style={appbarStyle.text}>{item.CityName}</Text>
-                      <Text style={appbarStyle.text}>{item.VenueName}</Text>
-                      <Text style={appbarStyle.text}>
-                        {Moment(item.StartDateTime.toString()).format("DD/MM/YYYY hh:mm A")}
-                      </Text>
+                      <Card.Content style={appbarStyle.cardContent}>
+                        <Text style={appbarStyle.text}>{item.CityName}</Text>
+                        <Text style={appbarStyle.text}>{item.VenueName}</Text>
+                        <Text style={appbarStyle.text}>
+                          {Moment(item.StartDateTime.toString()).format("DD/MM/YYYY hh:mm A")}
+                        </Text>
 
-                      <Image
-                        style={appbarStyle.image}
-                        source={{ uri: item.Image.toString() }}
-                      />
+                        <Image
+                          style={appbarStyle.image}
+                          source={{ uri: item.Image.toString() }}
+                        />
 
-                    </Card.Content>
-                  </Card>
-                </A>
-              );
-            }}
-          />
+                      </Card.Content>
+                    </Card>
+                  </A>
+                );
+              }}
+            />
 
-        </ScrollView>
+          </ScrollView>
+        </View>
       )}
     </Container>
   )
