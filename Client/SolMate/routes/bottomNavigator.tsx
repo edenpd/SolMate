@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import React from "react";
+import React, { useContext, useEffect } from "react";
 import { StyleSheet, Text, View, Dimensions } from "react-native";
 import { BottomNavigation, Appbar } from "react-native-paper";
 import ChatRoute from "../routes/ChatRoute";
@@ -20,6 +20,14 @@ import {
 } from "@expo-google-fonts/poppins";
 import WavyHeader from "../components/WavyHeader";
 import { Image } from "react-native-elements/dist/image/Image";
+import { tokenContext } from "../contexts/tokenContext";
+import * as WebBrowser from "expo-web-browser";
+import {
+  makeRedirectUri,
+  useAuthRequest,
+  ResponseType,
+} from "expo-auth-session";
+import { EXPO_ADDRESS, EXPO_PORT } from "@env";
 
 const customFonts = {
   Poppins_100Thin,
@@ -27,6 +35,8 @@ const customFonts = {
   Poppins_500Medium_Italic,
   Poppins_300Light,
 };
+
+WebBrowser.maybeCompleteAuthSession();
 
 export default function App() {
   const [index, setIndex] = React.useState(0);
@@ -40,6 +50,39 @@ export default function App() {
 
   // the same as Font.loadAsync , the hook returns  true | error
   const [isLoaded] = useFonts(customFonts);
+  const { token } = useContext(tokenContext);
+  const discovery = {
+    authorizationEndpoint: "https://accounts.spotify.com/authorize",
+    tokenEndpoint: "https://accounts.spotify.com/api/token",
+  };
+  const [request, response, promptAsync] = useAuthRequest(
+    {
+      clientId: "b5497b2f8f6441fa8449f7a108920552",
+      scopes: [
+        "user-read-private",
+        "user-read-email",
+        "user-top-read",
+        "user-read-recently-played",
+      ],
+      responseType: ResponseType.Token,
+      // In order to follow the "Authorization Code Flow" to fetch token after authorizationEndpoint
+      // this must be set to false
+      usePKCE: false,
+      // For usage in managed apps using the proxy
+      redirectUri: makeRedirectUri({
+        // For usage in bare and standalone
+        native: `exp://${EXPO_ADDRESS}:${EXPO_PORT}`,
+      }),
+    },
+    discovery
+  );
+
+  useEffect(() => {
+    console.log(token);
+    if (token.spotifyToken == undefined) {
+      promptAsync();
+    }
+  }, []);
 
   const renderScene = BottomNavigation.SceneMap({
     matches: MatchesRoute,
@@ -81,13 +124,13 @@ export default function App() {
       width: "100%",
     },
     logoImage: {
-      alignSelf: 'center',
+      alignSelf: "center",
       marginTop: 20,
       zIndex: 1000,
       position: "relative",
       width: 180,
-      height: 100
-    }
+      height: 100,
+    },
   });
 
   return (
@@ -108,7 +151,11 @@ export default function App() {
       />
       <View style={styles.headerContainer}>
         {/* <Text style={styles.headerText}>SolMate</Text> */}
-        <Image resizeMode='contain' source={require("../assets/solmate_white.png")} style={styles.logoImage} />
+        <Image
+          resizeMode="contain"
+          source={require("../assets/solmate_white.png")}
+          style={styles.logoImage}
+        />
       </View>
       <BottomNavigation
         activeColor={"#8860D0"}
