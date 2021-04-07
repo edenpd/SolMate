@@ -54,13 +54,14 @@ const StateProvider = ({ children }) => {
 
   const [state, dispatch] = useReducer((state, action) => {
     const currentState = { ...state };
-
     switch (action.type) {
       case "SET_USER":
-        currentState.user = {
-          email: action.payload.email,
-          _id: action.payload._id,
-        };
+        if (action.payload) {
+          currentState.user = {
+            email: action.payload.email,
+            _id: action.payload._id,
+          };
+        }
 
         return currentState;
       case "LOGOUT":
