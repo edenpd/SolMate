@@ -41,6 +41,7 @@ import useDate, { LOCALE } from "../hooks/useDate";
 import { userContext } from "../contexts/userContext";
 import { tokenContext } from "../contexts/tokenContext";
 import { SERVER_ADDRESS, SERVER_PORT } from '@env';
+import { EXPO_ADDRESS , EXPO_PORT} from "@env";
 
 export interface IUserForm {
   email: string;
@@ -117,7 +118,7 @@ export default function Register({ navigation }) {
       // For usage in managed apps using the proxy
       redirectUri: makeRedirectUri({
         // For usage in bare and standalone
-        native: "exp://10.100.102.3:19000",
+        native: `exp://${EXPO_ADDRESS}:${EXPO_PORT}`,
       }),
     },
     discovery

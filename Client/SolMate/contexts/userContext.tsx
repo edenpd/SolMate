@@ -20,7 +20,7 @@ const getIntialState = async (storageKey) => {
       if (!value) {
         return undefined;
       }
-      return value;
+      return JSON.parse(value);
     });
   }
   return value;
@@ -28,10 +28,10 @@ const getIntialState = async (storageKey) => {
 const initialState = getIntialState(STORAGE_KEY);
 
 const providerValue = {
-  state: initialState,
+  state: { _id: undefined, email: undefined },
   dispatch: (action) => {}, // << This will be overwritten
   fetch: (action) => {},
-  data: getIntialState("User"),
+  data: {},
 };
 
 const userContext = React.createContext(providerValue); // Create a context object
@@ -69,22 +69,27 @@ const StateProvider = ({ children }) => {
       default:
         throw new Error();
     }
-  }, initialState);
+  }, providerValue.state);
 
   useEffect(() => {
     async function presist() {
-      const initialState = await getIntialState(STORAGE_KEY);
-
-      dispatch({ type: "SET_USER", payload: initialState });
+      await getIntialState(STORAGE_KEY).then((value) =>
+        dispatch({ type: "SET_USER", payload: value })
+      );
     }
     presist();
   }, []);
 
   useEffect(() => {
-    async function presist() {
-      await persistState(STORAGE_KEY, state);
+    if (
+      state._id !== providerValue.state._id ||
+      state.email !== providerValue.state.email
+    ) {
+      async function presist() {
+        await persistState(STORAGE_KEY, state);
+      }
+      presist();
     }
-    presist();
   }, [state, data]);
 
   return (

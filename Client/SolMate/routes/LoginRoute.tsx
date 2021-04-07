@@ -21,7 +21,6 @@ export default function LoginRoute({ navigation }) {
   }, [token]);
 
   async function loginUser(credentials) {
-    console.log(credentials);
     return axios
       .post(`${SERVER_ADDRESS}:${SERVER_PORT}/user/login`, credentials, {
         headers: { "Content-Type": "application/json" },

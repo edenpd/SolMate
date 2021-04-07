@@ -45,6 +45,9 @@ const schema = new Schema({
   description: {
     type: String,
   },
+  hasSpotify: {
+    type: Boolean,
+  },
   sex: {
     type: Number,
     required: true,
