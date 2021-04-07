@@ -5,8 +5,7 @@ import * as SecureStore from "expo-secure-store";
 import { UserContextState } from "../util/Types";
 import { SERVER_ADDRESS, SERVER_PORT } from "@env";
 
-const STORAGE_KEY = "userInfo";
-
+const STORAGE_KEY = "userIfo";
 const persistState = async (storageKey, state) => {
   await SecureStore.setItemAsync(storageKey, JSON.stringify(state));
 };
@@ -16,14 +15,14 @@ const getIntialState = async (storageKey) => {
   const isAvaiable = await SecureStore.isAvailableAsync();
   if (isAvaiable) {
     value = await SecureStore.getItemAsync(storageKey).then((value) => {
-      console.log(value);
       if (!value) {
         return undefined;
       }
-      return JSON.parse(value);
+      return value;
     });
   }
-  return value;
+
+  return JSON.parse(value);
 };
 const initialState = getIntialState(STORAGE_KEY);
 
@@ -74,24 +73,24 @@ const StateProvider = ({ children }) => {
 
   useEffect(() => {
     async function presist() {
-      await getIntialState(STORAGE_KEY).then((value) =>
-        dispatch({ type: "SET_USER", payload: value })
-      );
+      await getIntialState(STORAGE_KEY).then((value) => 
+        dispatch({ type: "SET_USER", payload: value.user }));
     }
     presist();
   }, []);
 
   useEffect(() => {
     if (
-      state._id !== providerValue.state._id ||
-      state.email !== providerValue.state.email
+      state.user &&
+      (state.user._id != providerValue.state._id ||
+        state.user.email != providerValue.state.email)
     ) {
       async function presist() {
         await persistState(STORAGE_KEY, state);
       }
       presist();
     }
-  }, [state, data]);
+  }, [state]);
 
   return (
     <Provider value={{ state, dispatch, fetch, data }}>{children}</Provider>
