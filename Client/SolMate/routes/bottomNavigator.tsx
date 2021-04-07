@@ -38,7 +38,7 @@ const customFonts = {
 
 WebBrowser.maybeCompleteAuthSession();
 
-export default function App() {
+export default function App({ navigation }) {
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([
     { key: "matches", title: "Matches", icon: "account-multiple" },
@@ -77,13 +77,13 @@ export default function App() {
     discovery
   );
 
-  useEffect(() => {
-    console.log(token);
+  React.useEffect(() => {
     if (token.spotifyToken == undefined) {
       promptAsync();
     }
-  }, []);
-
+    return;
+    
+  }, [navigation]);
   const renderScene = BottomNavigation.SceneMap({
     matches: MatchesRoute,
     events: EventsRoute,
