@@ -28,6 +28,7 @@ import {
   ResponseType,
 } from "expo-auth-session";
 import { EXPO_ADDRESS, EXPO_PORT } from "@env";
+import { userContext } from "../contexts/userContext";
 
 const customFonts = {
   Poppins_100Thin,
@@ -48,9 +49,9 @@ export default function App({ navigation }) {
     { key: "setting", title: "Setting", icon: "cog" },
   ]);
 
+  const {state} = useContext(userContext);
   // the same as Font.loadAsync , the hook returns  true | error
   const [isLoaded] = useFonts(customFonts);
-  const { token } = useContext(tokenContext);
   const discovery = {
     authorizationEndpoint: "https://accounts.spotify.com/authorize",
     tokenEndpoint: "https://accounts.spotify.com/api/token",
@@ -77,13 +78,13 @@ export default function App({ navigation }) {
     discovery
   );
 
-  React.useEffect(() => {
-    if (token.spotifyToken == undefined) {
-      promptAsync();
-    }
-    return;
+  // React.useEffect(() => {
+  //   // if (user.spotifyToken == undefined) {
+  //     promptAsync();
+  //   // }
+  //   return;
     
-  }, [navigation]);
+  // }, [navigation]);
   const renderScene = BottomNavigation.SceneMap({
     matches: MatchesRoute,
     events: EventsRoute,
