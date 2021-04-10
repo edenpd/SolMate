@@ -18,7 +18,8 @@ const getIntialState = async (storageKey) => {
         return undefined;
       }
       return JSON.parse(value);
-    });
+    })
+    .catch((err) => console.log(JSON.stringify(err)));
   }
   return value;
 };

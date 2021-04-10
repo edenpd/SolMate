@@ -44,6 +44,8 @@ import { SERVER_ADDRESS, SERVER_PORT } from "@env";
 import { EXPO_ADDRESS, EXPO_PORT } from "@env";
 import * as ImagePicker from "expo-image-picker";
 
+WebBrowser.maybeCompleteAuthSession();
+
 export interface IUserForm {
   email: string;
   password: string;
@@ -122,33 +124,11 @@ export default function Register({ navigation }) {
       // this must be set to false
       usePKCE: false,
       // For usage in managed apps using the proxy
-      redirectUri: makeRedirectUri({
-        // For usage in bare and standalone
-        native: `exp://${EXPO_ADDRESS}:${EXPO_PORT}`,
-      }),
+      redirectUri: `exp://${EXPO_ADDRESS}:${EXPO_PORT}`,
     },
     discovery
   );
-
-  useEffect(() => {
-    return () => {
-      if (response) {
-        if (response?.type === "success") {
-          const { access_token, refresh_token } = response.params;
-          if (access_token) {
-            setFormData((prevstate) => {
-              return {
-                ...prevstate,
-                spotifyAccessToken: access_token,
-                spotifyRefreshToken: refresh_token,
-              };
-            });
-          }
-        }
-      }
-    };
-  }, [response]);
-
+  
   const handleChange = (name, value) => {
     setFormData((prevstate) => {
       return {
@@ -454,7 +434,24 @@ export default function Register({ navigation }) {
             activeOpacity={0.5}
             disabled={noSpotify}
             onPress={() => {
-              promptAsync();
+              promptAsync().then((response) => {
+                if (response) {
+                  if (response?.type === "success") {
+                    const { access_token } = response.params;
+                    console.log(JSON.stringify(access_token));
+
+                    if (access_token) {
+                      setFormData((prevstate) => {
+                        return {
+                          ...prevstate,
+                          spotifyAccessToken: access_token,
+                          // spotifyRefreshToken: refresh_token,
+                        };
+                      });
+                    }
+                  }
+                }
+              });
             }}
           >
             <Text style={registerStyle.buttonTextStyle}>
