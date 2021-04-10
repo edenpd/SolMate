@@ -26,7 +26,7 @@ const getIntialState = async (storageKey) => {
 const initialState = getIntialState(STORAGE_KEY);
 
 const providerValue = {
-  token: { token: undefined, spotifyToken: undefined },
+  token: { token: undefined },
   dispatchToken: (action) => {}, // << This will be overwritten
 };
 
@@ -41,12 +41,8 @@ const TokenStateProvider = ({ children }) => {
       case "SET_TOKEN":
         currentState.token = action.payload;
         return currentState;
-      case "SET_SPOTIFY_TOKEN":
-        currentState.spotifyToken = action.payload;
-        return currentState;
       case "LOGOUT":
         currentState.token = null;
-        currentState.spotifyToken = null;
         return currentState;
       default:
         throw new Error();
@@ -63,7 +59,7 @@ const TokenStateProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    if (token.token !== providerValue.token.token || token.sportifyToken !== providerValue.token.spotifyToken) {
+    if (token.token !== providerValue.token.token) {
       async function presist() {
         await persistState(STORAGE_KEY, token);
       }

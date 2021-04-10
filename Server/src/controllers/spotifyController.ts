@@ -1,16 +1,38 @@
 import SpotifyWebApi from "spotify-web-api-node";
 import { Request, Response } from "express";
+import crypto from "crypto";
 
 // Setting credentials can be done in the wrapper's constructor, or using the API object's setters.
 var spotifyApi = new SpotifyWebApi({
-  clientSecret: "0cbde209fec24b03bfddf4a7c4515e30",
-  clientId: "b5497b2f8f6441fa8449f7a108920552",
+  clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
+  clientId: process.env.SPOTIFY_CLIENT_ID,
 });
+
+function decrypt(token: string, iv: string) {
+  var secretKey: string;
+
+  const algorithm = "aes-256-ctr";
+  if (process.env.SPOTIFY_SECRET_KEY_TOKEN) {
+    secretKey = process.env.SPOTIFY_SECRET_KEY_TOKEN;
+  } else {
+    secretKey = "";
+  }
+  const decipher = crypto.createDecipheriv(
+    algorithm,
+    secretKey,
+    Buffer.from(iv, "hex")
+  );
+
+  const spotifyAccessToken = Buffer.concat([
+    decipher.update(Buffer.from(token, "hex")),
+    decipher.final(),
+  ]);
+  return spotifyAccessToken.toString();
+}
 
 // Create the authorization URL
 export const authorizeSpotify = async (req: Request, res: Response) => {
-  const token: string = req.body.token;
-  spotifyApi.setAccessToken(token);
+  spotifyApi.setAccessToken(decrypt(req.body.token, req.body.iv));
   spotifyApi.getMe().then(
     function (data) {
       return res.status(200).json(data);
@@ -22,6 +44,7 @@ export const authorizeSpotify = async (req: Request, res: Response) => {
 };
 
 export const getUserInfo = async (req: Request, res: Response) => {
+  spotifyApi.setAccessToken(decrypt(req.body.token, req.body.iv));
   if (spotifyApi.getAccessToken()) {
     spotifyApi.getMe().then(
       function (data) {
@@ -36,6 +59,7 @@ export const getUserInfo = async (req: Request, res: Response) => {
 };
 
 export const searchSong = async (req: Request, res: Response) => {
+  spotifyApi.setAccessToken(decrypt(req.body.token, req.body.iv));
   if (spotifyApi.getAccessToken()) {
     spotifyApi.searchTracks(req.body.songName).then(
       function (data) {
@@ -50,6 +74,7 @@ export const searchSong = async (req: Request, res: Response) => {
 };
 
 export const getTopTracks = async (req: Request, res: Response) => {
+  spotifyApi.setAccessToken(decrypt(req.body.token, req.body.iv));
   if (spotifyApi.getAccessToken()) {
     spotifyApi.getMyTopTracks().then(
       function (data) {
@@ -63,8 +88,8 @@ export const getTopTracks = async (req: Request, res: Response) => {
   return res.status(403).json("No auth");
 };
 
-
 export const getTopArtists = async (req: Request, res: Response) => {
+  spotifyApi.setAccessToken(decrypt(req.body.token, req.body.iv));
   if (spotifyApi.getAccessToken()) {
     spotifyApi.getMyTopArtists().then(
       function (data) {

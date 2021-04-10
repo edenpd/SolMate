@@ -9,7 +9,10 @@ export interface IUser {
   description: string;
   sex: number;
   birthday: Date;
+  iv: string;
   picture: string;
+  spotifyAccessToken: string;
+  spotifyRefreshToken: string;
   youtubeSong: string;
   radiusSearch: number;
   interestedSex: number;
@@ -45,8 +48,14 @@ const schema = new Schema({
   description: {
     type: String,
   },
-  hasSpotify: {
-    type: Boolean,
+  spotifyAccessToken: {
+    type: String,
+  },
+  spotifyRefreshToken: {
+    type: String,
+  },
+  iv: {
+    type: String,
   },
   sex: {
     type: Number,

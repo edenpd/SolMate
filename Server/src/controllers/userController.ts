@@ -7,17 +7,46 @@ import * as config from "../config/config.json";
 import { CallbackError, MapReduceOptions } from "mongoose";
 import { deleteChatsOfUser } from "../controllers/chatController";
 import { deleteMatchesOfUser } from "../controllers/matchController";
+import crypto from "crypto";
 
 export const registerUser = async (req: Request, res: Response) => {
   const hashedPassword = bcrypt.hashSync(
     req.body.password,
     bcrypt.genSaltSync(10)
   );
+  var secretKey;
+
+  const algorithm = "aes-256-ctr";
+  if (process.env.SPOTIFY_SECRET_KEY_TOKEN) {
+    secretKey = process.env.SPOTIFY_SECRET_KEY_TOKEN;
+  } else {
+    secretKey = "";
+  }
+  const iv = crypto.randomBytes(16);
+
+  const cipher = crypto.createCipheriv(algorithm, secretKey, iv);
+  console.log(req.body.spotifyAccessToken)
+  const encryptedToken = Buffer.concat([
+    cipher.update(req.body.spotifyAccessToken),
+    cipher.final(),
+  ]);
+
+  const encryptedSpotifyToken = encryptedToken.toString("hex");
+
+  // const encryptedRefToken = Buffer.concat([
+  //   cipher.update(req.body.spotifyRefreshToken),
+  //   cipher.final(),
+  // ]);
+
+  // const encryptedRefreshToken = encryptedRefToken.toString("hex");
 
   var userBody: IUser = req.body;
   const user = await User.create({
     email: userBody.email,
     password: hashedPassword,
+    iv: iv.toString("hex"),
+    spotifyAccessToken: encryptedSpotifyToken,
+    // spotifyRefreshToken: encryptedRefreshToken,
     firstName: userBody.firstName,
     lastName: userBody.lastName,
     description: userBody.description,

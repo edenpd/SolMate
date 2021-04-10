@@ -40,8 +40,9 @@ import RailSelected from "../components/RangeSlider/RailSelected";
 import useDate, { LOCALE } from "../hooks/useDate";
 import { userContext } from "../contexts/userContext";
 import { tokenContext } from "../contexts/tokenContext";
-import { SERVER_ADDRESS, SERVER_PORT } from '@env';
-import { EXPO_ADDRESS , EXPO_PORT} from "@env";
+import { SERVER_ADDRESS, SERVER_PORT } from "@env";
+import { EXPO_ADDRESS, EXPO_PORT } from "@env";
+import * as ImagePicker from "expo-image-picker";
 
 export interface IUserForm {
   email: string;
@@ -50,6 +51,8 @@ export interface IUserForm {
   firstName: string;
   lastName: string;
   fullName: string;
+  spotifyAccessToken: string;
+  spotifyRefreshToken: string;
   description: string;
   sex: number;
   birthday: Date;
@@ -77,12 +80,15 @@ export default function Register({ navigation }) {
   const [noSpotify, setNoSpotify] = useState(false);
   const [errors, setErrors] = useState({});
   const { dispatch } = useContext(userContext);
-  const { token,dispatchToken } = useContext(tokenContext);
+  const { token, dispatchToken } = useContext(tokenContext);
+  const [image, setImage] = useState(null);
 
   const [formData, setFormData] = useState<IUserForm>({
     email: "",
     password: "",
     confirmPassword: "",
+    spotifyAccessToken: "",
+    spotifyRefreshToken: "",
     firstName: "",
     lastName: "",
     fullName: "",
@@ -128,21 +134,15 @@ export default function Register({ navigation }) {
     return () => {
       if (response) {
         if (response?.type === "success") {
-          const { access_token } = response.params;
+          const { access_token, refresh_token } = response.params;
           if (access_token) {
-            dispatchToken({ type: "SET_SPOTIFY_TOKEN", payload: access_token });
-            axios
-              .post(
-                `${SERVER_ADDRESS}:${SERVER_PORT}/spotify/auth`,
-                { token: access_token },
-                {
-                  headers: { "Content-Type": "application/json" },
-                }
-              )
-              .then(async (response) => {
-                console.log(JSON.stringify(await response.data.body));
-              })
-              .catch((error) => Alert.alert(error.message));
+            setFormData((prevstate) => {
+              return {
+                ...prevstate,
+                spotifyAccessToken: access_token,
+                spotifyRefreshToken: refresh_token,
+              };
+            });
           }
         }
       }
@@ -157,6 +157,22 @@ export default function Register({ navigation }) {
       };
     });
   };
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    console.log(result);
+
+    if (!result.cancelled) {
+      setImage(result);
+    }
+  };
+
   async function uploadPic(credentials, token) {
     const formData = new FormData();
 
@@ -170,7 +186,11 @@ export default function Register({ navigation }) {
     };
     axios.defaults.headers.common["Authorization"] = "Bearer " + token;
     axios
-      .post(`${SERVER_ADDRESS}:${SERVER_PORT}/user/uploadProfile`, formData, config)
+      .post(
+        `${SERVER_ADDRESS}:${SERVER_PORT}/user/uploadProfile`,
+        formData,
+        config
+      )
       .then((response) => {
         return response;
       })
@@ -292,7 +312,6 @@ export default function Register({ navigation }) {
         >
           Sex
         </Text>
-
         <View
           style={{
             flexDirection: "row",
@@ -330,7 +349,6 @@ export default function Register({ navigation }) {
             }}
           />
         </View>
-
         <Text
           style={{
             width: "77%",
@@ -343,7 +361,6 @@ export default function Register({ navigation }) {
         >
           Intrested Sex
         </Text>
-
         <View
           style={{
             flexDirection: "row",
@@ -379,7 +396,6 @@ export default function Register({ navigation }) {
             }}
           />
         </View>
-
         <View
           style={{
             width: "100%",
@@ -418,7 +434,17 @@ export default function Register({ navigation }) {
             onValueChanged={handleValueChange}
           />
         </View>
-
+        <View
+          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+        >
+          <Button title="Pick an image from camera roll" onPress={pickImage} />
+          {image && (
+            <Image
+              source={{ uri: image }}
+              style={{ width: 200, height: 200 }}
+            />
+          )}
+        </View>
         <View style={{ marginVertical: 8, width: "100%" }}>
           <TouchableOpacity
             style={[
