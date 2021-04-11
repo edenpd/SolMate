@@ -19,6 +19,7 @@ const MatchesRoute = () => {
 
     const getMatches = () => {
         console.log("Getting multiple matches");
+        console.log(state);
         axios
             .get(`${SERVER_ADDRESS}:${SERVER_PORT}/match?userId=${state.user._id}`)
             .then((res) => {
@@ -48,7 +49,7 @@ const MatchesRoute = () => {
     };
 
     const renderCard = ({ item, index }) => {
-        const otherUser = (item as IMatch).firstUser['_id'] === state.user._id ? item.secondUser : item.firstUser;
+        const otherUser = (item as IMatch).firstUser['_id'] === state.user._id + "" ? item.secondUser : item.firstUser;
 
         return (
             <MatchCard user={otherUser} match={item} onAfterRespond={onAfterRespond} />

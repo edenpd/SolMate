@@ -4,6 +4,7 @@ import useToken from "../hooks/useToken";
 import * as SecureStore from "expo-secure-store";
 import { UserContextState } from "../util/Types";
 import { SERVER_ADDRESS, SERVER_PORT } from "@env";
+import { string } from "prop-types";
 
 const STORAGE_KEY = "userIfo";
 const persistState = async (storageKey, state) => {
@@ -27,7 +28,7 @@ const getIntialState = async (storageKey) => {
 const initialState = getIntialState(STORAGE_KEY);
 
 const providerValue = {
-  state: { _id: undefined, email: undefined },
+  state: { _id: undefined, email: undefined, user: { _id: string, email: string } },
   dispatch: (action) => {}, // << This will be overwritten
   fetch: (action) => {},
   data: {},
