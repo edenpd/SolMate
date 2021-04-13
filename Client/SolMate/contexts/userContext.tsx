@@ -22,13 +22,14 @@ const getIntialState = async (storageKey) => {
       return value;
     });
   }
-
   return JSON.parse(value);
 };
 const initialState = getIntialState(STORAGE_KEY);
 
 const providerValue = {
-  state: { _id: undefined, email: undefined, user: { _id: string, email: string } },
+  state: {
+    user: { _id: undefined, email: undefined },
+  },
   dispatch: (action) => {}, // << This will be overwritten
   fetch: (action) => {},
   data: {},
@@ -74,17 +75,17 @@ const StateProvider = ({ children }) => {
 
   useEffect(() => {
     async function presist() {
-      await getIntialState(STORAGE_KEY).then((value) => 
-        dispatch({ type: "SET_USER", payload: value.user }));
+      await getIntialState(STORAGE_KEY).then((value) =>
+        dispatch({ type: "SET_USER", payload: value.user })
+      );
     }
     presist();
   }, []);
 
   useEffect(() => {
     if (
-      state.user &&
-      (state.user._id != providerValue.state._id ||
-        state.user.email != providerValue.state.email)
+      state.user._id !== undefined ||
+      state.user.email !== undefined
     ) {
       async function presist() {
         await persistState(STORAGE_KEY, state);
