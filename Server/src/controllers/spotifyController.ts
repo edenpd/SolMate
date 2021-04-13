@@ -33,7 +33,7 @@ function decrypt(token: string, iv: string) {
 // Create the authorization URL
 export const authorizeSpotify = async (req: Request, res: Response) => {
   spotifyApi.setAccessToken(decrypt(req.body.token, req.body.iv));
-  spotifyApi.getMe().then(
+  await spotifyApi.getMe().then(
     function (data) {
       return res.status(200).json(data);
     },
@@ -46,7 +46,7 @@ export const authorizeSpotify = async (req: Request, res: Response) => {
 export const getUserInfo = async (req: Request, res: Response) => {
   spotifyApi.setAccessToken(decrypt(req.body.token, req.body.iv));
   if (spotifyApi.getAccessToken()) {
-    spotifyApi.getMe().then(
+    await spotifyApi.getMe().then(
       function (data) {
         return res.status(200).json(data);
       },
@@ -61,7 +61,7 @@ export const getUserInfo = async (req: Request, res: Response) => {
 export const searchSong = async (req: Request, res: Response) => {
   spotifyApi.setAccessToken(decrypt(req.body.token, req.body.iv));
   if (spotifyApi.getAccessToken()) {
-    spotifyApi.searchTracks(req.body.songName).then(
+    await spotifyApi.searchTracks(req.body.songName).then(
       function (data) {
         return res.status(200).json(data);
       },
@@ -69,14 +69,15 @@ export const searchSong = async (req: Request, res: Response) => {
         return res.status(403).json(err);
       }
     );
+  } else {
+    return res.status(403).json("No auth");
   }
-  return res.status(403).json("No auth");
 };
 
 export const getTopTracks = async (req: Request, res: Response) => {
   spotifyApi.setAccessToken(decrypt(req.body.token, req.body.iv));
   if (spotifyApi.getAccessToken()) {
-    spotifyApi.getMyTopTracks().then(
+    await spotifyApi.getMyTopTracks().then(
       function (data) {
         return res.status(200).json(data);
       },
@@ -84,14 +85,15 @@ export const getTopTracks = async (req: Request, res: Response) => {
         return res.status(403).json(err);
       }
     );
+  } else {
+    return res.status(403).json("No auth");
   }
-  return res.status(403).json("No auth");
 };
 
 export const getTopArtists = async (req: Request, res: Response) => {
   spotifyApi.setAccessToken(decrypt(req.body.token, req.body.iv));
   if (spotifyApi.getAccessToken()) {
-    spotifyApi.getMyTopArtists().then(
+    await spotifyApi.getMyTopArtists().then(
       function (data) {
         return res.status(200).json(data);
       },
@@ -99,6 +101,7 @@ export const getTopArtists = async (req: Request, res: Response) => {
         return res.status(403).json(err);
       }
     );
+  } else {
+    return res.status(403).json("No auth");
   }
-  return res.status(403).json("No auth");
 };
