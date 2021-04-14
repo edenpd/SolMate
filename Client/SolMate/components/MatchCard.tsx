@@ -129,7 +129,7 @@ const MatchCard = ({ match, user, onAfterRespond }: MatchCardProps) => {
         const artistsDOM = [];
         for (let i = 0; i < 3 && i < user.Songs.length; i++) {
             artistsDOM.push(
-                <View style={appbarStyle.artist}>
+                <View key={"artist" + i} style={appbarStyle.artist}>
                     <Avatar.Image style={appbarStyle.artistImage} source={{ uri: user.Artists[i].images[0].url }} />
                     {showNames && <Text style={appbarStyle.artistName}>{user.Artists[i].name}</Text>}
                 </View>
