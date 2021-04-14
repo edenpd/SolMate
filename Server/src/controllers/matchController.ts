@@ -3,10 +3,10 @@ import { CallbackError } from "mongoose";
 import Match, { IMatch, IMatchModel } from "../modules/matchModel";
 import { IChat } from "../modules/chatModel";
 import {
-  getUserByEmail,
   getUsersForMatches,
 } from "../controllers/userController";
 import { addChatAfterMatch } from "../controllers/chatController";
+import { decrypt, spotifyApi } from "../Util/spotifyAccess";
 
 export const addMatch = async (req: Request, res: Response) => {
   try {
@@ -82,11 +82,10 @@ export const updateMatch = async (req: Request, res: Response) => {
 
 export const getMatchesById = async (req: Request, res: Response) => {
   let userID = req.query.userId?.toString();
-  console.log("The user id is: " + userID);
 
   // Find matches in
   if (userID !== undefined) {
-    await Match.find({
+    Match.find({
       $or: [
         {
           $and: [
@@ -110,29 +109,55 @@ export const getMatchesById = async (req: Request, res: Response) => {
         },
       ],
     })
-      // .populate("firstUser")
-      // .populate("secondUser")
       .populate({
         path: "firstUser",
         model: "users",
-        // populate: {
-        //   path: "Songs",
-        //   model: "songs",
-        // },
       })
       .populate({
         path: "secondUser",
         model: "users",
-        // populate: {
-        //   path: "Songs",
-        //   model: "songs",
-        // },
       })
-      .exec((err: CallbackError, user: any) => {
+      .exec(async (err: CallbackError, matches: any) => {
         if (err) {
           res.status(500).send(err);
         } else {
-          res.status(200).json(user);
+          const matchesData = [];
+
+          for (let i = 0; i < matches.length; i++) {
+            const otherUser = matches[i].firstUser._id === userID ? matches[i]._doc.secondUser : matches[i]._doc.firstUser;
+
+            // Get the matches from spotify.
+            spotifyApi.setAccessToken(decrypt(otherUser.spotifyAccessToken, otherUser.iv));
+
+            // Try accessing the spotify API only if there is an access token.
+            if (spotifyApi.getAccessToken()) {
+              const artists = await spotifyApi.getMyTopArtists({ limit: 3 });
+
+              // Check which user made the request, and get the top artists of the other use.
+              if (matches[i]._doc.firstUser._id.toString() === userID) {
+                matchesData.push({
+                  ...matches[i]._doc,
+                  secondUser: {
+                    ...matches[i].secondUser._doc,
+                    Artists: artists.body.items
+                  }
+                });
+              } else {
+                console.log(artists);
+                matchesData.push({
+                  ...matches[i]._doc,
+                  firstUser: {
+                    ...matches[i]._doc.firstUser._doc,
+                    Artists: artists.body.items
+                  }
+                });
+              }
+            } else { // If there is no token, return the mataches without the users' top artists.
+              matchesData.push(matches[i]);
+            }
+          };
+
+          res.status(200).json(matchesData);
         }
       });
   }
@@ -196,7 +221,7 @@ export const MatchAlgorithm = async (req: Request, res: Response) => {
           // @ts-ignore
           similarSongs / (currentUser?.Songs.length + user.Songs.length) +
           similarSavedSongs /
-            (currentUserSavedSongs.length + userSavedSongs.length);
+          (currentUserSavedSongs.length + userSavedSongs.length);
       }
 
       // similar artists amount
@@ -231,7 +256,7 @@ export const MatchAlgorithm = async (req: Request, res: Response) => {
           // @ts-ignore
           similarArtists / (currentUser?.Artists.length + user.Artists.length) +
           similarFollowArtists /
-            (currentUserFollowArtists.length + userFollowArtists.length);
+          (currentUserFollowArtists.length + userFollowArtists.length);
       }
 
       // similar album amount

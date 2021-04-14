@@ -20,8 +20,8 @@ const MatchCard = ({ match, user, onAfterRespond }: MatchCardProps) => {
 
     const [showNames, setShowNames] = useState<Boolean>(false);
     const [isDialogVisible, setIsDialogVisible] = useState<Boolean>(false);
-    const {state} = useContext(userContext);
-    
+    const { state } = useContext(userContext);
+
     const appbarStyle = StyleSheet.create({
         userImage: {
             alignSelf: 'center',
@@ -90,11 +90,11 @@ const MatchCard = ({ match, user, onAfterRespond }: MatchCardProps) => {
         },
     });
 
-  const calcAge = (date: Date) => {
-    return new Number(
-      (new Date().getTime() - new Date(date).getTime()) / 31536000000
-    ).toFixed(0);
-  };
+    const calcAge = (date: Date) => {
+        return new Number(
+            (new Date().getTime() - new Date(date).getTime()) / 31536000000
+        ).toFixed(0);
+    };
 
     const respondToMatch = (resp: String) => {
         const uMatch = {
@@ -108,7 +108,7 @@ const MatchCard = ({ match, user, onAfterRespond }: MatchCardProps) => {
                 console.log("The res is:");
                 console.log(res.data);
                 const match = res.data.match;
-                
+
                 if (match.Approve1 === 'accepted' && match.Approve2 === 'accepted') {
 
                     // Show dialog.
@@ -125,6 +125,20 @@ const MatchCard = ({ match, user, onAfterRespond }: MatchCardProps) => {
             });
     };
 
+    const renderArtists = () => {
+        const artistsDOM = [];
+        for (let i = 0; i < 3 && i < user.Songs.length; i++) {
+            artistsDOM.push(
+                <View style={appbarStyle.artist}>
+                    <Avatar.Image style={appbarStyle.artistImage} source={{ uri: user.Artists[i].images[0].url }} />
+                    {showNames && <Text style={appbarStyle.artistName}>{user.Artists[i].name}</Text>}
+                </View>
+            );
+        }
+
+        return artistsDOM;
+    };
+
     return (
         <Card style={appbarStyle.card} elevation={5}>
             <ImageBackground
@@ -135,18 +149,7 @@ const MatchCard = ({ match, user, onAfterRespond }: MatchCardProps) => {
                 <Card.Title style={appbarStyle.cardTitle} title={<Text></Text>} />
                 <TouchableHighlight underlayColor={'transparent'} onPress={() => setShowNames(!showNames)}>
                     <View style={appbarStyle.artistList}>
-                        <View style={appbarStyle.artist}>
-                            <Avatar.Image style={appbarStyle.artistImage} source={{ uri: 'https://assets.vogue.com/photos/5e40a77f89bdc90008ecc389/master/pass/billie-eilish-promo.jpg' }} />
-                            {showNames && <Text style={appbarStyle.artistName}>Billie Eillish</Text>}
-                        </View>
-                        <View style={appbarStyle.artist}>
-                            <Avatar.Image style={appbarStyle.artistImage} source={{ uri: 'https://i.guim.co.uk/img/media/c001a1444cc7dc29768ff55dfa283d0ea25651e1/0_312_3000_1800/master/3000.jpg?width=1200&height=900&quality=85&auto=format&fit=crop&s=f2f5d6e805577a64dd67472affba629a' }} />
-                            {showNames && <Text style={appbarStyle.artistName}>Mac Miller</Text>}
-                        </View>
-                        <View style={appbarStyle.artist}>
-                            <Avatar.Image style={appbarStyle.artistImage} source={{ uri: 'https://anothermanimg-dazedgroup.netdna-ssl.com/640/azure/anotherman-prod/360/6/366567.jpg' }} />
-                            {showNames && <Text style={appbarStyle.artistName}>Arctic Monkeys</Text>}
-                        </View>
+                        {renderArtists()}
                     </View>
                 </TouchableHighlight>
                 <View style={appbarStyle.linearGradientContainer}>
