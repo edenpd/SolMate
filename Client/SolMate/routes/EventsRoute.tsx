@@ -128,9 +128,9 @@ const EventsRoute = () => {
   }, []);
 
   const getEvents = async () => {
-    console.log("Getting multiple events");
+
     await axios
-      .get(`${SERVER_ADDRESS}:${SERVER_PORT}/event?artists=maroon 5,Harry Styles`, {
+      .get(`${SERVER_ADDRESS}:${SERVER_PORT}/event?userId=${state.user._id}`, {
         headers: { "Content-Type": "application/json" },
       })
       .then((res) => {
@@ -159,6 +159,28 @@ const EventsRoute = () => {
         console.log("Error");
         console.log(err);
       });
+
+  };
+
+  const getEventsaa = async () => {
+    console.log("Getting multiple events for user " + state.user._id);
+
+    await axios
+      .get(`${SERVER_ADDRESS}:${SERVER_PORT}/spotify/topartists`, {
+        headers: { "Content-Type": "application/json" },
+        data: {
+          // iv: state.user.iv,
+          // token: state.user.spotifyAccessToken
+        }
+      })
+      .then((res) => {
+        // getEventsByArtists();
+      })
+      .catch((err) => {
+        console.log("Error");
+        console.log(err);
+      });
+
   };
 
 
