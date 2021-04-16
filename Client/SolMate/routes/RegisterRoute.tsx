@@ -128,7 +128,7 @@ export default function Register({ navigation }) {
     },
     discovery
   );
-  
+
   const handleChange = (name, value) => {
     setFormData((prevstate) => {
       return {
