@@ -1,16 +1,11 @@
 import { Router } from "express";
 import { authenticateJWT } from "../controllers/authController";
-import {
-  addMatch,
-  getMatchesById,
-  updateMatch,
-  MatcheAlgorithm,
-} from "../controllers/matchController";
+import { addMatch, getMatchesById, updateMatch, MatchAlgorithm } from "../controllers/matchController";
 
 const router = Router();
 // router.use(authenticateJWT);
 router.post("/", addMatch);
-router.post("/calc/", MatcheAlgorithm);
+router.post("/calc/", MatchAlgorithm);
 router.get("/", getMatchesById);
 router.put("/", updateMatch);
 

@@ -10,20 +10,24 @@ const persistState = async (storageKey, state) => {
 };
 
 const getIntialState = async (storageKey) => {
-  await SecureStore.getItemAsync(storageKey).then((value) => {
-    try {
+  let value;
+  const isAvaiable = await SecureStore.isAvailableAsync();
+  if (isAvaiable) {
+    value = await SecureStore.getItemAsync(storageKey).then((value) => {
       if (!value) {
         return undefined;
       }
-      return value;
-    } catch (e) {
-      return undefined;
-    }
-  });
+      return JSON.parse(value);
+    })
+    .catch((err) => console.log(JSON.stringify(err)));
+  }
+  return value;
 };
 
+const initialState = getIntialState(STORAGE_KEY);
+
 const providerValue = {
-  token: "",
+  token: { token: undefined },
   dispatchToken: (action) => {}, // << This will be overwritten
 };
 
@@ -38,31 +42,30 @@ const TokenStateProvider = ({ children }) => {
       case "SET_TOKEN":
         currentState.token = action.payload;
         return currentState;
-      case "SET_SPOTIFY_TOKEN":
-        currentState.spotifyToken = action.payload;
-        return currentState;
       case "LOGOUT":
         currentState.token = null;
-        currentState.spotifyToken = null;
         return currentState;
       default:
         throw new Error();
     }
-  }, getIntialState(STORAGE_KEY));
-
-  const getInitialTokens = async () => {
-    const initialState = await getIntialState(STORAGE_KEY);
-    dispatchToken({ type: "SET_TOKEN", payload: initialState });
-  };
-  useEffect(() => {
-    getInitialTokens();
-  }, []);
+  }, providerValue.token);
 
   useEffect(() => {
     async function presist() {
-      await persistState(STORAGE_KEY, token);
+      await getIntialState(STORAGE_KEY).then((value) =>
+        dispatchToken({ type: "SET_TOKEN", payload: value.token })
+      );
     }
     presist();
+  }, []);
+
+  useEffect(() => {
+    if (token.token !== providerValue.token.token) {
+      async function presist() {
+        await persistState(STORAGE_KEY, token);
+      }
+      presist();
+    }
   }, [token]);
 
   return <Provider value={{ token, dispatchToken }}>{children}</Provider>;

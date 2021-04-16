@@ -40,6 +40,11 @@ import RailSelected from "../components/RangeSlider/RailSelected";
 import useDate, { LOCALE } from "../hooks/useDate";
 import { userContext } from "../contexts/userContext";
 import { tokenContext } from "../contexts/tokenContext";
+import { SERVER_ADDRESS, SERVER_PORT } from "@env";
+import { EXPO_ADDRESS, EXPO_PORT } from "@env";
+import * as ImagePicker from "expo-image-picker";
+
+WebBrowser.maybeCompleteAuthSession();
 
 export interface IUserForm {
   email: string;
@@ -48,6 +53,8 @@ export interface IUserForm {
   firstName: string;
   lastName: string;
   fullName: string;
+  spotifyAccessToken: string;
+  spotifyRefreshToken: string;
   description: string;
   sex: number;
   birthday: Date;
@@ -75,12 +82,15 @@ export default function Register({ navigation }) {
   const [noSpotify, setNoSpotify] = useState(false);
   const [errors, setErrors] = useState({});
   const { dispatch } = useContext(userContext);
-  const { dispatchToken } = useContext(tokenContext);
+  const { token, dispatchToken } = useContext(tokenContext);
+  const [image, setImage] = useState(null);
 
   const [formData, setFormData] = useState<IUserForm>({
     email: "",
     password: "",
     confirmPassword: "",
+    spotifyAccessToken: "",
+    spotifyRefreshToken: "",
     firstName: "",
     lastName: "",
     fullName: "",
@@ -94,14 +104,6 @@ export default function Register({ navigation }) {
     Songs: [""],
   });
 
-  const {
-    spotifyToken,
-    setSpotifyToken,
-    isSpotifyTokenSet,
-    setToken,
-    token,
-    clearSpotifyToken,
-  } = useToken();
   WebBrowser.maybeCompleteAuthSession();
   // Endpoint
   const discovery = {
@@ -122,39 +124,11 @@ export default function Register({ navigation }) {
       // this must be set to false
       usePKCE: false,
       // For usage in managed apps using the proxy
-      redirectUri: makeRedirectUri({
-        // For usage in bare and standalone
-        native: "exp://10.100.102.3:19000",
-      }),
+      redirectUri: `exp://${EXPO_ADDRESS}:${EXPO_PORT}`,
     },
     discovery
   );
-
-  useEffect(() => {
-    return () => {
-      if (response) {
-        if (response?.type === "success") {
-          const { access_token } = response.params;
-          setSpotifyToken(access_token);
-          if (access_token) {
-            axios
-              .post(
-                "http://10.100.102.3:3001/spotify/auth",
-                { token: access_token },
-                {
-                  headers: { "Content-Type": "application/json" },
-                }
-              )
-              .then(async (response) => {
-                console.log(JSON.stringify(await response.data.body));
-              })
-              .catch((error) => Alert.alert(error.message));
-          }
-        }
-      }
-    };
-  }, [response]);
-
+  
   const handleChange = (name, value) => {
     setFormData((prevstate) => {
       return {
@@ -163,6 +137,22 @@ export default function Register({ navigation }) {
       };
     });
   };
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    console.log(result);
+
+    if (!result.cancelled) {
+      setImage(result);
+    }
+  };
+
   async function uploadPic(credentials, token) {
     const formData = new FormData();
 
@@ -176,7 +166,11 @@ export default function Register({ navigation }) {
     };
     axios.defaults.headers.common["Authorization"] = "Bearer " + token;
     axios
-      .post("http://localhost:3001/user/uploadProfile", formData, config)
+      .post(
+        `${SERVER_ADDRESS}:${SERVER_PORT}/user/uploadProfile`,
+        formData,
+        config
+      )
       .then((response) => {
         return response;
       })
@@ -201,7 +195,7 @@ export default function Register({ navigation }) {
     // console.log(formData);
 
     await axios
-      .post("http://10.100.102.15:3001/user/register", formData, {
+      .post(`${SERVER_ADDRESS}:${SERVER_PORT}/user/register`, formData, {
         headers: { "Content-Type": "application/json" },
       })
       .then((response) => {
@@ -298,7 +292,6 @@ export default function Register({ navigation }) {
         >
           Sex
         </Text>
-
         <View
           style={{
             flexDirection: "row",
@@ -336,7 +329,6 @@ export default function Register({ navigation }) {
             }}
           />
         </View>
-
         <Text
           style={{
             width: "77%",
@@ -349,7 +341,6 @@ export default function Register({ navigation }) {
         >
           Intrested Sex
         </Text>
-
         <View
           style={{
             flexDirection: "row",
@@ -385,7 +376,6 @@ export default function Register({ navigation }) {
             }}
           />
         </View>
-
         <View
           style={{
             width: "100%",
@@ -424,7 +414,17 @@ export default function Register({ navigation }) {
             onValueChanged={handleValueChange}
           />
         </View>
-
+        <View
+          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+        >
+          <Button title="Pick an image from camera roll" onPress={pickImage} />
+          {image && (
+            <Image
+              source={{ uri: image }}
+              style={{ width: 200, height: 200 }}
+            />
+          )}
+        </View>
         <View style={{ marginVertical: 8, width: "100%" }}>
           <TouchableOpacity
             style={[
@@ -434,7 +434,24 @@ export default function Register({ navigation }) {
             activeOpacity={0.5}
             disabled={noSpotify}
             onPress={() => {
-              promptAsync();
+              promptAsync().then((response) => {
+                if (response) {
+                  if (response?.type === "success") {
+                    const { access_token } = response.params;
+                    console.log(JSON.stringify(access_token));
+
+                    if (access_token) {
+                      setFormData((prevstate) => {
+                        return {
+                          ...prevstate,
+                          spotifyAccessToken: access_token,
+                          // spotifyRefreshToken: refresh_token,
+                        };
+                      });
+                    }
+                  }
+                }
+              });
             }}
           >
             <Text style={registerStyle.buttonTextStyle}>

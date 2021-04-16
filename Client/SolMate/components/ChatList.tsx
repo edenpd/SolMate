@@ -1,21 +1,24 @@
 import { NavigationContainer, useFocusEffect } from '@react-navigation/native';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import { Container, Card, MessageText, PostTime, TextSection, UserImg, UserImgWrapper, UserInfo, UserInfoText, UserName } from '../styles/ChatStyles';
 import { io } from 'socket.io-client';
 import axios from 'axios';
 import { IChat, IUser, IMessage } from '../util/Types';
+import { SERVER_PORT, SERVER_ADDRESS, CHAT_SOCKET_PORT, CHAT_SOCKET_ADDRESS } from "@env";
+import { userContext } from '../contexts/userContext';
 
 const ChatList = ({navigation}) => {
 
-    // TODO: Switch to actual user id.
-    const USER_ID = '604639ae4ad4fa1dcc6822e5';
+    const {state} = useContext(userContext);
     const [chats, setChats] = useState<IChat[]>([])
 
     // This works when connected via the QR code in LAN mode.
     // Find your local IP address.
-    const socket = io('http://10.0.0.6:8999?_id=' + USER_ID, {
+    console.log("The web socket is:");
+    console.log(`${CHAT_SOCKET_ADDRESS}:${CHAT_SOCKET_PORT}?_id=${state.user._id}`);
+    const socket = io(`${CHAT_SOCKET_ADDRESS}:${CHAT_SOCKET_PORT}?_id=${state.user._id}`, {
         transports: [ 'websocket' ],
 	    upgrade: false,
         rejectUnauthorized: false
@@ -35,7 +38,7 @@ const ChatList = ({navigation}) => {
       });
 
       socket.on("connect_error", (err) => {
-        console.log(err);
+        // console.log(err);
       });
 
     useEffect(() => {
@@ -46,15 +49,9 @@ const ChatList = ({navigation}) => {
         });
     }, []);
 
-    // useFocusEffect(() => {
-    //     console.log("UseFocusEffect");
-    //     getChats();
-    // });
-
-
     const getChats = () => {
         console.log("Getting multiple chats");
-        axios.get('http://10.0.0.6:3001/chat?UserId=' + USER_ID)
+        axios.get(`${SERVER_ADDRESS}:${SERVER_PORT}/chat?UserId=${state.user._id}`)
             .then((res) => {
                 setChats(res.data);
             })
@@ -71,7 +68,7 @@ const ChatList = ({navigation}) => {
                 data={chats}
                 keyExtractor={(item, index) => (index + "")}
                 renderItem={({item, index}) => {
-                    const otherUser: IUser = (item as IChat).UserId1['_id'] === "604639ae4ad4fa1dcc6822e5" ? (item as IChat).UserId2 : (item as IChat).UserId1;;
+                    const otherUser: IUser = (item as IChat).UserId1['_id'] === state.user._id ? (item as IChat).UserId2 : (item as IChat).UserId1;;
                     const lastMessage: IMessage | undefined = (item as IChat).Messages[0];
                     return (
                     <Card onPress={() => navigation.navigate('Chat', { userName: item.userName, index: index, chatId: chats[index]['_id'] })}>

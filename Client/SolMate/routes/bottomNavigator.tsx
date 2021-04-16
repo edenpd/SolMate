@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import React from "react";
+import React, { useContext, useEffect } from "react";
 import { StyleSheet, Text, View, Dimensions } from "react-native";
 import { BottomNavigation, Appbar } from "react-native-paper";
 import ChatRoute from "../routes/ChatRoute";
@@ -19,6 +19,16 @@ import {
   Poppins_300Light,
 } from "@expo-google-fonts/poppins";
 import WavyHeader from "../components/WavyHeader";
+import { Image } from "react-native-elements/dist/image/Image";
+import { tokenContext } from "../contexts/tokenContext";
+import * as WebBrowser from "expo-web-browser";
+import {
+  makeRedirectUri,
+  useAuthRequest,
+  ResponseType,
+} from "expo-auth-session";
+import { EXPO_ADDRESS, EXPO_PORT } from "@env";
+import { userContext } from "../contexts/userContext";
 
 const customFonts = {
   Poppins_100Thin,
@@ -27,7 +37,9 @@ const customFonts = {
   Poppins_300Light,
 };
 
-export default function App() {
+WebBrowser.maybeCompleteAuthSession();
+
+export default function App({ navigation }) {
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([
     { key: "matches", title: "Matches", icon: "account-multiple" },
@@ -37,9 +49,42 @@ export default function App() {
     { key: "setting", title: "Setting", icon: "cog" },
   ]);
 
+  const {state} = useContext(userContext);
   // the same as Font.loadAsync , the hook returns  true | error
   const [isLoaded] = useFonts(customFonts);
+  const discovery = {
+    authorizationEndpoint: "https://accounts.spotify.com/authorize",
+    tokenEndpoint: "https://accounts.spotify.com/api/token",
+  };
+  const [request, response, promptAsync] = useAuthRequest(
+    {
+      clientId: "b5497b2f8f6441fa8449f7a108920552",
+      scopes: [
+        "user-read-private",
+        "user-read-email",
+        "user-top-read",
+        "user-read-recently-played",
+      ],
+      responseType: ResponseType.Token,
+      // In order to follow the "Authorization Code Flow" to fetch token after authorizationEndpoint
+      // this must be set to false
+      usePKCE: false,
+      // For usage in managed apps using the proxy
+      redirectUri: makeRedirectUri({
+        // For usage in bare and standalone
+        native: `exp://${EXPO_ADDRESS}:${EXPO_PORT}`,
+      }),
+    },
+    discovery
+  );
 
+  // React.useEffect(() => {
+  //   // if (user.spotifyToken == undefined) {
+  //     promptAsync();
+  //   // }
+  //   return;
+    
+  // }, [navigation]);
   const renderScene = BottomNavigation.SceneMap({
     matches: MatchesRoute,
     events: EventsRoute,
@@ -57,7 +102,6 @@ export default function App() {
   }
 
   const styles = StyleSheet.create({
-    // rest of the styles
     svgCurve: {
       position: "relative",
       top: 0,
@@ -67,8 +111,6 @@ export default function App() {
     },
     headerText: {
       fontSize: 30,
-      // fontWeight: 'bold',
-      // change the color property for better output
       color: "#fff",
       textAlign: "center",
       marginTop: 40,
@@ -81,6 +123,14 @@ export default function App() {
       alignItems: "center",
       justifyContent: "center",
       width: "100%",
+    },
+    logoImage: {
+      alignSelf: "center",
+      marginTop: 20,
+      zIndex: 1000,
+      position: "relative",
+      width: 180,
+      height: 100,
     },
   });
 
@@ -101,10 +151,14 @@ export default function App() {
         customWavePattern="M0,96L48,112C96,128,192,160,288,186.7C384,213,480,235,576,213.3C672,192,768,128,864,128C960,128,1056,192,1152,208C1248,224,1344,192,1392,176L1440,160L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"
       />
       <View style={styles.headerContainer}>
-        <Text style={styles.headerText}>SolMate</Text>
+        {/* <Text style={styles.headerText}>SolMate</Text> */}
+        <Image
+          resizeMode="contain"
+          source={require("../assets/solmate_white.png")}
+          style={styles.logoImage}
+        />
       </View>
       <BottomNavigation
-        backgroundColor
         activeColor={"#8860D0"}
         barStyle={navigationStyle}
         navigationState={{ index, routes }}

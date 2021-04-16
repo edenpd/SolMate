@@ -37,8 +37,22 @@ export interface IUser {
   interestedAgeMin: number;
   interestedAgeMax: number;
   Genre: Array<string>;
-  Artists: Array<string>;
+  Artists: Array<IArtist>;
   Chats: Array<number>;
   Songs: Array<string>;
   Media: Array<string>;
+}
+
+export interface IArtist {
+  images: {
+    url: string;
+  };
+  name: string;
+};
+
+export interface UserContextState {
+  user: {
+    _id: String;
+    email: String;
+  };
 }

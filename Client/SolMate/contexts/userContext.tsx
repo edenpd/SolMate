@@ -2,32 +2,37 @@ import React, { useReducer, useEffect, useState } from "react";
 import axios from "axios";
 import useToken from "../hooks/useToken";
 import * as SecureStore from "expo-secure-store";
+import { UserContextState } from "../util/Types";
+import { SERVER_ADDRESS, SERVER_PORT } from "@env";
+import { string } from "prop-types";
 
-const STORAGE_KEY = "userInfo";
-
+const STORAGE_KEY = "userIfo";
 const persistState = async (storageKey, state) => {
   await SecureStore.setItemAsync(storageKey, JSON.stringify(state));
 };
 
 const getIntialState = async (storageKey) => {
-  const savedState = await SecureStore.getItemAsync(storageKey);
-  try {
-    if (!savedState) {
-      return undefined;
-    }
-    return JSON.parse(savedState);
-  } catch (e) {
-    return undefined;
+  let value;
+  const isAvaiable = await SecureStore.isAvailableAsync();
+  if (isAvaiable) {
+    value = await SecureStore.getItemAsync(storageKey).then((value) => {
+      if (!value) {
+        return undefined;
+      }
+      return value;
+    });
   }
+  return JSON.parse(value);
 };
-
-const initialState = getIntialState(STORAGE_KEY) ?? {};
+const initialState = getIntialState(STORAGE_KEY);
 
 const providerValue = {
-  state: initialState,
+  state: {
+    user: { _id: undefined, email: undefined },
+  },
   dispatch: (action) => {}, // << This will be overwritten
   fetch: (action) => {},
-  data: getIntialState("User"),
+  data: {},
 };
 
 const userContext = React.createContext(providerValue); // Create a context object
@@ -39,22 +44,25 @@ const StateProvider = ({ children }) => {
 
   const fetch = (id) => {
     axios.defaults.headers.common["Authorization"] = "Bearer " + token;
-    axios.get("http://localhost:3001/user?UserEmail=" + id).then((response) => {
-      if (response.data === null || response.data === undefined) return;
+    axios
+      .get(`${SERVER_ADDRESS}:${SERVER_PORT}/user?UserEmail=${id}`)
+      .then((response) => {
+        if (response.data === null || response.data === undefined) return;
 
-      setData(response.data[0]);
-    });
+        setData(response.data[0]);
+      });
   };
 
   const [state, dispatch] = useReducer((state, action) => {
     const currentState = { ...state };
-
     switch (action.type) {
       case "SET_USER":
-        currentState.user = {
-          email: action.payload.email,
-          _id: action.payload._id,
-        };
+        if (action.payload) {
+          currentState.user = {
+            email: action.payload.email,
+            _id: action.payload._id,
+          };
+        }
 
         return currentState;
       case "LOGOUT":
@@ -63,14 +71,28 @@ const StateProvider = ({ children }) => {
       default:
         throw new Error();
     }
-  }, initialState);
+  }, providerValue.state);
 
   useEffect(() => {
     async function presist() {
-      await persistState(STORAGE_KEY, state);
+      await getIntialState(STORAGE_KEY).then((value) =>
+        dispatch({ type: "SET_USER", payload: value.user })
+      );
     }
     presist();
-  }, [state, data]);
+  }, []);
+
+  useEffect(() => {
+    if (
+      state.user._id !== undefined ||
+      state.user.email !== undefined
+    ) {
+      async function presist() {
+        await persistState(STORAGE_KEY, state);
+      }
+      presist();
+    }
+  }, [state]);
 
   return (
     <Provider value={{ state, dispatch, fetch, data }}>{children}</Provider>

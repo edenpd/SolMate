@@ -6,6 +6,7 @@ import axios from "axios";
 import useToken from "../hooks/useToken";
 import { userContext } from "../contexts/userContext";
 import { tokenContext } from "../contexts/tokenContext";
+import { SERVER_ADDRESS, SERVER_PORT } from '@env';
 
 export default function LoginRoute({ navigation }) {
   const [email, setEmail] = useState("");
@@ -19,13 +20,9 @@ export default function LoginRoute({ navigation }) {
     navigation.popToTop();
   }, [token]);
 
-
-
- 
   async function loginUser(credentials) {
-    console.log(credentials);
     return axios
-      .post("http://10.100.102.15:3001/user/login", credentials, {
+      .post(`${SERVER_ADDRESS}:${SERVER_PORT}/user/login`, credentials, {
         headers: { "Content-Type": "application/json" },
       })
       .then(async (response) => {
