@@ -176,30 +176,22 @@ export const getUserByEmail = async (req: Request, res: Response) => {
 
 export const getUsersForMatches = async (userId: String) => {
   let usersToRet: IUserModel[] = [];
-  const cuurentUser = await User.find(
-    { _id: userId },
-    async (err: CallbackError, users: IUser[]) => {
-      if (err) {
-        console.log(err);
-      } else {
-        const users = await User.find(
-          {
-            _id: { $ne: cuurentUser[0]._id },
-            sex: cuurentUser[0].interestedSex,
-            interestedSex: cuurentUser[0].sex,
-            meeting_purpose: cuurentUser[0].meeting_purpose,
-          },
-          (err: CallbackError, users: IUserModel[]) => {
-            if (err) {
-              console.log(err);
-            } else {
-              return users;
-            }
-          }
-        );
-      }
-    }
-  );
+  const cuurentUser = await User.findOne({ _id: userId });
+  if (cuurentUser) {
+    let startDate = new Date();
+    let endDate = new Date();
+    startDate.setFullYear(startDate.getFullYear() - 20);
+    endDate.setFullYear(startDate.getFullYear() - 30);
+
+    const users = await User.find({
+      _id: { $ne: cuurentUser._id },
+      sex: cuurentUser.interestedSex,
+      interestedSex: cuurentUser.sex,
+      meeting_purpose: cuurentUser.meeting_purpose,
+    });
+    return [...users, cuurentUser];
+  }
+
   return usersToRet;
 };
 
