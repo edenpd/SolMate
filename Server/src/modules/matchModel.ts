@@ -5,6 +5,7 @@ export interface IMatch {
   secondUser: String;
   Approve1: String;
   Approve2: String;
+  grade: Number;
 }
 export interface IMatchModel extends Document, IMatch {}
 
@@ -21,17 +22,20 @@ const schema = new Schema({
   // },
   firstUser: {
     type: String,
-    ref: 'users'
+    ref: "users",
   },
   secondUser: {
     type: String,
-    ref: 'users'
+    ref: "users",
   },
   Approve1: {
     type: String,
   },
   Approve2: {
     type: String,
+  },
+  grade: {
+    type: Number,
   },
 });
 
