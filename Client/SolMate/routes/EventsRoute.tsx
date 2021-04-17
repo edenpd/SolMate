@@ -1,4 +1,4 @@
-import { Text, StyleSheet, ActivityIndicator, Image, ScrollView, Platform, View } from "react-native";
+import { Text, StyleSheet, ActivityIndicator, Image, ScrollView, View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 import React, { useState, useEffect, useContext } from "react";
 import { Container } from "../styles/ChatStyles";
@@ -85,6 +85,13 @@ const EventsRoute = () => {
       fontFamily: "Poppins_300Light",
       color: "#8860D0",
       marginTop: 10,
+    },
+
+    loadText: {
+      fontFamily: "Poppins_300Light",
+      color: "#8860D0",
+      marginTop: 20,
+      marginBottom: 20,
     },
   });
 
@@ -188,7 +195,13 @@ const EventsRoute = () => {
   return (
     <Container>
 
-      {isLoading ? <ActivityIndicator /> : (
+      {isLoading ? (
+        <View><Text style={appbarStyle.loadText}>
+          Searching events especially for you
+        </Text>
+          <ActivityIndicator size="large" color="#8860D0" />
+        </View>
+      ) : (
         <View>
           <Searchbar
             style={appbarStyle.searchBar}
