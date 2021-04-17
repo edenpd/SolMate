@@ -1,5 +1,5 @@
 import React, {useState, useContext} from 'react';
-import { StyleSheet, View, Image, Text } from 'react-native';
+import { StyleSheet, View, Image, Text, ScrollView } from 'react-native';
 import {  Paragraph, Title, Avatar, Button, IconButton, BottomNavigation } from 'react-native-paper';
 import { userContext } from "../contexts/userContext";
 import { IUser } from '../util/Types';
@@ -19,7 +19,10 @@ const Profile = ({ user }: ProfileProps) => {
     }
 
     const Media = (style) => {
-      return <View style={style}>{renderMedia()}</View>
+        
+      return (<ScrollView>
+      <View style={style}>{renderMedia()}</View>
+      </ScrollView>)
     }
     
 
@@ -85,8 +88,8 @@ const renderMedia = () => {
             //paddingTop: 50,
         },
           image: {
-            width: 80,
-            height: 80,
+            width: 180,
+            height: 180,
           },
           Title: {
             alignItems: 'center',
@@ -108,7 +111,7 @@ const renderMedia = () => {
         <View style={styles.root}>
 
             <Avatar.Image size = {180} source={{ uri: user.picture }} />
-            <Title style={{fontSize: 200 }}>{user.firstName + " " + user.lastName}</Title>
+            <Title style={styles.title}>{user.firstName + " " + user.lastName}</Title>
             <Paragraph style={styles.description}>{user.description}</Paragraph>
 
             <View style={styles.tabs}>
