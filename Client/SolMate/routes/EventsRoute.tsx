@@ -128,7 +128,8 @@ const EventsRoute = () => {
   }, []);
 
   const getEvents = async () => {
-
+    console.log("Getting multiple events");
+    console.log(state);
     await axios
       .get(`${SERVER_ADDRESS}:${SERVER_PORT}/event?userId=${state.user._id}`, {
         headers: { "Content-Type": "application/json" },
