@@ -3,8 +3,7 @@ import { StyleSheet, View, Image, Text, ScrollView } from 'react-native';
 import {  Paragraph, Title, Avatar, Button, IconButton, BottomNavigation } from 'react-native-paper';
 import { userContext } from "../contexts/userContext";
 import { IUser } from '../util/Types';
-import { SERVER_ADDRESS, SERVER_PORT } from '@env';
-import axios from "axios";
+
 
 
 interface ProfileProps {
@@ -66,17 +65,18 @@ const renderMedia = () => {
             borderRadius: 100
         },
         title:{
-            marginTop: 30,
+            marginTop: 10,
             alignItems: 'center',
             alignContent: 'center',
             textAlign: 'center',
             fontFamily: 'Poppins_500Medium_Italic',
         },
         description: {
-            marginTop: 5
+            marginTop: 1,
+            fontFamily: 'Poppins_500Medium_Italic',
         },
         tabs:{
-            marginTop: 30,
+            marginTop: 10,
             flexDirection: 'row',
         },
         content:{
@@ -103,10 +103,9 @@ const renderMedia = () => {
     });
     
     let content = null;
-    console.log("hey" + " " + user.description);
 
     index === 0 ? content = topArtists() : content = Media(styles.content)
-
+    
     return (
         <View style={styles.root}>
 
