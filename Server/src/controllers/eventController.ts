@@ -41,118 +41,126 @@ export const getEventById = async (req: Request, res: Response) => {
 
 export const getEvents = async (req: Request, res: Response) => {
 
-  console.log("Getting events for user id: "+ req.query.userId);
+  console.log("Getting events for user id: " + req.query.userId);
 
   // if (req.query.artists == undefined) {
   //   res.status(500).send("Error");
   //   return;
   // }
 
-  await User.findOne({ _id: req.query.userId }, async (err: CallbackError, user: IUser) => {
+  await User.find({ _id: req.query.userId }, async (err: CallbackError, userArray: IUser[]) => {
+    let user = userArray[0];
     if (err) {
       res.status(500).send(err);
     } else {
-      // Get the artists from spotify
-      spotifyApi.setAccessToken(decrypt(user.spotifyAccessToken, user.iv));
-      // Try accessing the spotify API only if there is an access token
-      if (spotifyApi.getAccessToken()) {
-        const artistsArray = await spotifyApi.getMyTopArtists({ limit: 5 });
 
-        // *************
+      let artists: string[] = [];
 
-        let artists: string[] = [];
+      try {
+        // Get the artists from spotify
+        spotifyApi.setAccessToken(decrypt(user.spotifyAccessToken, user.iv));
+        // Try accessing the spotify API only if there is an access token
+        if (spotifyApi.getAccessToken()) {
+          const artistsArray = await spotifyApi.getMyTopArtists({ limit: 5 });
 
-        for (let item of artistsArray.body.items) {
-          artists.push(item.name);
+          for (let item of artistsArray.body.items) {
+            artists.push(item.name);
+          }
         }
+      } catch (error) {
+        console.log("Error with spotify token");
+      }
+      if (artists.length == 0) {
+        artists = user.Artists;
+      }
 
-        let suggestionsArtistsUrl = "";
-        let events: IEvent[] = [];
+      let suggestionsArtistsUrl = "";
+      let events: IEvent[] = [];
 
-        //  Gets the artists id
-        for (let artist of artists) {
-          await axios.get('https://api.seatgeek.com/2/performers?q=' + artist + '&client_id=' + client_id)
-            .then(async function (response: any) {
-              // console.log(artist + ":" + response.data.performers[0].id);
-              suggestionsArtistsUrl += "&performers.id=" + response.data.performers[0].id;
+      //  Gets the artists id
+      for (let artist of artists) {
+        await axios.get('https://api.seatgeek.com/2/performers?q=' + artist + '&client_id=' + client_id)
+          .then(async function (response: any) {
+            // console.log(artist + ":" + response.data.performers[0].id);
+            suggestionsArtistsUrl += "&performers.id=" + response.data.performers[0].id;
 
-              // Gets the artist's first 5 events
-              await axios.get('https://api.seatgeek.com/2/events?performers.id=' + response.data.performers[0].id + '&per_page=5&client_id=' + client_id)
-                .then(function (response: any) {
+            // Gets the artist's first 5 events
+            await axios.get('https://api.seatgeek.com/2/events?performers.id=' + response.data.performers[0].id + '&per_page=5&client_id=' + client_id)
+              .then(function (response: any) {
 
-                  response.data.events.forEach(function (event: any) {
+                response.data.events.forEach(function (event: any) {
 
-                    let artistsNames = "";
-                    event.performers.forEach(function (performer: any) {
-                      artistsNames += performer.name + ", ";
-                    });
-
-                    artistsNames = artistsNames.substring(0, artistsNames.length - 2);
-
-                    let newEvent: IEvent = {
-                      EventId: event.id,
-                      EventName: event.short_title,
-                      StartDateTime: event.datetime_local,
-                      ArtistName: artistsNames,
-                      CityName: event.venue.extended_address,
-                      VenueName: event.venue.name,
-                      EventUrl: event.url,
-                      Image: event.performers[0].image,
-                      IsRecommended: false
-                    }
-                    events.push(newEvent);
+                  let artistsNames = "";
+                  event.performers.forEach(function (performer: any) {
+                    artistsNames += performer.name + ", ";
                   });
 
-                })
-                .catch(function (error: any) {
-                  console.log("Not found events for " + artist);
-                })
+                  artistsNames = artistsNames.substring(0, artistsNames.length - 2);
 
-            })
-            .catch(function (error: any) {
-              console.log("Artist " + artist + "not Found");
-            })
-        }
+                  let newEvent: IEvent = {
+                    EventId: event.id,
+                    EventName: event.short_title,
+                    StartDateTime: event.datetime_local,
+                    ArtistName: artistsNames,
+                    CityName: event.venue.extended_address,
+                    VenueName: event.venue.name,
+                    EventUrl: event.url,
+                    Image: event.performers[0].image,
+                    IsRecommended: false
+                  }
+                  events.push(newEvent);
+                });
 
-        // Gets the recommended events
-        await axios.get('https://api.seatgeek.com/2/recommendations?' + suggestionsArtistsUrl + '&postal_code=10014&per_page=10&client_id=' + client_id)
-          .then(function (response: any) {
-
-            response.data.recommendations.forEach(function (recommendation: any) {
-
-              let artistsNames = "";
-              recommendation.event.performers.forEach(function (performer: any) {
-                artistsNames += performer.name + ", ";
-              });
-
-              artistsNames = artistsNames.substring(0, artistsNames.length - 2);
-
-              let newEvent: IEvent = {
-                EventId: recommendation.event.id,
-                EventName: recommendation.event.short_title,
-                StartDateTime: recommendation.event.datetime_local,
-                ArtistName: artistsNames,
-                CityName: recommendation.event.venue.extended_address,
-                VenueName: recommendation.event.venue.name,
-                EventUrl: recommendation.event.url,
-                Image: recommendation.event.performers[0].image,
-                IsRecommended: true
-              }
-              events.push(newEvent);
-            });
+              })
+              .catch(function (error: any) {
+                console.log("Not found events for " + artist);
+              })
 
           })
           .catch(function (error: any) {
-            console.log("ERROR with suggested events");
+            console.log("Artist " + artist + "not Found");
           })
-
-        res.status(200).json(events);
-
-      } else { // If there is no token, return the mataches without the users' top artists.
-        res.status(500).send("No aritists found");
       }
+
+      // Gets the recommended events
+      await axios.get('https://api.seatgeek.com/2/recommendations?' + suggestionsArtistsUrl + '&postal_code=10014&per_page=10&client_id=' + client_id)
+        .then(function (response: any) {
+
+          response.data.recommendations.forEach(function (recommendation: any) {
+
+            let artistsNames = "";
+            recommendation.event.performers.forEach(function (performer: any) {
+              artistsNames += performer.name + ", ";
+            });
+
+            artistsNames = artistsNames.substring(0, artistsNames.length - 2);
+
+            let newEvent: IEvent = {
+              EventId: recommendation.event.id,
+              EventName: recommendation.event.short_title,
+              StartDateTime: recommendation.event.datetime_local,
+              ArtistName: artistsNames,
+              CityName: recommendation.event.venue.extended_address,
+              VenueName: recommendation.event.venue.name,
+              EventUrl: recommendation.event.url,
+              Image: recommendation.event.performers[0].image,
+              IsRecommended: true
+            }
+            events.push(newEvent);
+          });
+
+        })
+        .catch(function (error: any) {
+          console.log("ERROR with suggested events");
+        })
+
+      res.status(200).json(events);
+
+      // } else { // If there is no token, return the mataches without the users' top artists.
+      //   res.status(500).send("No aritists found");
+      // }
     }
-  });
+  })
 
 
 };
