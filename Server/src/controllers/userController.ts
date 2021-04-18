@@ -25,7 +25,7 @@ export const registerUser = async (req: Request, res: Response) => {
   const iv = crypto.randomBytes(16);
 
   const cipher = crypto.createCipheriv(algorithm, secretKey, iv);
-  console.log(req.body.spotifyAccessToken)
+  console.log(req.body.spotifyAccessToken);
   const encryptedToken = Buffer.concat([
     cipher.update(req.body.spotifyAccessToken),
     cipher.final(),
@@ -201,27 +201,6 @@ export const getUserByEmail = async (req: Request, res: Response) => {
       res.status(200).json(user);
     }
   }).populate("Songs");
-};
-
-export const getUsersForMatches = async (userId: String) => {
-  let usersToRet: IUserModel[] = [];
-  const cuurentUser = await User.findOne({ _id: userId });
-  if (cuurentUser) {
-    let startDate = new Date();
-    let endDate = new Date();
-    startDate.setFullYear(startDate.getFullYear() - 20);
-    endDate.setFullYear(startDate.getFullYear() - 30);
-
-    const users = await User.find({
-      _id: { $ne: cuurentUser._id },
-      sex: cuurentUser.interestedSex,
-      interestedSex: cuurentUser.sex,
-      meeting_purpose: cuurentUser.meeting_purpose,
-    });
-    return [...users, cuurentUser];
-  }
-
-  return usersToRet;
 };
 
 export const deleteUser = async (req: Request, res: Response) => {
