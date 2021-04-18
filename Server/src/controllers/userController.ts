@@ -262,3 +262,17 @@ export const deleteUser = async (req: Request, res: Response) => {
     res.sendStatus(500);
   }
 };
+
+export const getUserByid = async(req: Request, res: Response) =>
+{
+ // const userId = "60796738b87efd2d3471f026";
+ const userId = req.query.userId;
+  await User.find({ _id: userId },(err: CallbackError, user: IUser) =>
+  {
+    if (err) {
+      res.status(500).send(err);
+    } else {
+      res.status(200).json(user);
+    }
+  })
+};

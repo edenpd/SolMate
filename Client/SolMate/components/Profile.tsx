@@ -1,48 +1,56 @@
-import React, {useState} from 'react';
-import { StyleSheet, View, Image, Text } from 'react-native';
+import React, {useState, useContext} from 'react';
+import { StyleSheet, View, Image, Text, ScrollView } from 'react-native';
 import {  Paragraph, Title, Avatar, Button, IconButton, BottomNavigation } from 'react-native-paper';
-
+import { userContext } from "../contexts/userContext";
 import { IUser } from '../util/Types';
+
+
 
 interface ProfileProps {
     user: IUser;
 };
 
-const Media = (style) => {
-    return (
-        <View style={style}>
-                        <Image
-                source={require('../assets/favicon.png')}
-            />
-                        <Image
-                source={require('../assets/favicon.png')}
-            />
-        </View>
-    )
-}
-
-const topArtists = (style) => {
-    return (
-        <View style={style}>
-                        <Image
-                source={require('../assets/favicon.png')}
-            />
-                        <Image
-                source={require('../assets/favicon.png')}
-            />
-                        <Image
-                source={require('../assets/favicon.png')}
-            />
-                        <Image
-                source={require('../assets/favicon.png')}
-            />
-        </View>
-    )
-
-}
-
 const Profile = ({ user }: ProfileProps) => {
     const [index,setIndex] = useState(0);
+  
+    const topArtists = () => {
+        renderArtists();
+    }
+
+    const Media = (style) => {
+        
+      return (<ScrollView>
+      <View style={style}>{renderMedia()}</View>
+      </ScrollView>)
+    }
+    
+
+  const renderArtists = () => {
+    const artistsDOM = [];
+    for (let i = 0; i < 3 && i < user.Artists.length; i++) {
+        artistsDOM.push(
+            <View key={"artist" + i}>
+            {/* <Avatar.Image source={{ uri: user.Artists[i].images[0].url }} /> */}
+             
+            </View>
+        );
+    }
+
+    return artistsDOM;
+};
+
+const renderMedia = () => {
+    const mediaDOM = [];
+    for (let i = 0;  i < user.Media.length; i++) {
+        mediaDOM.push(
+            <View key={"media" + i}>
+            <Image style={styles.image} source={{ uri: user.Media[i] }} />
+            </View>
+        );
+    }
+
+    return mediaDOM;
+};
 
     const styles = StyleSheet.create({
         root:{
@@ -52,21 +60,23 @@ const Profile = ({ user }: ProfileProps) => {
         avatar:{
             marginTop: 40,
             alignSelf: 'center',
-            width: 200,
-            height: 200,
+            width: 150,
+            height: 150,
             borderRadius: 100
         },
         title:{
-            marginTop: 30,
+            marginTop: 10,
             alignItems: 'center',
             alignContent: 'center',
             textAlign: 'center',
+            fontFamily: 'Poppins_500Medium_Italic',
         },
         description: {
-            marginTop: 5
+            marginTop: 1,
+            fontFamily: 'Poppins_500Medium_Italic',
         },
         tabs:{
-            marginTop: 30,
+            marginTop: 10,
             flexDirection: 'row',
         },
         content:{
@@ -75,19 +85,33 @@ const Profile = ({ user }: ProfileProps) => {
             justifyContent: 'center',
             alignItems: 'center',
             flexWrap: 'wrap',
+            //paddingTop: 50,
+        },
+          image: {
+            width: 180,
+            height: 180,
+          },
+          Title: {
+            alignItems: 'center',
+            alignContent: 'center',
+            color: 'white',
+            textAlign: 'center',
+            alignSelf: 'center',
+            fontSize: 24,
+            fontFamily: 'Poppins_500Medium_Italic'
         },
     });
     
     let content = null;
 
-    index === 0 ? content = topArtists(styles.content) : content = Media(styles.content)
-
+    index === 0 ? content = topArtists() : content = Media(styles.content)
+    
     return (
         <View style={styles.root}>
 
-            <Avatar.Image style={styles.avatar} source={{ uri: 'https://picsum.photos/700' }} />
-            <Title style={styles.title}>Shiri Mesika</Title>
-            <Paragraph style={styles.description}>Dancer</Paragraph>
+            <Avatar.Image size = {180} source={{ uri: user.picture }} />
+            <Title style={styles.title}>{user.firstName + " " + user.lastName}</Title>
+            <Paragraph style={styles.description}>{user.description}</Paragraph>
 
             <View style={styles.tabs}>
                 <Button mode="contained" onPress={()=>setIndex(0)}>Top Artists</Button>
