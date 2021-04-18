@@ -20,7 +20,6 @@ const getUser = async() =>{
   .then((res) => {
       setUser(res.data);
       setLoading(false);
-      console.log(user);
   })
   .catch((err) => {
       console.log("Error");
