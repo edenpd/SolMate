@@ -136,26 +136,31 @@ export const getMatchesById = async (req: Request, res: Response) => {
 
             // Try accessing the spotify API only if there is an access token.
             if (spotifyApi.getAccessToken()) {
-              const artists = await spotifyApi.getMyTopArtists({ limit: 3 });
+              try {
+                const artists = await spotifyApi.getMyTopArtists({ limit: 3 });
 
-              // Check which user made the request, and get the top artists of the other use.
-              if (matches[i]._doc.firstUser._id.toString() === userID) {
-                matchesData.push({
-                  ...matches[i]._doc,
-                  secondUser: {
-                    ...matches[i].secondUser._doc,
-                    Artists: artists.body.items,
-                  },
-                });
-              } else {
-                console.log(artists);
-                matchesData.push({
-                  ...matches[i]._doc,
-                  firstUser: {
-                    ...matches[i]._doc.firstUser._doc,
-                    Artists: artists.body.items,
-                  },
-                });
+                // Check which user made the request, and get the top artists of the other use.
+                if (matches[i]._doc.firstUser._id.toString() === userID) {
+                  matchesData.push({
+                    ...matches[i]._doc,
+                    secondUser: {
+                      ...matches[i].secondUser._doc,
+                      Artists: artists.body.items,
+                    },
+                  });
+                } else {
+                  console.log(artists);
+                  matchesData.push({
+                    ...matches[i]._doc,
+                    firstUser: {
+                      ...matches[i]._doc.firstUser._doc,
+                      Artists: artists.body.items,
+                    },
+                  });
+                }
+              } catch (e) {
+                // TODO: Implement error handling.
+                console.log("Oops");
               }
             } else {
               // If there is no token, return the mataches without the users' top artists.
@@ -300,7 +305,7 @@ export const MatchAlgorithm = async (userId: String) => {
               // @ts-ignore
               similarSongs / (currentUser?.Songs.length + user.Songs.length) +
               similarSavedSongs /
-                (currentUserSavedSongs.length + userSavedSongs.length);
+              (currentUserSavedSongs.length + userSavedSongs.length);
           }
 
           // similar artists amount
@@ -333,10 +338,10 @@ export const MatchAlgorithm = async (userId: String) => {
           ) {
             artistsGrade =
               similarArtists /
-                // @ts-ignore
-                (currentUser?.Artists.length + user.Artists.length) +
+              // @ts-ignore
+              (currentUser?.Artists.length + user.Artists.length) +
               similarFollowArtists /
-                (currentUserFollowArtists.length + userFollowArtists.length);
+              (currentUserFollowArtists.length + userFollowArtists.length);
           }
 
           // similar album amount
