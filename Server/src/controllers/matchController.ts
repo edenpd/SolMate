@@ -2,9 +2,9 @@ import { Request, Response } from "express";
 import { CallbackError } from "mongoose";
 import Match, { IMatch, IMatchModel } from "../modules/matchModel";
 import { IChat } from "../modules/chatModel";
-import { getUsersForMatches } from "../controllers/userController";
 import { addChatAfterMatch } from "../controllers/chatController";
 import { decrypt, spotifyApi } from "../Util/spotifyAccess";
+import User, { IUser, IUserModel } from "../modules/userModel";
 
 export const addMatch = async (req: Request, res: Response) => {
   try {
@@ -168,10 +168,39 @@ export const getMatchesById = async (req: Request, res: Response) => {
       });
   }
 };
+export const getUsersForMatches = async (userId: String) => {
+  let usersToRet: IUserModel[] = [];
+  const cuurentUser = await User.findOne({ _id: userId });
+  if (cuurentUser) {
+    let startDate = new Date();
+    let endDate = new Date();
+    startDate.setFullYear(startDate.getFullYear() - 20);
+    endDate.setFullYear(startDate.getFullYear() - 30);
 
-export const MatchAlgorithm = async (req: Request, res: Response) => {
+    const users = await User.find({
+      _id: { $ne: cuurentUser._id },
+      sex: cuurentUser.interestedSex,
+      interestedSex: cuurentUser.sex,
+      meeting_purpose: cuurentUser.meeting_purpose,
+    });
+    return [...users, cuurentUser];
+  }
+
+  return usersToRet;
+};
+
+export const MatchAlgoForAll = async () => {
+  const allUsers = await User.find();
+  allUsers.forEach((user) => {
+    MatchAlgorithm(user._id);
+  });
+};
+
+// export const MatchAlgorithm = async (req: Request, res: Response) => {
+
+export const MatchAlgorithm = async (userId: String) => {
   // TODO- location radius
-  let userId = req.query.userId?.toString();
+  //  let userId = req.query.userId?.toString();
   console.log("Calculating matches for : " + userId);
 
   // basic filter
@@ -195,7 +224,13 @@ export const MatchAlgorithm = async (req: Request, res: Response) => {
         const curr_SavedSongs = await spotifyApi.getMySavedTracks();
         const curr_Albums = await spotifyApi.getMySavedAlbums();
         const curr_Genre = await spotifyApi.getAvailableGenreSeeds();
-        //  currentUserFollowArtists.push({...cuur_artists.body.artists});
+
+        currentUserSavedSongs.push(curr_SavedSongs.body.items.toString());
+        currentUserAlbums.push(curr_Albums.body.items.toString());
+        currentUserFollowArtists.push(
+          cuur_artists.body.artists.items.toString()
+        );
+        currentUserGenre.push(curr_Genre.body.genres.toString());
 
         users = users.filter((user) => {
           const age = Date.now() - user.birthday.getTime();
@@ -219,6 +254,19 @@ export const MatchAlgorithm = async (req: Request, res: Response) => {
           var albumGrade = 0;
           var genereGrade = 0;
           var finalGrade = 0;
+
+          // Get the user data from spotify.
+          spotifyApi.setAccessToken(decrypt(user.spotifyAccessToken, user.iv));
+          if (spotifyApi.getAccessToken()) {
+            // const user_artists = await spotifyApi.getFollowedArtists();
+            // const user_SavedSongs = await spotifyApi.getMySavedTracks();
+            // const user_Albums = await spotifyApi.getMySavedAlbums();
+            // const user_Genre = await spotifyApi.getAvailableGenreSeeds();
+            // userSavedSongs.push(curr_SavedSongs.body.items.toString());
+            // userAlbums.push(curr_Albums.body.items.toString());
+            // userFollowArtists.push(cuur_artists.body.artists.items.toString());
+            // userGenre.push(curr_Genre.body.genres.toString());
+          }
 
           // similar songs amount
           var similarSongs = 0;
@@ -403,12 +451,18 @@ export const MatchAlgorithm = async (req: Request, res: Response) => {
                 grade: match.grade,
               };
               const matchAdded = await Match.create(toAdd);
-              res
-                .status(200)
-                .json({ message: "new match added", ...matchAdded });
+
+              /////////////////////////
+              // res
+              //   .status(200)
+              //   .json({ message: "new match added", ...matchAdded });
+              console.log({ message: "new match added", ...matchAdded });
+              /////////////////////////
             } catch (e) {
               console.log(e);
-              res.status(500).send(e);
+              /////////////////////////
+              //   res.status(500).send(e);
+              /////////////////////////
             }
           }
         });
@@ -416,7 +470,9 @@ export const MatchAlgorithm = async (req: Request, res: Response) => {
     }
   } catch (e) {
     console.log(e);
-    res.sendStatus(500);
+    ////////////////////////
+    // res.sendStatus(500);
+    ////////////////////////
   }
 };
 
