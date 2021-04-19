@@ -71,7 +71,7 @@ const ChatList = ({navigation}) => {
                     const otherUser: IUser = (item as IChat).UserId1['_id'] === state.user._id ? (item as IChat).UserId2 : (item as IChat).UserId1;;
                     const lastMessage: IMessage | undefined = (item as IChat).Messages[0];
                     return (
-                    <Card onPress={() => navigation.navigate('Chat', { userName: item.userName, index: index, chatId: chats[index]['_id'] })}>
+                    <Card onPress={() => navigation.navigate('Chat', { userName: `${otherUser.firstName} ${otherUser.lastName}`, index: index, chatId: chats[index]['_id'] })}>
                         <UserInfo>
                             <UserImgWrapper>
                                 <UserImg source={{uri: otherUser.picture}} />
