@@ -14,9 +14,10 @@ interface MatchCardProps {
     match: IMatch;
     user: IUser;
     onAfterRespond: () => void;
+    onProfileClick: () => void;
 };
 
-const MatchCard = ({ match, user, onAfterRespond }: MatchCardProps) => {
+const MatchCard = ({ match, user, onAfterRespond, onProfileClick }: MatchCardProps) => {
     const PICS = [user.picture, ...user.Media];
     const [showNames, setShowNames] = useState<Boolean>(false);
     const [isDialogVisible, setIsDialogVisible] = useState<Boolean>(false);
@@ -175,7 +176,7 @@ const MatchCard = ({ match, user, onAfterRespond }: MatchCardProps) => {
                         icon="account"
                         color={Colors.white}
                         size={35}
-                        onPress={() => console.log("Hi") /* TODO: Implement navigation here. */}
+                        onPress={() => onProfileClick()}
                     />
                 </View>
                 <Card.Title style={appbarStyle.cardTitle} title={<Text></Text>} />
