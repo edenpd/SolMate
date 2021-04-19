@@ -201,7 +201,12 @@ export const MatchAlgoForAll = async () => {
   });
 };
 
-// export const MatchAlgorithm = async (req: Request, res: Response) => {
+export const MatchAlgorithmAfterReg = async (req: Request, res: Response) => {
+  let userId = req.query.userId?.toString();
+  if (userId) {
+    MatchAlgorithm(userId);
+  }
+};
 
 export const MatchAlgorithm = async (userId: String) => {
   // TODO- location radius
@@ -247,237 +252,245 @@ export const MatchAlgorithm = async (userId: String) => {
           );
         });
 
-        const matchesToInsert = users.map((user) => {
-          let matchFound: IMatch;
-          // var age = Date.now() - user.birthday.getTime();
-          let userSavedSongs: string[] = [];
-          let userFollowArtists: string[] = [];
-          let userAlbums: string[] = [];
-          let userGenre: string[] = [];
-          var songGrade = 0;
-          var artistsGrade = 0;
-          var albumGrade = 0;
-          var genereGrade = 0;
-          var finalGrade = 0;
-
-          // Get the user data from spotify.
-          spotifyApi.setAccessToken(decrypt(user.spotifyAccessToken, user.iv));
-          if (spotifyApi.getAccessToken()) {
-            // const user_artists = await spotifyApi.getFollowedArtists();
-            // const user_SavedSongs = await spotifyApi.getMySavedTracks();
-            // const user_Albums = await spotifyApi.getMySavedAlbums();
-            // const user_Genre = await spotifyApi.getAvailableGenreSeeds();
-            // userSavedSongs.push(curr_SavedSongs.body.items.toString());
-            // userAlbums.push(curr_Albums.body.items.toString());
-            // userFollowArtists.push(cuur_artists.body.artists.items.toString());
-            // userGenre.push(curr_Genre.body.genres.toString());
-          }
-
-          // similar songs amount
-          var similarSongs = 0;
-          if (currentUser?.Songs) {
-            similarSongs = currentUser?.Songs.filter(
-              (item) =>
-                user.Songs.findIndex((song) => {
-                  return song === item;
-                }) !== -1
-            ).length;
-          }
-
-          // similar saved songs amount
-          var similarSavedSongs = 0;
-          if (currentUserSavedSongs) {
-            similarSavedSongs = currentUserSavedSongs.filter(
-              (item) =>
-                userSavedSongs.findIndex((song) => {
-                  return song === item;
-                }) !== -1
-            ).length;
-          }
-
-          // calc songs match grade
-          if (
-            // @ts-ignore
-            currentUser?.Songs.length + user.Songs.length !== 0 &&
-            currentUserSavedSongs.length + userSavedSongs.length !== 0
-          ) {
-            songGrade =
-              // @ts-ignore
-              similarSongs / (currentUser?.Songs.length + user.Songs.length) +
-              similarSavedSongs /
-              (currentUserSavedSongs.length + userSavedSongs.length);
-          }
-
-          // similar artists amount
-          var similarArtists = 0;
-          if (currentUser?.Artists) {
-            similarArtists = currentUser?.Artists.filter(
-              (item) =>
-                user.Artists.findIndex((artist) => {
-                  return artist === item;
-                }) !== -1
-            ).length;
-          }
-
-          // similar artists follow amount
-          var similarFollowArtists = 0;
-          if (currentUserFollowArtists) {
-            similarFollowArtists = currentUserFollowArtists.filter(
-              (item) =>
-                userFollowArtists.findIndex((artist) => {
-                  return artist === item;
-                }) !== -1
-            ).length;
-          }
-
-          // calc artists match grade
-          if (
-            // @ts-ignore
-            currentUser?.Artists.length + user.Artists.length !== 0 &&
-            currentUserFollowArtists.length + userFollowArtists.length !== 0
-          ) {
-            artistsGrade =
-              similarArtists /
-              // @ts-ignore
-              (currentUser?.Artists.length + user.Artists.length) +
-              similarFollowArtists /
-              (currentUserFollowArtists.length + userFollowArtists.length);
-          }
-
-          // similar album amount
-          var similarAlbums = 0;
-          if (currentUserAlbums) {
-            similarAlbums = currentUserAlbums.filter(
-              (item) =>
-                userAlbums.findIndex((album) => {
-                  return album === item;
-                }) !== -1
-            ).length;
-          }
-
-          // calc album match grade
-          if (
-            // @ts-ignore
-            currentUserAlbums.length + userAlbums.length !==
-            0
-          ) {
-            albumGrade =
-              // @ts-ignore
-              similarAlbums / (currentUserAlbums.length + userAlbums.length);
-          }
-
-          // similar genre amount
-          var similarGenre = 0;
-          if (currentUserGenre) {
-            similarGenre = currentUserGenre.filter(
-              (item) =>
-                userGenre.findIndex((genre) => {
-                  return genre === item;
-                }) !== -1
-            ).length;
-          }
-
-          // calc genre match grade
-          if (
-            // @ts-ignore
-            currentUserGenre.length + userGenre.length !==
-            0
-          ) {
-            genereGrade =
-              // @ts-ignore
-              similarGenre / (currentUserGenre.length + userGenre.length);
-          }
-
-          finalGrade =
-            (2 * songGrade + 2 * artistsGrade + albumGrade + genereGrade) / 6;
-
-          matchFound = {
-            firstUser: "",
-            secondUser: "",
-            Approve1: "",
-            Approve2: "",
-            grade: finalGrade,
-          };
-          return matchFound;
-        });
-
-        matchesToInsert.forEach(async (match) => {
-          const matchExist = await Match.findOne({
-            $or: [
-              {
-                firstUser: match.firstUser,
-                secondUser: match.secondUser,
-              },
-              {
-                firstUser: match.secondUser,
-                secondUser: match.firstUser,
-              },
-            ],
-          });
-
-          if (matchExist) {
-            if (
-              matchExist.firstUser === match.firstUser &&
-              matchExist.secondUser === match.secondUser
-            ) {
-              Match.updateOne(
-                {
-                  firstUser: match.firstUser,
-                  secondUser: match.secondUser,
-                },
-                {
-                  $set: {
-                    grade: match.grade,
-                  },
-                }
-              );
-            } else {
-              Match.updateOne(
-                {
-                  firstUser: match.secondUser,
-                  secondUser: match.firstUser,
-                },
-                {
-                  $set: {
-                    grade: match.grade,
-                  },
-                }
-              );
-            }
-          }
-          // insert new row
-          else {
+        const matchesToInsert = await Promise.all(
+          users.map(async (user) => {
             try {
-              const toAdd: IMatch = {
-                firstUser: match.firstUser,
-                secondUser: match.secondUser,
-                Approve1: match.Approve1,
-                Approve2: match.Approve2,
-                grade: match.grade,
-              };
-              const matchAdded = await Match.create(toAdd);
+              let matchFound: IMatch;
+              // var age = Date.now() - user.birthday.getTime();
+              let userSavedSongs: string[] = [];
+              let userFollowArtists: string[] = [];
+              let userAlbums: string[] = [];
+              let userGenre: string[] = [];
+              var songGrade = 0;
+              var artistsGrade = 0;
+              var albumGrade = 0;
+              var genereGrade = 0;
+              var finalGrade = 0;
 
-              /////////////////////////
-              // res
-              //   .status(200)
-              //   .json({ message: "new match added", ...matchAdded });
-              console.log({ message: "new match added", ...matchAdded });
-              /////////////////////////
+              // Get the user data from spotify.
+              spotifyApi.setAccessToken(
+                decrypt(user.spotifyAccessToken, user.iv)
+              );
+              if (spotifyApi.getAccessToken()) {
+                const user_artists = await spotifyApi.getFollowedArtists();
+                const user_SavedSongs = await spotifyApi.getMySavedTracks();
+                const user_Albums = await spotifyApi.getMySavedAlbums();
+                const user_Genre = await spotifyApi.getAvailableGenreSeeds();
+
+                userSavedSongs.push(curr_SavedSongs.body.items.toString());
+                userAlbums.push(curr_Albums.body.items.toString());
+                userFollowArtists.push(
+                  cuur_artists.body.artists.items.toString()
+                );
+                userGenre.push(curr_Genre.body.genres.toString());
+              }
+
+              // similar songs amount
+              var similarSongs = 0;
+              if (currentUser?.Songs) {
+                similarSongs = currentUser?.Songs.filter(
+                  (item) =>
+                    user.Songs.findIndex((song) => {
+                      return song === item;
+                    }) !== -1
+                ).length;
+              }
+
+              // similar saved songs amount
+              var similarSavedSongs = 0;
+              if (currentUserSavedSongs) {
+                similarSavedSongs = currentUserSavedSongs.filter(
+                  (item) =>
+                    userSavedSongs.findIndex((song) => {
+                      return song === item;
+                    }) !== -1
+                ).length;
+              }
+
+
+              // calc songs match grade
+              if (
+                // @ts-ignore
+                currentUser?.Songs.length + user.Songs.length !== 0 &&
+                currentUserSavedSongs.length + userSavedSongs.length !== 0
+              ) {
+                songGrade =
+                  similarSongs /
+                    // @ts-ignore
+                    (currentUser?.Songs.length + user.Songs.length) +
+                  similarSavedSongs /
+                    (currentUserSavedSongs.length + userSavedSongs.length);
+              }
+              // similar artists amount
+              var similarArtists = 0;
+              if (currentUser?.Artists) {
+                similarArtists = currentUser?.Artists.filter(
+                  (item) =>
+                    user.Artists.findIndex((artist) => {
+                      return artist === item;
+                    }) !== -1
+                ).length;
+              }
+
+              // similar artists follow amount
+              var similarFollowArtists = 0;
+              if (currentUserFollowArtists) {
+                similarFollowArtists = currentUserFollowArtists.filter(
+                  (item) =>
+                    userFollowArtists.findIndex((artist) => {
+                      return artist === item;
+                    }) !== -1
+                ).length;
+              }
+
+
+              // calc artists match grade
+              if (
+                // @ts-ignore
+                currentUser?.Artists.length + user.Artists.length !== 0 &&
+                currentUserFollowArtists.length + userFollowArtists.length !== 0
+              ) {
+                artistsGrade =
+                  similarArtists /
+                    // @ts-ignore
+                    (currentUser?.Artists.length + user.Artists.length) +
+                  similarFollowArtists /
+                    (currentUserFollowArtists.length +
+                      userFollowArtists.length);
+              }
+              // similar album amount
+              var similarAlbums = 0;
+              if (currentUserAlbums) {
+                similarAlbums = currentUserAlbums.filter(
+                  (item) =>
+                    userAlbums.findIndex((album) => {
+                      return album === item;
+                    }) !== -1
+                ).length;
+              }
+
+              // calc album match grade
+              if (
+                // @ts-ignore
+                currentUserAlbums.length + userAlbums.length !==
+                0
+              ) {
+                albumGrade =
+                  // @ts-ignore
+                  similarAlbums /
+                  (currentUserAlbums.length + userAlbums.length);
+              }
+
+              // similar genre amount
+              var similarGenre = 0;
+              if (currentUserGenre) {
+                similarGenre = currentUserGenre.filter(
+                  (item) =>
+                    userGenre.findIndex((genre) => {
+                      return genre === item;
+                    }) !== -1
+                ).length;
+              }
+
+              // calc genre match grade
+              if (
+                // @ts-ignore
+                currentUserGenre.length + userGenre.length !==
+                0
+              ) {
+                genereGrade =
+                  // @ts-ignore
+                  similarGenre / (currentUserGenre.length + userGenre.length);
+              }
+
+              finalGrade =
+                (2 * songGrade + 2 * artistsGrade + albumGrade + genereGrade) /
+                6;
+
+              matchFound = {
+                firstUser: "",
+                secondUser: "",
+                Approve1: "",
+                Approve2: "",
+                grade: finalGrade,
+              };
+              return matchFound;
             } catch (e) {
-              console.log(e);
-              /////////////////////////
-              //   res.status(500).send(e);
-              /////////////////////////
+              return undefined;
             }
-          }
-        });
+          })
+        );
+
+        matchesToInsert
+          .filter((match) => match !== undefined)
+          .forEach(async (match) => {
+            if (match) {
+              const matchExist = await Match.findOne({
+                $or: [
+                  {
+                    firstUser: match.firstUser,
+                    secondUser: match.secondUser,
+                  },
+                  {
+                    firstUser: match.secondUser,
+                    secondUser: match.firstUser,
+                  },
+                ],
+              });
+
+              if (matchExist) {
+                if (
+                  matchExist.firstUser === match.firstUser &&
+                  matchExist.secondUser === match.secondUser
+                ) {
+                  Match.updateOne(
+                    {
+                      firstUser: match.firstUser,
+                      secondUser: match.secondUser,
+                    },
+                    {
+                      $set: {
+                        grade: match.grade,
+                      },
+                    }
+                  );
+                } else {
+                  Match.updateOne(
+                    {
+                      firstUser: match.secondUser,
+                      secondUser: match.firstUser,
+                    },
+                    {
+                      $set: {
+                        grade: match.grade,
+                      },
+                    }
+                  );
+                }
+              }
+              // insert new row
+              else {
+                try {
+                  const toAdd: IMatch = {
+                    firstUser: match.firstUser,
+                    secondUser: match.secondUser,
+                    Approve1: match.Approve1,
+                    Approve2: match.Approve2,
+                    grade: match.grade,
+                  };
+                  const matchAdded = await Match.create(toAdd);
+
+                  console.log({ message: "new match added", ...matchAdded });
+                } catch (e) {
+                  console.log(e);
+                }
+              }
+            }
+          });
       }
     }
   } catch (e) {
     console.log(e);
-    ////////////////////////
-    // res.sendStatus(500);
-    ////////////////////////
   }
 };
 
