@@ -502,10 +502,10 @@ export default function Register({ navigation }) {
           <TouchableOpacity
             style={[
               registerStyle.SpotifyButton,
-              noSpotify ? { opacity: 0.3 } : { opacity: 1 },
+              response ? { opacity: 0.3 } : { opacity: 1 },
             ]}
-            activeOpacity={0.5}
-            disabled={noSpotify}
+            activeOpacity={response ? 0.5 : 1}
+            disabled={response !== null}
             onPress={() => {
               promptAsync().then((response) => {
                 if (response) {
