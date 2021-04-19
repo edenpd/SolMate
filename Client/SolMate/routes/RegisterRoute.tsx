@@ -4,11 +4,8 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Linking,
   Alert,
   ScrollView,
-  KeyboardAvoidingView,
-  Dimensions,
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome5";
 import {
@@ -21,16 +18,9 @@ import {
 } from "react-native-elements";
 import axios from "axios";
 import * as WebBrowser from "expo-web-browser";
-import {
-  makeRedirectUri,
-  useAuthRequest,
-  ResponseType,
-} from "expo-auth-session";
+import { useAuthRequest, ResponseType } from "expo-auth-session";
 import useToken from "../hooks/useToken";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { IconButton } from "react-native-paper";
-import Slider from "@react-native-community/slider";
-import MultiSlider from "react-native-multi-slider";
 import RangeSlider from "rn-range-slider";
 import Label from "../components/RangeSlider/Label";
 import Rail from "../components/RangeSlider/Rail";
@@ -128,6 +118,75 @@ export default function Register({ navigation }) {
     },
     discovery
   );
+  function validate() {
+    let input = formData;
+    let errors = {};
+    let isValid = true;
+
+    if (!input["fullName"]) {
+      isValid = false;
+      errors["name"] = "Please enter your name.";
+    }
+    var pattern = new RegExp(/\b\D*?\b(?:\s+\b\D*?\b)+/);
+    if (!pattern.test(input["fullName"])) {
+      isValid = false;
+      errors["name"] = "Please enter valid full name .";
+    }
+
+    if (!input["email"]) {
+      isValid = false;
+      errors["email"] = "Please enter your email Address.";
+    }
+
+    if (typeof input["email"] !== "undefined") {
+      pattern = new RegExp(
+        /^(("[\w-\s]+")|([\w-]+(?:\.[\w-]+)*)|("[\w-\s]+")([\w-]+(?:\.[\w-]+)*))(@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$)|(@\[?((25[0-5]\.|2[0-4][0-9]\.|1[0-9]{2}\.|[0-9]{1,2}\.))((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){2}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\]?$)/i
+      );
+      if (!pattern.test(input["email"])) {
+        isValid = false;
+        errors["email"] = "Please enter valid email address.";
+      }
+    }
+    if (!input["password"]) {
+      isValid = false;
+      errors["password"] = "Please enter your password.";
+    }
+
+    if (!input["confirmPassword"]) {
+      isValid = false;
+      errors["confirm_password"] = "Please enter your confirm password.";
+    }
+    if (!input["sex"]) {
+      isValid = false;
+      errors["sex"] = "Please enter your sex.";
+    }
+
+    if (!input["birthday"]) {
+      isValid = false;
+      errors["birthday"] = "Please enter your birthday.";
+    }
+
+    if (!input["picture"]) {
+      isValid = false;
+      errors["picture"] = "Please choose profile pic.";
+    }
+
+    if (
+      typeof input["password"] !== "undefined" &&
+      typeof input["confirmPassword"] !== "undefined"
+    ) {
+      if (input["password"] !== input["confirmPassword"]) {
+        isValid = false;
+        errors["password"] = "Passwords don't match.";
+        errors["confirm_password"] = "Passwords don't match.";
+      }
+    }
+    console.log(errors);
+
+    setErrors(errors);
+
+    return isValid;
+  }
 
   const handleChange = (name, value) => {
     setFormData((prevstate) => {
@@ -190,23 +249,25 @@ export default function Register({ navigation }) {
   };
 
   const onSubmit = async () => {
-    formData.firstName = formData.fullName.split(" ").slice(0, -1).join(" ");
-    formData.lastName = formData.fullName.split(" ").slice(-1).join(" ");
-    // console.log(formData);
+    if (validate()) {
+      formData.firstName = formData.fullName.split(" ").slice(0, -1).join(" ");
+      formData.lastName = formData.fullName.split(" ").slice(-1).join(" ");
+      // console.log(formData);
 
-    await axios
-      .post(`${SERVER_ADDRESS}:${SERVER_PORT}/user/register`, formData, {
-        headers: { "Content-Type": "application/json" },
-      })
-      .then((response) => {
-        // var res = uploadPic(formData, response.data.token);
-        dispatch({ type: "SET_USER", payload: response.data.user });
-        dispatchToken({ type: "SET_TOKEN", payload: response.data.token });
-        navigation.navigate("Login");
-      })
-      .catch((err) => {
-        Alert.alert(JSON.stringify(err));
-      });
+      await axios
+        .post(`${SERVER_ADDRESS}:${SERVER_PORT}/user/register`, formData, {
+          headers: { "Content-Type": "application/json" },
+        })
+        .then((response) => {
+          // var res = uploadPic(formData, response.data.token);
+          dispatch({ type: "SET_USER", payload: response.data.user });
+          dispatchToken({ type: "SET_TOKEN", payload: response.data.token });
+          navigation.navigate("Login");
+        })
+        .catch((err) => {
+          Alert.alert(JSON.stringify(err));
+        });
+    }
   };
 
   const renderThumb = useCallback(() => <Thumb />, []);
@@ -226,7 +287,13 @@ export default function Register({ navigation }) {
   }, []);
 
   return (
-    <ScrollView contentContainerStyle={{ flexGrow: 1, display: "flex" }}>
+    <ScrollView
+      contentContainerStyle={{
+        flexGrow: 1,
+        display: "flex",
+        paddingTop: 30,
+      }}
+    >
       <View style={registerStyle.registerContainer}>
         {show && (
           <DateTimePicker
@@ -251,18 +318,21 @@ export default function Register({ navigation }) {
             label="Email"
             onChangeText={(value) => handleChange("email", value)}
             errorStyle={{ color: "red" }}
+            errorMessage={errors["email"]}
           />
           <Input
             label="Password"
             onChangeText={(value) => handleChange("password", value)}
             secureTextEntry={true}
             errorStyle={{ color: "red" }}
+            errorMessage={errors["password"]}
           />
           <Input
             onChangeText={(value) => handleChange("confirmPassword", value)}
             value={formData.confirmPassword}
             label="Confirm Password"
             errorStyle={{ color: "red" }}
+            errorMessage={errors["confirm_password"]}
             secureTextEntry={true}
           />
           <Input
@@ -270,6 +340,7 @@ export default function Register({ navigation }) {
             value={formData.fullName}
             onChangeText={(value) => handleChange("fullName", value)}
             errorStyle={{ color: "red" }}
+            errorMessage={errors["name"]}
             labelStyle={{}}
           />
           <Input
@@ -277,6 +348,8 @@ export default function Register({ navigation }) {
             value={date.toLocaleDateString(LOCALE)}
             // editable={false}
             style={{ padding: 0 }}
+            errorStyle={{ color: "red" }}
+            errorMessage={errors["birthday"]}
             onTouchStart={showDatepicker}
           />
         </View>
@@ -570,7 +643,6 @@ export default function Register({ navigation }) {
 const registerStyle = StyleSheet.create({
   registerContainer: {
     width: "100%",
-    // height: 100,
     color: "#fff",
 
     alignItems: "center",
@@ -578,7 +650,6 @@ const registerStyle = StyleSheet.create({
     display: "flex",
     justifyContent: "center",
     flexDirection: "column",
-    // maxHeight: 700,
   },
   SpotifyButton: {
     flexDirection: "row",
