@@ -31,6 +31,8 @@ const Chat = (props) => {
     });
 
     const getChat = () => {
+        console.log("Getting messages");
+        console.log(`${SERVER_ADDRESS}:${SERVER_PORT}/chat/single?chatId=${chatId}`);
         axios.get(`${SERVER_ADDRESS}:${SERVER_PORT}/chat/single?chatId=${chatId}`)
             .then((res) => {
                 setChat(res.data);
