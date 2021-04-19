@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
-import { ImageBackground, StyleSheet, Text, View } from 'react-native';
-import { Card, Paragraph, Title, Avatar, Button } from 'react-native-paper';
+import { GestureResponderEvent, ImageBackground, StyleSheet, Text, View } from 'react-native';
+import { Card, Paragraph, Title, Avatar, Button, TouchableRipple } from 'react-native-paper';
 import { IMatch, IUser } from '../util/Types';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Colors, IconButton } from 'react-native-paper';
@@ -17,10 +17,11 @@ interface MatchCardProps {
 };
 
 const MatchCard = ({ match, user, onAfterRespond }: MatchCardProps) => {
-
+    const PICS = [user.picture, ...user.Media];
     const [showNames, setShowNames] = useState<Boolean>(false);
     const [isDialogVisible, setIsDialogVisible] = useState<Boolean>(false);
     const { state } = useContext(userContext);
+    const [picIndex, setPicIndex] = useState(0);
 
     const appbarStyle = StyleSheet.create({
         userImage: {
@@ -48,6 +49,8 @@ const MatchCard = ({ match, user, onAfterRespond }: MatchCardProps) => {
         artistList: {
             display: 'flex',
             flexDirection: 'column',
+            zIndex: 10,
+            flexWrap: 'wrap'
             // position: 'absolute',
             // left: 0,
             // top: '20%'
@@ -88,6 +91,18 @@ const MatchCard = ({ match, user, onAfterRespond }: MatchCardProps) => {
             bottom: 80,
             // borderBottomLeftRadius: 100
         },
+        profileButton: {
+            alignSelf: 'center',
+            position: 'absolute',
+            zIndex: 2
+        },
+        artistListRipple: {
+            borderRadius: 50,
+            display: 'flex',
+            flexDirection: 'column',
+            zIndex: 10,
+            flexWrap: 'wrap'
+        }
     });
 
     const calcAge = (date: Date) => {
@@ -139,19 +154,36 @@ const MatchCard = ({ match, user, onAfterRespond }: MatchCardProps) => {
         return artistsDOM;
     };
 
+    const switchPic = () => {
+        setPicIndex(picIndex + 1 < PICS.length ? picIndex + 1 : 0);
+    };
+
+    const onPressArtists = (e: GestureResponderEvent) => {
+        setShowNames(!showNames)
+    };
+
     return (
-        <Card style={appbarStyle.card} elevation={5}>
+        <Card onPress={switchPic} style={appbarStyle.card} elevation={5}>
             <ImageBackground
                 style={appbarStyle.ImageBackground}
                 imageStyle={appbarStyle.ImageBackground}
                 resizeMode='cover'
-                source={{ uri: user.picture }} >
+                source={{ uri: PICS[picIndex] }} >
+                <View
+                    style={appbarStyle.profileButton}>
+                    <IconButton
+                        icon="account"
+                        color={Colors.white}
+                        size={35}
+                        onPress={() => console.log("Hi") /* TODO: Implement navigation here. */}
+                    />
+                </View>
                 <Card.Title style={appbarStyle.cardTitle} title={<Text></Text>} />
-                <TouchableHighlight underlayColor={'transparent'} onPress={() => setShowNames(!showNames)}>
+                <TouchableRipple borderless={true} style={appbarStyle.artistListRipple} underlayColor={'transparent'} onPress={onPressArtists}>
                     <View style={appbarStyle.artistList}>
                         {renderArtists()}
                     </View>
-                </TouchableHighlight>
+                </TouchableRipple>
                 <View style={appbarStyle.linearGradientContainer}>
                     <Card.Content style={{ position: 'absolute', bottom: 20, zIndex: 5 }}>
                         <Text style={appbarStyle.cardTitle}>{`${user.firstName} ${user.lastName}, ${calcAge(user.birthday)}`}</Text>

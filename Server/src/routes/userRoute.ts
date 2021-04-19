@@ -6,7 +6,8 @@ import {
   getUserByEmail,
   updateUser,
   // getStatistics,
-  deleteUser
+  deleteUser,
+  getUserByid
 } from "../controllers/userController";
 import { response, Router } from "express";
 import multer from "multer";
@@ -47,5 +48,6 @@ router.post("/uploadMedia", authenticateJWT, upload, uploadMedia);
 router.put("/",authenticateJWT, updateUser);
 // router.get("/statistic", getStatistics);
 router.delete("/", deleteUser);
+router.get("/getuser", getUserByid);
 
 export default router;
