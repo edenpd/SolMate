@@ -12,8 +12,9 @@ import chatRouter from "../routes/chatRoute";
 import messageRouter from "../routes/messageRoute";
 import songRouter from "../routes/songRoute";
 import eventRouter from "../routes/eventRoute";
-import spotifyRouter from '../routes/spotifyRoute';
+import spotifyRouter from "../routes/spotifyRoute";
 import cors from "cors";
+import { MatchAlgoForAll } from "../controllers/matchController";
 
 const app = express();
 
@@ -34,8 +35,19 @@ export const startServer = async () => {
   app.use("/message", messageRouter);
   app.use("/song", songRouter);
   app.use("/event", eventRouter);
-  app.use("/spotify",spotifyRouter)
+  app.use("/spotify", spotifyRouter);
 
+  // schedule
+  var CronJob = require("cron").CronJob;
+  var cronJob1 = new CronJob({
+    cronTime: "00 59 23 * * * ",
+    onTick: function () {
+      //Your code that is to be executed on every midnight
+      MatchAlgoForAll();
+    },
+    start: true,
+    runOnInit: false,
+  });
   await new Promise((resolve, reject) => {
     const PORT = 3001;
     app.listen(PORT, () => {
