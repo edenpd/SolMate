@@ -1,12 +1,19 @@
 import React, { useContext, useEffect, useState } from "react";
-import { View, Text, Image, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { Input, Button } from "react-native-elements";
 import axios from "axios";
 import useToken from "../hooks/useToken";
 import { userContext } from "../contexts/userContext";
 import { tokenContext } from "../contexts/tokenContext";
-import { SERVER_ADDRESS, SERVER_PORT } from '@env';
+import { SERVER_ADDRESS, SERVER_PORT } from "@env";
 
 export default function LoginRoute({ navigation }) {
   const [email, setEmail] = useState("");
@@ -85,20 +92,37 @@ export default function LoginRoute({ navigation }) {
           titleStyle={{ fontSize: 20 }}
           loading={isLoading}
           onPress={handleSubmit}
-          buttonStyle={{ backgroundColor: "purple", borderRadius: 50 }}
+          containerStyle={{borderRadius: 50,}}
+
+          buttonStyle={{
+            backgroundColor: "purple",
+            borderRadius: 50,
+            shadowColor: "#000",
+            shadowOffset: {
+              width: 0,
+              height: 6,
+            },
+            shadowOpacity: 0.37,
+            shadowRadius: 7.49,
+          }}
         />
-        <View style={{ flexDirection: "row", marginVertical: 20 }}>
-          <Text style={{ paddingHorizontal: 10, fontSize: 16 }}>
-            I don't have a user -
-          </Text>
-          <Text
-            style={{ color: "blue", fontSize: 16 }}
+        <View style={{ marginVertical: 20 ,width:"100%"}}>
+          <Button
+            title="Register"
+            titleStyle={{ fontSize: 20, color: "purple" ,
+         }}
+            loading={isLoading}
             onPress={() => {
               navigation.navigate("Register");
             }}
-          >
-            Register now !
-          </Text>
+            containerStyle={{borderRadius: 50,}}
+            buttonStyle={{
+              backgroundColor: "white",
+              borderColor: "purple",
+              borderWidth: 1,
+              borderRadius: 50,
+            }}
+          />
         </View>
       </View>
     </View>
