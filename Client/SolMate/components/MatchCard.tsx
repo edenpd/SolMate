@@ -143,7 +143,7 @@ const MatchCard = ({ match, user, onAfterRespond, onProfileClick }: MatchCardPro
 
     const renderArtists = () => {
         const artistsDOM = [];
-        for (let i = 0; i < 3 && i < user.Songs.length; i++) {
+        for (let i = 0; i < 3 && i < user.Artists.length; i++) {
             artistsDOM.push(
                 <View key={"artist" + i} style={appbarStyle.artist}>
                     <Avatar.Image style={appbarStyle.artistImage} source={{ uri: user.Artists[i].images[0].url }} />
