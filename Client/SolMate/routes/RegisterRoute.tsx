@@ -58,10 +58,8 @@ export interface IUserForm {
 export default function Register({ navigation }) {
   const {
     date,
-    mode,
     show,
     showDatepicker,
-    showTimepicker,
     onChangeDate,
     setShow,
   } = useDate();
@@ -72,7 +70,7 @@ export default function Register({ navigation }) {
   const [noSpotify, setNoSpotify] = useState(false);
   const [errors, setErrors] = useState({});
   const { dispatch } = useContext(userContext);
-  const { token, dispatchToken } = useContext(tokenContext);
+  const { dispatchToken } = useContext(tokenContext);
   const [image, setImage] = useState(null);
 
   const [formData, setFormData] = useState<IUserForm>({
@@ -156,20 +154,16 @@ export default function Register({ navigation }) {
       isValid = false;
       errors["confirm_password"] = "Please enter your confirm password.";
     }
-    if (!input["sex"]) {
-      isValid = false;
-      errors["sex"] = "Please enter your sex.";
-    }
 
     if (!input["birthday"]) {
       isValid = false;
       errors["birthday"] = "Please enter your birthday.";
     }
 
-    if (!input["picture"]) {
-      isValid = false;
-      errors["picture"] = "Please choose profile pic.";
-    }
+    // if (!input["picture"]) {
+    //   isValid = false;
+    //   errors["picture"] = "Please choose profile pic.";
+    // }
 
     if (
       typeof input["password"] !== "undefined" &&
@@ -199,7 +193,7 @@ export default function Register({ navigation }) {
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
@@ -207,15 +201,20 @@ export default function Register({ navigation }) {
 
     console.log(result);
 
-    if (!result.cancelled) {
-      setImage(result);
+    if (!result.cancelled ) {
+      setImage(result.uri);
     }
   };
 
   async function uploadPic(credentials, token) {
     const formData = new FormData();
+    let filename = credentials.pictureFile.split('/').pop();
+  
+    // Infer the type of the image
+    let match = /\.(\w+)$/.exec(filename);
+    let type = match ? `image/${match[1]}` : `image`;
 
-    formData.append("myImage", credentials.pictureFile);
+    formData.append('myImage', { uri: credentials.pictureFile, name: filename, type });
     formData.append("userId", credentials.email);
 
     const config = {
@@ -249,19 +248,20 @@ export default function Register({ navigation }) {
   };
 
   const onSubmit = async () => {
-    if (validate()) {
+    if (validate) {
       formData.firstName = formData.fullName.split(" ").slice(0, -1).join(" ");
       formData.lastName = formData.fullName.split(" ").slice(-1).join(" ");
-      // console.log(formData);
+      console.log(formData);
 
       await axios
         .post(`${SERVER_ADDRESS}:${SERVER_PORT}/user/register`, formData, {
           headers: { "Content-Type": "application/json" },
         })
-        .then((response) => {
+        .then(async (response) => {
           // var res = uploadPic(formData, response.data.token);
           dispatch({ type: "SET_USER", payload: response.data.user });
           dispatchToken({ type: "SET_TOKEN", payload: response.data.token });
+          await uploadPic({ email: response.data.user.email , pictureFile: image}, response.data.token);
           navigation.navigate("Login");
         })
         .catch((err) => {
@@ -314,6 +314,35 @@ export default function Register({ navigation }) {
             marginTop: 50,
           }}
         >
+          <TouchableOpacity
+            activeOpacity={0.5}
+            style={{
+              borderRadius: 30,
+            }}
+            disabled={image}
+            onPress={pickImage}
+          >
+            <View
+              style={{
+                alignItems: "center",
+                justifyContent: "center",
+                marginVertical: 20,
+              }}
+            >
+              {image && (
+                <Image
+                  source={{ uri: image }}
+                  style={{ width: 200, height: 200, borderRadius: 100 }}
+                />
+              )}
+              {!image && (
+                <Image
+                  source={require("../assets/user-icon.png")}
+                  style={{ width: 200, height: 200 }}
+                />
+              )}
+            </View>
+          </TouchableOpacity>
           <Input
             label="Email"
             onChangeText={(value) => handleChange("email", value)}
@@ -486,17 +515,6 @@ export default function Register({ navigation }) {
             renderNotch={renderNotch}
             onValueChanged={handleValueChange}
           />
-        </View>
-        <View
-          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-        >
-          <Button title="Pick an image from camera roll" onPress={pickImage} />
-          {image && (
-            <Image
-              source={{ uri: image }}
-              style={{ width: 200, height: 200 }}
-            />
-          )}
         </View>
         <View style={{ marginVertical: 8, width: "100%" }}>
           <TouchableOpacity
