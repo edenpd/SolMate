@@ -161,6 +161,24 @@ export const getMatchesById = async (req: Request, res: Response) => {
               } catch (e) {
                 // TODO: Implement error handling.
                 console.log("Oops");
+                // Check which user made the request, and get the top artists of the other use.
+                if (matches[i]._doc.firstUser._id.toString() === userID) {
+                  matchesData.push({
+                    ...matches[i]._doc,
+                    secondUser: {
+                      ...matches[i].secondUser._doc,
+                      Artists: [],
+                    },
+                  });
+                } else {
+                  matchesData.push({
+                    ...matches[i]._doc,
+                    firstUser: {
+                      ...matches[i]._doc.firstUser._doc,
+                      Artists: [],
+                    },
+                  });
+                }
               }
             } else {
               // If there is no token, return the mataches without the users' top artists.
@@ -168,6 +186,8 @@ export const getMatchesById = async (req: Request, res: Response) => {
             }
           }
 
+          console.log("Sending Matches");
+          console.log(matchesData);
           res.status(200).json(matchesData);
         }
       });

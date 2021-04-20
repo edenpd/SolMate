@@ -20,6 +20,7 @@ const MatchPage = ({navigation}) => {
     const getMatches = () => {
         console.log("Getting multiple matches");
         console.log(state);
+        console.log(`${SERVER_ADDRESS}:${SERVER_PORT}/match?userId=${state.user._id}`);
         axios
             .get(`${SERVER_ADDRESS}:${SERVER_PORT}/match?userId=${state.user._id}`)
             .then((res) => {
