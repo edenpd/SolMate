@@ -44,7 +44,7 @@ export const updateMatch = async (req: Request, res: Response) => {
   });
 
   await Match.findOneAndUpdate(
-    { _id: matchId, secondUser: approve },
+    { _id: matchId, secondUser: userId },
     { $set: { Approve2: approve } },
     { new: true }
   ).then((val) => {
