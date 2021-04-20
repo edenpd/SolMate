@@ -270,7 +270,7 @@ const EventsRoute = () => {
                         <Text style={appbarStyle.text}>{item.CityName}</Text>
                         <Text style={appbarStyle.text}>{item.VenueName}</Text>
                         <Text style={appbarStyle.text}>
-                          {Moment(item.StartDateTime.toString()).format("DD/MM/YYYY hh:mm A")}
+                          {item.StartDateTime}
                         </Text>
 
                         <Image
