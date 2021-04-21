@@ -8,6 +8,7 @@ import { CallbackError, MapReduceOptions } from "mongoose";
 import { deleteChatsOfUser } from "../controllers/chatController";
 import { deleteMatchesOfUser } from "../controllers/matchController";
 import crypto from "crypto";
+import { decrypt, spotifyApi } from "../Util/spotifyAccess";
 
 export const registerUser = async (req: Request, res: Response) => {
   const hashedPassword = bcrypt.hashSync(
@@ -242,16 +243,29 @@ export const deleteUser = async (req: Request, res: Response) => {
   }
 };
 
-export const getUserByid = async(req: Request, res: Response) =>
-{
- // const userId = "60796738b87efd2d3471f026";
- const userId = req.query.userId;
-  await User.find({ _id: userId },(err: CallbackError, user: IUser) =>
-  {
+export const getUserByid = async (req: Request, res: Response) => {
+  const userId = req.query.userId?.toString();
+
+  await User.find({ _id: userId }, async (err: CallbackError, user: any) => {
     if (err) {
       res.status(500).send(err);
     } else {
-      res.status(200).json(user);
+      const iv = user[0].iv;
+      const spotifyAccessToken = user[0].spotifyAccessToken;
+
+      spotifyApi.setAccessToken(decrypt(spotifyAccessToken, iv));
+
+      if (spotifyApi.getAccessToken())
+        try {
+          const artists = await spotifyApi.getMyTopArtists({ limit: 3 });
+          let newUser = { Artists: artists, user: user[0]._doc };
+          console.log(newUser.user);
+          res.status(200).json(newUser);
+        } catch (e) {
+          // TODO: Implement error handling.
+          console.log("[getUserByid2] oops");
+          res.status(500).send(e);
+        }
     }
-  })
+  });
 };
