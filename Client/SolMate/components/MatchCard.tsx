@@ -192,7 +192,7 @@ const MatchCard = ({
         style={appbarStyle.ImageBackground}
         imageStyle={appbarStyle.ImageBackground}
         resizeMode='cover'
-        source={{ uri: PICS[picIndex] }}
+        source={{ uri: `${SERVER_ADDRESS}:${SERVER_PORT}/static/${PICS[picIndex]}` }}
       >
         <View style={appbarStyle.profileButton}>
           <IconButton
