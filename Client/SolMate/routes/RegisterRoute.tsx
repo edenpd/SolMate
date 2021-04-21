@@ -247,7 +247,7 @@ export default function Register({ navigation }) {
   };
 
   const onSubmit = async () => {
-    if (validate) {
+    if (validate()) {
       formData.firstName = formData.fullName.split(" ").slice(0, -1).join(" ");
       formData.lastName = formData.fullName.split(" ").slice(-1).join(" ");
       console.log(formData);
