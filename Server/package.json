@@ -7,7 +7,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "tsc && nodemon ./src/index.ts",
-    "prod": "tsc && nodemon ./dist/index.js"
+    "prod": "tsc && nodemon ./dist/index.js",
+    "build": "tsc"
   },
   "author": "",
   "license": "ISC",
