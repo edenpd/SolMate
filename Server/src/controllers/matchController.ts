@@ -193,9 +193,9 @@ export const getMatchesById = async (req: Request, res: Response) => {
       });
   }
 };
-export const getUsersForMatches = async (userId: String) => {
+export const getUsersForMatches = async (user_email: String) => {
   let usersToRet: IUserModel[] = [];
-  const cuurentUser = await User.findOne({ _id: userId });
+  const cuurentUser = await User.findOne({ email: user_email.toString() });
   if (cuurentUser) {
     let startDate = new Date();
     let endDate = new Date();
@@ -203,7 +203,7 @@ export const getUsersForMatches = async (userId: String) => {
     endDate.setFullYear(startDate.getFullYear() - 30);
 
     const users = await User.find({
-      _id: { $ne: cuurentUser._id },
+      // email: { $ne: cuurentUser.email },
       sex: cuurentUser.interestedSex,
       interestedSex: cuurentUser.sex,
       meeting_purpose: cuurentUser.meeting_purpose,
@@ -216,28 +216,31 @@ export const getUsersForMatches = async (userId: String) => {
 
 export const MatchAlgoForAll = async () => {
   const allUsers = await User.find();
-  allUsers.forEach((user) => {
-    MatchAlgorithm(user._id);
-  });
+  for (const user of allUsers) {
+    await MatchAlgorithm(user.email);
+  }
+  // allUsers.forEach((user) => {
+  //   MatchAlgorithm(user._id);
+  // });
 };
 
 export const MatchAlgorithmAfterReg = async (req: Request, res: Response) => {
-  let userId = req.query.userId?.toString();
-  if (userId) {
-    MatchAlgorithm(userId);
+  let userEmail = req.query.email?.toString();
+  if (userEmail) {
+    MatchAlgorithm(userEmail);
   }
 };
 
-export const MatchAlgorithm = async (userId: String) => {
+export const MatchAlgorithm = async (email: String) => {
   // TODO- location radius
   //  let userId = req.query.userId?.toString();
-  console.log("Calculating matches for : " + userId);
+  console.log("Calculating matches for : " + email);
 
   // basic filter
   try {
-    let users = await getUsersForMatches(userId as string);
-    let currentUser = users.find((user) => user._id === userId);
-    users = users.filter((user) => user._id !== userId);
+    let users = await getUsersForMatches(email as string);
+    let currentUser = users.find((user) => user.email === email);
+    users = users.filter((user) => user.email !== email);
 
     let currentUserSavedSongs: string[] = [];
     let currentUserFollowArtists: string[] = [];
@@ -327,7 +330,6 @@ export const MatchAlgorithm = async (userId: String) => {
                 ).length;
               }
 
-
               // calc songs match grade
               if (
                 // @ts-ignore
@@ -362,7 +364,6 @@ export const MatchAlgorithm = async (userId: String) => {
                     }) !== -1
                 ).length;
               }
-
 
               // calc artists match grade
               if (

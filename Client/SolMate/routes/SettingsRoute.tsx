@@ -65,7 +65,6 @@ const SettingRoute = () => {
       <Text style={settings.Title}>Adi Bigler</Text>
       <View>
         <FieldsContainer>
-          {/* <Fieldset label="Personal Details" style={settings.card}> */}
           <FormGroup>
             <Label>
               <Text style={settings.label}>First name</Text>
@@ -132,7 +131,6 @@ const SettingRoute = () => {
                 }}
               ></CheckBox>
             </View>
-            {/* </Form> */}
             <View>
               <CheckBox
                 title="Female"

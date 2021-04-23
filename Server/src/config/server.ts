@@ -40,6 +40,7 @@ export const startServer = async () => {
   // schedule
   var CronJob = require("cron").CronJob;
   var cronJob1 = new CronJob({
+    // cronTime: "00 14 18 * * * ",
     cronTime: "00 59 23 * * * ",
     onTick: function () {
       //Your code that is to be executed on every midnight
@@ -48,10 +49,13 @@ export const startServer = async () => {
     start: true,
     runOnInit: false,
   });
+
+  await MatchAlgoForAll();
   await new Promise((resolve, reject) => {
     const PORT = 3001;
     app.listen(PORT, () => {
       console.log("Express server listening on port " + PORT);
+
       resolve(true);
     });
   });
