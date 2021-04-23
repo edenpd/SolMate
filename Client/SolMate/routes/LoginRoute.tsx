@@ -52,6 +52,7 @@ export default function LoginRoute({ navigation }) {
         display: "flex",
         justifyContent: "center",
         // alignContent: "center",
+        marginTop:80,
         alignItems: "center",
       }}
     >
@@ -86,7 +87,7 @@ export default function LoginRoute({ navigation }) {
           leftIcon={<Icon name="lock" size={24} color="black" />}
         />
       </View>
-      <View style={{ width: "60%", minWidth: 200,marginTop:100 }}>
+      <View style={{ width: "60%", minWidth: 200,marginTop:10 }}>
         <Button
           title="Login"
           titleStyle={{ fontSize: 20 }}

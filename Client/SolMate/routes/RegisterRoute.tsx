@@ -106,6 +106,9 @@ export default function Register({ navigation }) {
         "user-read-email",
         "user-top-read",
         "user-read-recently-played",
+        "user-follow-read",
+        "user-library-read",
+        
       ],
       responseType: ResponseType.Token,
       // In order to follow the "Authorization Code Flow" to fetch token after authorizationEndpoint
