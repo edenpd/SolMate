@@ -1,22 +1,23 @@
 import axios from 'axios';
 import React, { useState, useEffect, useCallback, useContext } from 'react';
-import { View, Text } from 'react-native';
 import { Bubble, Composer, GiftedChat, InputToolbar, Send } from 'react-native-gifted-chat';
 import { io } from 'socket.io-client';
-import { IMessage, IChat } from '../util/Types';
+import { IChat } from '../util/Types';
 import { SERVER_ADDRESS, SERVER_PORT, CHAT_SOCKET_ADDRESS, CHAT_SOCKET_PORT } from '@env';
 import { userContext } from '../contexts/userContext';
 
 const Chat = (props) => {
 
     // State Declaration
-    const {state} = useContext(userContext);
+    const { state } = useContext(userContext);
     const [messages, setMessages] = useState<Array<any>>([]);
-    const [chatId, setChatId] = useState(props.route.params.chatId);
-    const [user, setUser] = useState({
-        _id: state.user._id + "",
-    });
     const [chat, setChat] = useState({ Messages: [] } as IChat);
+
+    const chatId = props.route.params.chatId;
+    const user = {
+        _id: state.user._id,
+        // avatar: "http://10.0.0.4:3001/static/IMAGE-1619268114468.jpg"
+    };
 
     const socket = io(`${CHAT_SOCKET_ADDRESS}:${CHAT_SOCKET_PORT}?_id=${state.user._id}`, {
         transports: ['websocket'],
@@ -27,12 +28,9 @@ const Chat = (props) => {
     socket.on('chat_message', () => {
         console.log("Received message on single chat client");
         getChat();
-        // props.route.params.getChats();
     });
 
     const getChat = () => {
-        console.log("Getting messages");
-        console.log(`${SERVER_ADDRESS}:${SERVER_PORT}/chat/single?chatId=${chatId}`);
         axios.get(`${SERVER_ADDRESS}:${SERVER_PORT}/chat/single?chatId=${chatId}`)
             .then((res) => {
                 setChat(res.data);
@@ -50,8 +48,14 @@ const Chat = (props) => {
     useEffect(() => {
         let newMsg = Array.from(chat.Messages.map(msg => ({
             ...msg,
-            createdAt: msg.msgDate
+            createdAt: msg.msgDate,
+            user: {
+                ...msg.user,
+                name: msg.user.firstName + " " + msg.user.lastName,
+                avatar: `${SERVER_ADDRESS}:${SERVER_PORT}/static/${msg.user._id === chat.UserId1._id ? chat.UserId1.picture : chat.UserId2.picture}`,
+            }
         })));
+
         setMessages(newMsg);
     }, [chat]);
 
@@ -60,12 +64,13 @@ const Chat = (props) => {
             ...chat,
             Messages: GiftedChat.append(messages, newMessages.map(msg => ({
                 ...msg,
-                msgDate: new Date()
+                msgDate: new Date(),
+                user: state.user._id
             }))).map((msg: any, index: any) => ({
                 MsgId: index + "",
                 msgDate: msg.msgDate,
                 text: msg.text,
-                user: state.user._id
+                user: msg.user
             }))
         })
             .then(res => {
@@ -129,7 +134,7 @@ const Chat = (props) => {
             user={user}
             renderBubble={renderBubble}
             renderSend={renderSend}
-            listViewProps={{style: { backgroundColor: '#f6f6f6' }}}
+            listViewProps={{ style: { backgroundColor: '#f6f6f6' } }}
             renderComposer={renderComposer} />
     );
 }

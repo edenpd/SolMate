@@ -1,17 +1,17 @@
 import React, { useState, useEffect, useContext } from "react";
 import { View, Text, StyleSheet } from "react-native";
-import Header from "../components/Header";
 import MatchCard from "../components/MatchCard";
 import Carousel from "react-native-snap-carousel";
-import { Colors, IconButton } from "react-native-paper";
 import axios from "axios";
 import { IMatch } from "../util/Types";
 import { userContext } from "../contexts/userContext";
 import { SERVER_ADDRESS, SERVER_PORT } from "@env";
+import NewMatchDialog from "./NewMatchDialog";
 
 const MatchPage = ({ navigation }) => {
   const [matches, setMatches] = useState<IMatch[]>([]);
   const { state } = useContext(userContext);
+  const [isDialogVisible, setIsDialogVisible] = useState<Boolean>(false);
 
   useEffect(() => {
     getMatches();
@@ -63,6 +63,7 @@ const MatchPage = ({ navigation }) => {
         match={item}
         onAfterRespond={onAfterRespond}
         onProfileClick={onProfileClick}
+        setIsDialogVisible={setIsDialogVisible}
       />
     );
   };
@@ -85,21 +86,8 @@ const MatchPage = ({ navigation }) => {
           sliderWidth={400}
           layoutCardOffset={9}
         />
-        {/* <View style={{ flexDirection: "row", justifyContent: 'space-around', width: 250 }}>
-                    <IconButton
-                        icon="alpha-x-circle-outline"
-                        color={Colors.red500}
-                        size={70}
-                        onPress={() => console.log('Pressed')}
-                    />
-                    <IconButton
-                        icon="check-circle-outline"
-                        color={Colors.green500}
-                        size={70}
-                        onPress={() => console.log('Pressed')}
-                    />
-                </View> */}
       </View>
+      <NewMatchDialog setIsVisible={setIsDialogVisible} visible={isDialogVisible} />
     </View>
   );
 };
