@@ -462,14 +462,17 @@ export const MatchAlgorithm = async (email: String) => {
                   // + genereGrade
                   6;
 
-                matchFound = {
-                  firstUser: "",
-                  secondUser: "",
-                  Approve1: "",
-                  Approve2: "",
-                  grade: finalGrade,
-                };
-                return matchFound;
+                if (currentUser) {
+                  matchFound = {
+                    firstUser: currentUser?.email,
+                    secondUser: user.email,
+                    Approve1: "waiting",
+                    Approve2: "waiting",
+                    grade: finalGrade,
+                  };
+
+                  return matchFound;
+                }
               }
             } catch (e) {
               return undefined;
@@ -494,7 +497,7 @@ export const MatchAlgorithm = async (email: String) => {
                 ],
               });
 
-              if (matchExist) {
+              if (matchExist?.firstUser && matchExist.secondUser) {
                 if (
                   matchExist.firstUser === match.firstUser &&
                   matchExist.secondUser === match.secondUser
