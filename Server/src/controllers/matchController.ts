@@ -247,7 +247,6 @@ export const MatchAlgorithm = async (email: String) => {
     let currentUserFollowArtists: string[] = [];
     let currentUserRelatedArtists: string[] = [];
     let currentUserAlbums: string[] = [];
-    // let currentUserGenre: string[] = [];
 
     if (users && currentUser) {
       // Get the matches from spotify.
@@ -259,7 +258,6 @@ export const MatchAlgorithm = async (email: String) => {
         const curr_SavedSongs = await spotifyApi.getMySavedTracks();
         const curr_TopSongs = await spotifyApi.getMyTopTracks();
         const curr_Albums = await spotifyApi.getMySavedAlbums();
-        // const curr_Genre = await spotifyApi.getAvailableGenreSeeds();
 
         curr_SavedSongs.body.items.forEach((item) => {
           currentUserSavedSongs.push(item.track.name);
@@ -281,10 +279,6 @@ export const MatchAlgorithm = async (email: String) => {
             currentUserRelatedArtists.push(item.name);
           });
         });
-
-        // curr_Genre.body.genres.forEach((item) => {
-        //   currentUserGenre.push(item);
-        // });
 
         users = users.filter((user) => {
           const ageDifMs = Date.now() - user.birthday.getTime();
@@ -344,10 +338,6 @@ export const MatchAlgorithm = async (email: String) => {
                     userRelatedArtists.push(item.name);
                   });
                 });
-
-                // user_Genre.body.genres.forEach((item) => {
-                //   userGenre.push(item);
-                // });
 
                 // similar songs amount
                 var similarSongs = 0;
@@ -440,32 +430,15 @@ export const MatchAlgorithm = async (email: String) => {
                     (currentUserAlbums.length + userAlbums.length);
                 }
 
-                // // similar genre amount
-                // var similarGenre = 0;
-                // if (currentUserGenre) {
-                //   similarGenre = currentUserGenre.filter(
-                //     (item) =>
-                //       userGenre.findIndex((genre) => {
-                //         return genre === item;
-                //       }) !== -1
-                //   ).length;
-                // }
-
-                // // calc genre match grade
-                // if (currentUserGenre.length + userGenre.length !== 0) {
-                //   genereGrade =
-                //     similarGenre / (currentUserGenre.length + userGenre.length);
-                // }
-
                 finalGrade =
                   (2 * songGrade + 2 * artistsGrade + albumGrade) /
                   // + genereGrade
-                  6;
+                  5;
 
                 if (currentUser) {
                   matchFound = {
-                    firstUser: currentUser?.email,
-                    secondUser: user.email,
+                    firstUser: currentUser?._id,
+                    secondUser: user._id,
                     Approve1: "waiting",
                     Approve2: "waiting",
                     grade: finalGrade,
