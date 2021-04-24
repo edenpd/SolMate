@@ -8,18 +8,13 @@ import {
 } from "react-native";
 import {
   Card,
-  Paragraph,
-  Title,
   Avatar,
-  Button,
   TouchableRipple,
 } from "react-native-paper";
 import { IMatch, IUser } from "../util/Types";
 import { LinearGradient } from "expo-linear-gradient";
 import { Colors, IconButton } from "react-native-paper";
-import { TouchableHighlight } from "react-native-gesture-handler";
 import axios from "axios";
-import NewMatchDialog from "./NewMatchDialog";
 import { userContext } from "../contexts/userContext";
 import { SERVER_ADDRESS, SERVER_PORT } from "@env";
 
@@ -28,6 +23,7 @@ interface MatchCardProps {
   user: IUser;
   onAfterRespond: () => void;
   onProfileClick: (userId: string) => void;
+  setIsDialogVisible: React.Dispatch<React.SetStateAction<Boolean>>;
 }
 
 const MatchCard = ({
@@ -35,10 +31,10 @@ const MatchCard = ({
   user,
   onAfterRespond,
   onProfileClick,
+  setIsDialogVisible
 }: MatchCardProps) => {
   const PICS = [user.picture, ...user.Media];
   const [showNames, setShowNames] = useState<Boolean>(false);
-  const [isDialogVisible, setIsDialogVisible] = useState<Boolean>(false);
   const { state } = useContext(userContext);
   const [picIndex, setPicIndex] = useState(0);
 
@@ -68,7 +64,7 @@ const MatchCard = ({
     artistList: {
       display: "flex",
       flexDirection: "column",
-      zIndex: 10,
+      zIndex: 4,
       flexWrap: "wrap",
       // position: 'absolute',
       // left: 0,
@@ -119,7 +115,7 @@ const MatchCard = ({
       borderRadius: 50,
       display: "flex",
       flexDirection: "column",
-      zIndex: 10,
+      zIndex: 3,
       flexWrap: "wrap",
     },
   });
@@ -276,10 +272,6 @@ const MatchCard = ({
           </View>
         </View>
       </ImageBackground>
-      <NewMatchDialog
-        visible={isDialogVisible}
-        setIsVisible={setIsDialogVisible}
-      />
     </Card>
   );
 };
