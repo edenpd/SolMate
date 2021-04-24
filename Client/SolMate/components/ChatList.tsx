@@ -74,7 +74,7 @@ const ChatList = ({navigation}) => {
                     <Card onPress={() => navigation.navigate('Chat', { userName: `${otherUser.firstName} ${otherUser.lastName}`, index: index, chatId: chats[index]['_id'] })}>
                         <UserInfo>
                             <UserImgWrapper>
-                                <UserImg source={{uri: otherUser.picture}} />
+                                <UserImg source={{uri: `${SERVER_ADDRESS}:${SERVER_PORT}/static/${otherUser.picture}`}} />
                             </UserImgWrapper>
                             <TextSection>
                                 <UserInfoText>
