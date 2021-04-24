@@ -243,7 +243,9 @@ export const MatchAlgorithm = async (email: String) => {
     users = users.filter((user) => user.email !== email);
 
     let currentUserSavedSongs: string[] = [];
+    let currentUserTopSongs: string[] = [];
     let currentUserFollowArtists: string[] = [];
+    let currentUserRelatedArtists: string[] = [];
     let currentUserAlbums: string[] = [];
     let currentUserGenre: string[] = [];
 
@@ -255,15 +257,34 @@ export const MatchAlgorithm = async (email: String) => {
       if (spotifyApi.getAccessToken()) {
         const cuur_artists = await spotifyApi.getFollowedArtists();
         const curr_SavedSongs = await spotifyApi.getMySavedTracks();
+        const curr_TopSongs = await spotifyApi.getMyTopTracks();
         const curr_Albums = await spotifyApi.getMySavedAlbums();
         const curr_Genre = await spotifyApi.getAvailableGenreSeeds();
 
-        currentUserSavedSongs.push(curr_SavedSongs.body.items.toString());
-        currentUserAlbums.push(curr_Albums.body.items.toString());
-        currentUserFollowArtists.push(
-          cuur_artists.body.artists.items.toString()
-        );
-        currentUserGenre.push(curr_Genre.body.genres.toString());
+        curr_SavedSongs.body.items.forEach((item) => {
+          currentUserSavedSongs.push(item.track.name);
+        });
+
+        curr_TopSongs.body.items.forEach((item) => {
+          currentUserTopSongs.push(item.name);
+        });
+
+        curr_Albums.body.items.forEach((item) => {
+          currentUserAlbums.push(item.album.name);
+        });
+
+        cuur_artists.body.artists.items.forEach(async (item) => {
+          currentUserFollowArtists.push(item.name);
+          await (
+            await spotifyApi.getArtistRelatedArtists(item.id)
+          ).body.artists.forEach((item) => {
+            currentUserRelatedArtists.push(item.name);
+          });
+        });
+
+        curr_Genre.body.genres.forEach((item) => {
+          currentUserGenre.push(item);
+        });
 
         users = users.filter((user) => {
           const age = Date.now() - user.birthday.getTime();
@@ -281,7 +302,9 @@ export const MatchAlgorithm = async (email: String) => {
               let matchFound: IMatch;
               // var age = Date.now() - user.birthday.getTime();
               let userSavedSongs: string[] = [];
+              let userTopSongs: string[] = [];
               let userFollowArtists: string[] = [];
+              let userRelatedArtists: string[] = [];
               let userAlbums: string[] = [];
               let userGenre: string[] = [];
               var songGrade = 0;
@@ -297,145 +320,157 @@ export const MatchAlgorithm = async (email: String) => {
               if (spotifyApi.getAccessToken()) {
                 const user_artists = await spotifyApi.getFollowedArtists();
                 const user_SavedSongs = await spotifyApi.getMySavedTracks();
+                const user_TopSongs = await spotifyApi.getMyTopTracks();
                 const user_Albums = await spotifyApi.getMySavedAlbums();
                 const user_Genre = await spotifyApi.getAvailableGenreSeeds();
 
-                userSavedSongs.push(curr_SavedSongs.body.items.toString());
-                userAlbums.push(curr_Albums.body.items.toString());
-                userFollowArtists.push(
-                  cuur_artists.body.artists.items.toString()
-                );
-                userGenre.push(curr_Genre.body.genres.toString());
-              }
+                user_SavedSongs.body.items.forEach((item) => {
+                  userSavedSongs.push(item.track.name);
+                });
+                user_TopSongs.body.items.forEach((item) => {
+                  userTopSongs.push(item.name);
+                });
+                user_Albums.body.items.forEach((item) => {
+                  userAlbums.push(item.album.name);
+                });
 
-              // similar songs amount
-              var similarSongs = 0;
-              if (currentUser?.Songs) {
-                similarSongs = currentUser?.Songs.filter(
-                  (item) =>
-                    user.Songs.findIndex((song) => {
-                      return song === item;
-                    }) !== -1
-                ).length;
-              }
+                user_artists.body.artists.items.forEach(async (item) => {
+                  userFollowArtists.push(item.name);
+                  await (
+                    await spotifyApi.getArtistRelatedArtists(item.id)
+                  ).body.artists.forEach((item) => {
+                    userRelatedArtists.push(item.name);
+                  });
+                });
 
-              // similar saved songs amount
-              var similarSavedSongs = 0;
-              if (currentUserSavedSongs) {
-                similarSavedSongs = currentUserSavedSongs.filter(
-                  (item) =>
-                    userSavedSongs.findIndex((song) => {
-                      return song === item;
-                    }) !== -1
-                ).length;
-              }
+                user_Genre.body.genres.forEach((item) => {
+                  userGenre.push(item);
+                });
 
-              // calc songs match grade
-              if (
-                // @ts-ignore
-                currentUser?.Songs.length + user.Songs.length !== 0 &&
-                currentUserSavedSongs.length + userSavedSongs.length !== 0
-              ) {
-                songGrade =
-                  similarSongs /
-                    // @ts-ignore
-                    (currentUser?.Songs.length + user.Songs.length) +
-                  similarSavedSongs /
-                    (currentUserSavedSongs.length + userSavedSongs.length);
-              }
-              // similar artists amount
-              var similarArtists = 0;
-              if (currentUser?.Artists) {
-                similarArtists = currentUser?.Artists.filter(
-                  (item) =>
-                    user.Artists.findIndex((artist) => {
-                      return artist === item;
-                    }) !== -1
-                ).length;
-              }
+                // similar songs amount
+                var similarSongs = 0;
+                if (currentUserTopSongs) {
+                  similarSongs = currentUserTopSongs.filter(
+                    (item) =>
+                      userTopSongs.findIndex((song) => {
+                        return song === item;
+                      }) !== -1
+                  ).length;
+                }
 
-              // similar artists follow amount
-              var similarFollowArtists = 0;
-              if (currentUserFollowArtists) {
-                similarFollowArtists = currentUserFollowArtists.filter(
-                  (item) =>
-                    userFollowArtists.findIndex((artist) => {
-                      return artist === item;
-                    }) !== -1
-                ).length;
-              }
+                // similar saved songs amount
+                var similarSavedSongs = 0;
+                if (currentUserSavedSongs) {
+                  similarSavedSongs = currentUserSavedSongs.filter(
+                    (item) =>
+                      userSavedSongs.findIndex((song) => {
+                        return song === item;
+                      }) !== -1
+                  ).length;
+                }
 
-              // calc artists match grade
-              if (
-                // @ts-ignore
-                currentUser?.Artists.length + user.Artists.length !== 0 &&
-                currentUserFollowArtists.length + userFollowArtists.length !== 0
-              ) {
-                artistsGrade =
-                  similarArtists /
-                    // @ts-ignore
-                    (currentUser?.Artists.length + user.Artists.length) +
-                  similarFollowArtists /
-                    (currentUserFollowArtists.length +
-                      userFollowArtists.length);
-              }
-              // similar album amount
-              var similarAlbums = 0;
-              if (currentUserAlbums) {
-                similarAlbums = currentUserAlbums.filter(
-                  (item) =>
-                    userAlbums.findIndex((album) => {
-                      return album === item;
-                    }) !== -1
-                ).length;
-              }
+                // calc songs match grade
+                if (
+                  currentUserTopSongs.length + userTopSongs.length !== 0 &&
+                  currentUserSavedSongs.length + userSavedSongs.length !== 0
+                ) {
+                  songGrade =
+                    similarSongs /
+                      (currentUserTopSongs.length + userTopSongs.length) +
+                    similarSavedSongs /
+                      (currentUserSavedSongs.length + userSavedSongs.length);
+                }
 
-              // calc album match grade
-              if (
-                // @ts-ignore
-                currentUserAlbums.length + userAlbums.length !==
-                0
-              ) {
-                albumGrade =
-                  // @ts-ignore
-                  similarAlbums /
-                  (currentUserAlbums.length + userAlbums.length);
+                // similar related artists amount
+                var similarArtists = 0;
+                if (currentUserRelatedArtists) {
+                  similarArtists = currentUserRelatedArtists.filter(
+                    (item) =>
+                      userRelatedArtists.findIndex((artist) => {
+                        return artist === item;
+                      }) !== -1
+                  ).length;
+                }
+
+                // similar artists follow amount
+                var similarFollowArtists = 0;
+                if (currentUserFollowArtists) {
+                  similarFollowArtists = currentUserFollowArtists.filter(
+                    (item) =>
+                      userFollowArtists.findIndex((artist) => {
+                        return artist === item;
+                      }) !== -1
+                  ).length;
+                }
+
+                // calc artists match grade
+                if (
+                  currentUserRelatedArtists.length +
+                    userRelatedArtists.length !==
+                    0 &&
+                  currentUserFollowArtists.length + userFollowArtists.length !==
+                    0
+                ) {
+                  artistsGrade =
+                    similarArtists /
+                      (currentUserRelatedArtists.length +
+                        userRelatedArtists.length) +
+                    similarFollowArtists /
+                      (currentUserFollowArtists.length +
+                        userFollowArtists.length);
+                }
+
+                // similar album amount
+                var similarAlbums = 0;
+                if (currentUserAlbums) {
+                  similarAlbums = currentUserAlbums.filter(
+                    (item) =>
+                      userAlbums.findIndex((album) => {
+                        return album === item;
+                      }) !== -1
+                  ).length;
+                }
+
+                // calc album match grade
+                if (currentUserAlbums.length + userAlbums.length !== 0) {
+                  albumGrade =
+                    similarAlbums /
+                    (currentUserAlbums.length + userAlbums.length);
+                }
+
+                // similar genre amount
+                var similarGenre = 0;
+                if (currentUserGenre) {
+                  similarGenre = currentUserGenre.filter(
+                    (item) =>
+                      userGenre.findIndex((genre) => {
+                        return genre === item;
+                      }) !== -1
+                  ).length;
+                }
+
+                // calc genre match grade
+                if (currentUserGenre.length + userGenre.length !== 0) {
+                  genereGrade =
+                    similarGenre / (currentUserGenre.length + userGenre.length);
+                }
+
+                finalGrade =
+                  (2 * songGrade +
+                    2 * artistsGrade +
+                    albumGrade +
+                    genereGrade) /
+                  6;
+
+                matchFound = {
+                  firstUser: "",
+                  secondUser: "",
+                  Approve1: "",
+                  Approve2: "",
+                  grade: finalGrade,
+                };
+                return matchFound;
               }
-
-              // similar genre amount
-              var similarGenre = 0;
-              if (currentUserGenre) {
-                similarGenre = currentUserGenre.filter(
-                  (item) =>
-                    userGenre.findIndex((genre) => {
-                      return genre === item;
-                    }) !== -1
-                ).length;
-              }
-
-              // calc genre match grade
-              if (
-                // @ts-ignore
-                currentUserGenre.length + userGenre.length !==
-                0
-              ) {
-                genereGrade =
-                  // @ts-ignore
-                  similarGenre / (currentUserGenre.length + userGenre.length);
-              }
-
-              finalGrade =
-                (2 * songGrade + 2 * artistsGrade + albumGrade + genereGrade) /
-                6;
-
-              matchFound = {
-                firstUser: "",
-                secondUser: "",
-                Approve1: "",
-                Approve2: "",
-                grade: finalGrade,
-              };
-              return matchFound;
             } catch (e) {
               return undefined;
             }
