@@ -56,13 +56,7 @@ export interface IUserForm {
 }
 
 export default function Register({ navigation }) {
-  const {
-    date,
-    show,
-    showDatepicker,
-    onChangeDate,
-    setShow,
-  } = useDate();
+  const { date, show, showDatepicker, onChangeDate, setShow } = useDate();
   var currentDateMoreThan18 = new Date();
   currentDateMoreThan18.setFullYear(new Date().getFullYear() - 18);
   const [isLoading, setIsLoading] = useState(false);
@@ -106,6 +100,10 @@ export default function Register({ navigation }) {
         "user-read-email",
         "user-top-read",
         "user-read-recently-played",
+        "user-follow-read",
+        "user-library-read",
+        "playlist-modify",
+        "user-read-private",
       ],
       responseType: ResponseType.Token,
       // In order to follow the "Authorization Code Flow" to fetch token after authorizationEndpoint
@@ -195,26 +193,29 @@ export default function Register({ navigation }) {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-      aspect: [4, 3],
       quality: 1,
     });
 
     console.log(result);
 
-    if (!result.cancelled ) {
+    if (!result.cancelled) {
       setImage(result.uri);
     }
   };
 
   async function uploadPic(credentials, token) {
     const formData = new FormData();
-    let filename = credentials.pictureFile.split('/').pop();
-  
+    let filename = credentials.pictureFile.split("/").pop();
+
     // Infer the type of the image
     let match = /\.(\w+)$/.exec(filename);
     let type = match ? `image/${match[1]}` : `image`;
 
-    formData.append('myImage', { uri: credentials.pictureFile, name: filename, type });
+    formData.append("myImage", {
+      uri: credentials.pictureFile,
+      name: filename,
+      type,
+    });
     formData.append("userId", credentials.email);
 
     const config = {
@@ -248,7 +249,7 @@ export default function Register({ navigation }) {
   };
 
   const onSubmit = async () => {
-    if (validate) {
+    if (validate()) {
       formData.firstName = formData.fullName.split(" ").slice(0, -1).join(" ");
       formData.lastName = formData.fullName.split(" ").slice(-1).join(" ");
       console.log(formData);
@@ -261,7 +262,10 @@ export default function Register({ navigation }) {
           // var res = uploadPic(formData, response.data.token);
           dispatch({ type: "SET_USER", payload: response.data.user });
           dispatchToken({ type: "SET_TOKEN", payload: response.data.token });
-          await uploadPic({ email: response.data.user.email , pictureFile: image}, response.data.token);
+          await uploadPic(
+            { email: response.data.user.email, pictureFile: image },
+            response.data.token
+          );
           navigation.navigate("Login");
         })
         .catch((err) => {
