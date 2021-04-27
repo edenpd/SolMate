@@ -89,7 +89,6 @@ const Chat = (props) => {
     const getDateRecommendation = (chatData: IChat) => {
         axios.get(`${SERVER_ADDRESS}:${SERVER_PORT}/event/shared?userId1=${chatData.UserId1._id}&userId2=${chatData.UserId2._id}`)
             .then((res) => {
-                console.log(res.data);
                 setRecEvents(res.data);
             })
             .catch((err) => {
