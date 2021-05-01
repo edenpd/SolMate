@@ -24,6 +24,7 @@ export interface IUser {
   Songs: Array<string>;
   Media: Array<string>;
   meeting_purpose: number;
+  location: Object;
 }
 export interface IUserModel extends IUser, Document {}
 const schema = new Schema({
@@ -111,6 +112,10 @@ const schema = new Schema({
   ],
   meeting_purpose: {
     type: Number,
+  },
+  location: {
+    type: Object,
+    // required: true,
   },
 });
 
