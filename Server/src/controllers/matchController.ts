@@ -5,7 +5,7 @@ import { IChat } from "../modules/chatModel";
 import { addChatAfterMatch } from "../controllers/chatController";
 import { decrypt, spotifyApi } from "../Util/spotifyAccess";
 import User, { IUser, IUserModel } from "../modules/userModel";
-
+import { getUsersDistance } from "../Util/general";
 export const addMatch = async (req: Request, res: Response) => {
   try {
     const userBody: IMatch = req.body;
@@ -197,10 +197,10 @@ export const getUsersForMatches = async (user_email: String) => {
   let usersToRet: IUserModel[] = [];
   const cuurentUser = await User.findOne({ email: user_email.toString() });
   if (cuurentUser) {
-    let startDate = new Date();
-    let endDate = new Date();
-    startDate.setFullYear(startDate.getFullYear() - 20);
-    endDate.setFullYear(startDate.getFullYear() - 30);
+    // let startDate = new Date();
+    // let endDate = new Date();
+    // startDate.setFullYear(startDate.getFullYear() - 20);
+    // endDate.setFullYear(startDate.getFullYear() - 30);
 
     const users = await User.find({
       // email: { $ne: cuurentUser.email },
@@ -284,11 +284,19 @@ export const MatchAlgorithm = async (email: String) => {
           const ageDifMs = Date.now() - user.birthday.getTime();
           const ageDate = new Date(ageDifMs);
           const age = Math.abs(ageDate.getUTCFullYear() - 1970);
+
+          const distance = getUsersDistance(
+            // @ts-ignore
+            currentUser?.location,
+            user.location
+          );
           return (
             // @ts-ignore
             currentUser?.interestedAgeMin <= age &&
             // @ts-ignore
-            currentUser?.interestedAgeMax >= age
+            currentUser?.interestedAgeMax >= age &&
+            // @ts-ignore
+            currentUser?.radiusSearch <= distance
           );
         });
 
