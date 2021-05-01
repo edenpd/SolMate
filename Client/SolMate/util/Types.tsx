@@ -9,7 +9,7 @@ export interface IMessage {
   MsgId: number;
   msgDate: string;
   text: string;
-  sender: string;
+  user: IUser;
 }
 
 export interface IMatch {

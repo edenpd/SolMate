@@ -34,7 +34,9 @@ import { SERVER_ADDRESS, SERVER_PORT } from "@env";
 import { EXPO_ADDRESS, EXPO_PORT,SPOTIFY_CLIENT_SECRET,SPOTIFY_CLIENT_ID } from "@env";
 import * as ImagePicker from "expo-image-picker";
 import { encode as btoa } from 'base-64';
-
+// import GetLocation from "react-native-get-location";
+import * as Location from "expo-location";
+import * as Permissions from "expo-permissions";
 WebBrowser.maybeCompleteAuthSession();
 
 export interface IUserForm {
@@ -55,6 +57,7 @@ export interface IUserForm {
   interestedAgeMin: number;
   interestedAgeMax: number;
   Songs: Array<string>;
+  location: Object;
 }
 
 export default function Register({ navigation }) {
@@ -87,6 +90,7 @@ export default function Register({ navigation }) {
     interestedAgeMin: 18,
     interestedAgeMax: 24,
     Songs: [""],
+    location: "",
   });
 
   WebBrowser.maybeCompleteAuthSession();
@@ -105,6 +109,8 @@ export default function Register({ navigation }) {
         "user-read-recently-played",
         "user-follow-read",
         "user-library-read",
+        "playlist-modify",
+        "user-read-private",
       ],
       // responseType: ResponseType.Token,
       // In order to follow the "Authorization Code Flow" to fetch token after authorizationEndpoint
@@ -254,7 +260,17 @@ export default function Register({ navigation }) {
       formData.firstName = formData.fullName.split(" ").slice(0, -1).join(" ");
       formData.lastName = formData.fullName.split(" ").slice(-1).join(" ");
       console.log(formData);
-
+      console.log("permmision!");
+      const { status } = await Permissions.askAsync(Permissions.LOCATION);
+      if (status != "granted") {
+        console.log("PERMISSION NOT GRANRED");
+      }
+      const location = await Location.getCurrentPositionAsync();
+      console.log("location is ", location);
+      formData.location = {
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      };
       await axios
         .post(`${SERVER_ADDRESS}:${SERVER_PORT}/user/register`, formData, {
           headers: { "Content-Type": "application/json" },
@@ -272,6 +288,19 @@ export default function Register({ navigation }) {
         .catch((err) => {
           Alert.alert(JSON.stringify(err));
         });
+
+      // GetLocation.getCurrentPosition({
+      //   enableHighAccuracy: true,
+      //   timeout: 15000,
+      // })
+      //   .then((location) => {
+      //     formData.location = location;
+      //     console.log(location);
+      //   })
+      //   .catch((error) => {
+      //     const { code, message } = error;
+      //     console.warn(code, message);
+      //   });
     }
   };
 

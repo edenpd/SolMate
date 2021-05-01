@@ -8,6 +8,7 @@ import axios from 'axios';
 import { IChat, IUser, IMessage } from '../util/Types';
 import { SERVER_PORT, SERVER_ADDRESS, CHAT_SOCKET_PORT, CHAT_SOCKET_ADDRESS } from "@env";
 import { userContext } from '../contexts/userContext';
+import moment from 'moment';
 
 const ChatList = ({navigation}) => {
 
@@ -74,12 +75,12 @@ const ChatList = ({navigation}) => {
                     <Card onPress={() => navigation.navigate('Chat', { userName: `${otherUser.firstName} ${otherUser.lastName}`, index: index, chatId: chats[index]['_id'] })}>
                         <UserInfo>
                             <UserImgWrapper>
-                                <UserImg source={{uri: otherUser.picture}} />
+                                <UserImg source={{uri: `${SERVER_ADDRESS}:${SERVER_PORT}/static/${otherUser.picture}`}} />
                             </UserImgWrapper>
                             <TextSection>
                                 <UserInfoText>
                                     <UserName>{`${otherUser.firstName} ${otherUser.lastName}`}</UserName>
-                                    <PostTime>{lastMessage?.msgDate}</PostTime>
+                                    <PostTime >{moment(lastMessage?.msgDate).calendar()}</PostTime>
                                 </UserInfoText>
                                 <MessageText>{lastMessage?.text }</MessageText>
                             </TextSection>

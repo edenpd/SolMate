@@ -48,6 +48,7 @@ export const registerUser = async (req: Request, res: Response) => {
     Chats: userBody.Chats,
     Media: userBody.Media,
     Songs: userBody.Songs,
+    location: userBody.location,
   });
 
   const token = jwt.sign({ email: userBody.email }, config.secret, {
