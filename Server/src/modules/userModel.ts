@@ -13,6 +13,7 @@ export interface IUser {
   picture: string;
   spotifyAccessToken: string;
   spotifyRefreshToken: string;
+  spotifyTokenExpiryDate: Date;
   youtubeSong: string;
   radiusSearch: number;
   interestedSex: number;
@@ -56,6 +57,9 @@ const schema = new Schema({
   },
   iv: {
     type: String,
+  },
+  spotifyTokenExpiryDate: {
+    type: Date,
   },
   sex: {
     type: Number,

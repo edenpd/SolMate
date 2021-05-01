@@ -1,53 +1,37 @@
 import bcrypt from "bcrypt";
 import { NextFunction, Request, response, Response } from "express";
 import jwt from "jsonwebtoken";
-import passport from "passport";
+import passport, { use } from "passport";
 import User, { IUser, IUserModel } from "../modules/userModel";
 import * as config from "../config/config.json";
 import { CallbackError, MapReduceOptions } from "mongoose";
 import { deleteChatsOfUser } from "../controllers/chatController";
 import { deleteMatchesOfUser } from "../controllers/matchController";
 import crypto from "crypto";
-import { decrypt, spotifyApi } from "../Util/spotifyAccess";
+import { decrypt, spotifyApi, encryptTokens } from "../Util/spotifyAccess";
 
 export const registerUser = async (req: Request, res: Response) => {
   const hashedPassword = bcrypt.hashSync(
     req.body.password,
     bcrypt.genSaltSync(10)
   );
-  var secretKey;
 
-  const algorithm = "aes-256-ctr";
-  if (process.env.SPOTIFY_SECRET_KEY_TOKEN) {
-    secretKey = process.env.SPOTIFY_SECRET_KEY_TOKEN;
-  } else {
-    secretKey = "";
-  }
-  const iv = crypto.randomBytes(16);
-
-  const cipher = crypto.createCipheriv(algorithm, secretKey, iv);
-  console.log(req.body.spotifyAccessToken);
-  const encryptedToken = Buffer.concat([
-    cipher.update(req.body.spotifyAccessToken),
-    cipher.final(),
-  ]);
-
-  const encryptedSpotifyToken = encryptedToken.toString("hex");
-
-  // const encryptedRefToken = Buffer.concat([
-  //   cipher.update(req.body.spotifyRefreshToken),
-  //   cipher.final(),
-  // ]);
-
-  // const encryptedRefreshToken = encryptedRefToken.toString("hex");
+  const { encryptedAccessToken, encryptedRefreshToken, iv } = encryptTokens(
+    req.body.spotifyAccessToken,
+    req.body.spotifyAccessToken
+  );
+  const expirationDate = new Date(
+    new Date().getTime() + req.body.expiresIn * 1000
+  );
 
   var userBody: IUser = req.body;
   const user = await User.create({
     email: userBody.email,
     password: hashedPassword,
     iv: iv.toString("hex"),
-    spotifyAccessToken: encryptedSpotifyToken,
-    // spotifyRefreshToken: encryptedRefreshToken,
+    spotifyAccessToken: encryptedAccessToken,
+    spotifyRefreshToken: encryptedRefreshToken,
+    spotifyTokenExpiryDate: expirationDate,
     firstName: userBody.firstName,
     lastName: userBody.lastName,
     description: userBody.description,
@@ -161,6 +145,7 @@ export const updateUser = async (req: Request, res: Response) => {
   const sex = req.body.sex;
   const birthday = req.body.birthday;
   const interestedSex = req.body.interestedSex;
+  const { encryptedAccessToken, encryptedRefreshToken, iv } = encryptTokens(req.body.spotifyAccessToken,req.body.spotifyRefreshToken);
   try {
     await User.updateOne(
       {
@@ -178,6 +163,12 @@ export const updateUser = async (req: Request, res: Response) => {
           sex: sex,
           birthday: birthday,
           interestedSex: interestedSex,
+          spotifyAccessToken: encryptedAccessToken,
+          spotifyRefreshToken: encryptedRefreshToken,
+          iv: iv?.toString('hex'),
+          spotifyTokenExpiryDate: req.body.spotifyTokenExpiryDate,
+
+
         },
       }
     ).exec((err: CallbackError, user: any) => {
@@ -190,6 +181,57 @@ export const updateUser = async (req: Request, res: Response) => {
   } catch (e) {
     console.log(e);
     res.sendStatus(500);
+  }
+};
+
+export const updateUserWithNoResponse = async (req: Request) => {
+  console.log(req.body);
+  const userId = req.body._id;
+  const firstName = req.body.firstName;
+  const lastName = req.body.lastName;
+  const Songs = req.body.Songs;
+  const description = req.body.description;
+  const interestedAgeMin = req.body.interestedAgeMin;
+  const interestedAgeMax = req.body.interestedAgeMax;
+  const radiusSearch = req.body.radiusSearch;
+  const sex = req.body.sex;
+  const birthday = req.body.birthday;
+  const interestedSex = req.body.interestedSex;
+  const { encryptedAccessToken, encryptedRefreshToken, iv } = encryptTokens(req.body.spotifyAccessToken,req.body.spotifyRefreshToken);
+
+  try {
+    await User.updateOne(
+      {
+        _id: userId,
+      },
+      {
+        $set: {
+          firstName: firstName,
+          lastName: lastName,
+          Songs: Songs,
+          description: description,
+          interestedAgeMin: interestedAgeMin,
+          interestedAgeMax: interestedAgeMax,
+          radiusSearch: radiusSearch,
+          sex: sex,
+          birthday: birthday,
+          interestedSex: interestedSex,
+          spotifyAccessToken: encryptedAccessToken,
+          spotifyRefreshToken: encryptedRefreshToken,
+          iv: iv?.toString('hex'),
+          spotifyTokenExpiryDate: req.body.spotifyTokenExpiryDate,
+        },
+      }
+    ).exec((err: CallbackError, user: any) => {
+      if (err) {
+        return err;
+      } else {
+        return user;
+      }
+    });
+  } catch (e) {
+    console.log(e);
+    return e;
   }
 };
 
