@@ -24,7 +24,7 @@ export interface IUser {
   Songs: Array<string>;
   Media: Array<string>;
   meeting_purpose: number;
-  location: Object;
+  location: { latitude: number; longitude: number };
 }
 export interface IUserModel extends IUser, Document {}
 const schema = new Schema({
@@ -114,7 +114,8 @@ const schema = new Schema({
     type: Number,
   },
   location: {
-    type: Object,
+    latitude: { type: Number },
+    longitude: { type: Number },
     // required: true,
   },
 });

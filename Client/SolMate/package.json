@@ -19,7 +19,7 @@
     "axios": "^0.21.1",
     "expo": "~40.0.0",
     "expo-app-loading": "^1.0.2",
-    "expo-auth-session": "~3.0.0",
+    "expo-auth-session": "^3.2.3",
     "expo-crypto": "~8.4.0",
     "expo-image-picker": "~9.2.0",
     "expo-linear-gradient": "~8.4.0",
@@ -40,6 +40,7 @@
     "react-native-elements": "^3.3.1",
     "react-native-encrypted-storage": "^4.0.2",
     "react-native-gesture-handler": "^1.8.0",
+    "react-native-get-location": "^2.1.0",
     "react-native-gifted-chat": "^0.16.3",
     "react-native-inappbrowser-reborn": "^3.5.1",
     "react-native-indicator": "^1.2.2",
@@ -56,7 +57,8 @@
     "rn-range-slider": "^2.0.4",
     "socket.io-client": "^4.0.0",
     "songkick-api-node": "^1.0.4",
-    "styled-components": "^5.2.1"
+    "styled-components": "^5.2.1",
+    "expo-permissions": "~10.0.0"
   },
   "devDependencies": {
     "@babel/core": "~7.9.0",
