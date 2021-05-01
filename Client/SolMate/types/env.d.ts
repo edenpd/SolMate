@@ -6,4 +6,6 @@ declare module "@env" {
   export const EXPO_PORT: string;
   export const CHAT_SOCKET_ADDRESS: string;
   export const CHAT_SOCKET_PORT: string;
+  export const SPOTIFY_CLIENT_ID: string;
+  export const SPOTIFY_CLIENT_SECRET: string;
 }

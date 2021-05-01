@@ -4,6 +4,7 @@ import Event, { IEvent } from "../modules/eventModel";
 import axios from "axios";
 import { decrypt, spotifyApi } from "../Util/spotifyAccess";
 import User, { IUser, IUserModel } from "../modules/userModel";
+import { checkAccessToken } from "../controllers/spotifyController";
 
 const client_id = "MjE2NDYzNTF8MTYxNjkxOTA0OS4yODI1MjUz";
 
@@ -61,6 +62,10 @@ export const getEvents = async (req: Request, res: Response) => {
         spotifyApi.setAccessToken(decrypt(user.spotifyAccessToken, user.iv));
         // Try accessing the spotify API only if there is an access token
         if (spotifyApi.getAccessToken()) {
+          const token = await checkAccessToken(user);
+          if (token) {
+            spotifyApi.setAccessToken(token);
+          }
           const artistsArray = await spotifyApi.getMyTopArtists({ limit: 5 });
 
           for (let item of artistsArray.body.items) {

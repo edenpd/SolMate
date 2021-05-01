@@ -31,9 +31,10 @@ import useDate, { LOCALE } from "../hooks/useDate";
 import { userContext } from "../contexts/userContext";
 import { tokenContext } from "../contexts/tokenContext";
 import { SERVER_ADDRESS, SERVER_PORT } from "@env";
-import { EXPO_ADDRESS, EXPO_PORT } from "@env";
+import { EXPO_ADDRESS, EXPO_PORT,SPOTIFY_CLIENT_SECRET,SPOTIFY_CLIENT_ID } from "@env";
 import * as ImagePicker from "expo-image-picker";
-import GetLocation from "react-native-get-location";
+import { encode as btoa } from 'base-64';
+// import GetLocation from "react-native-get-location";
 import * as Location from "expo-location";
 import * as Permissions from "expo-permissions";
 WebBrowser.maybeCompleteAuthSession();
@@ -47,6 +48,7 @@ export interface IUserForm {
   fullName: string;
   spotifyAccessToken: string;
   spotifyRefreshToken: string;
+  expiresIn: number;
   description: string;
   sex: number;
   birthday: Date;
@@ -76,6 +78,7 @@ export default function Register({ navigation }) {
     confirmPassword: "",
     spotifyAccessToken: "",
     spotifyRefreshToken: "",
+    expiresIn: 0,
     firstName: "",
     lastName: "",
     fullName: "",
@@ -98,7 +101,7 @@ export default function Register({ navigation }) {
   };
   const [request, response, promptAsync] = useAuthRequest(
     {
-      clientId: "b5497b2f8f6441fa8449f7a108920552",
+      clientId: SPOTIFY_CLIENT_ID,
       scopes: [
         "user-read-private",
         "user-read-email",
@@ -109,7 +112,7 @@ export default function Register({ navigation }) {
         "playlist-modify",
         "user-read-private",
       ],
-      responseType: ResponseType.Token,
+      // responseType: ResponseType.Token,
       // In order to follow the "Authorization Code Flow" to fetch token after authorizationEndpoint
       // this must be set to false
       usePKCE: false,
@@ -556,21 +559,34 @@ export default function Register({ navigation }) {
             activeOpacity={response ? 0.5 : 1}
             disabled={response !== null}
             onPress={() => {
-              promptAsync().then((response) => {
+              promptAsync().then(async (response) => {
                 if (response) {
                   if (response?.type === "success") {
-                    const { access_token } = response.params;
-                    console.log(JSON.stringify(access_token));
+                    const { code } = response.params;
+                    const credsB64 = btoa(
+                      `${SPOTIFY_CLIENT_ID}:${SPOTIFY_CLIENT_SECRET}`
+                    );
+                    const tokenResponse = await fetch("https://accounts.spotify.com/api/token", {
+                      method: "POST",
+                      headers: {
+                        Authorization: `Basic ${credsB64}`,
+                        "Content-Type": "application/x-www-form-urlencoded",
+                      },
+                      body: `grant_type=authorization_code&code=${code}&redirect_uri=${`exp://${EXPO_ADDRESS}:${EXPO_PORT}`}`,
+                    });
+                    const responseJson = await tokenResponse.json();
+                    // destructure the response and rename the properties to be in camelCase to satisfy my linter ;)
+                    const {
+                      access_token: accessToken,
+                      refresh_token: refreshToken,
+                      expires_in: expiresIn,
+                    } = responseJson;
+                
 
-                    if (access_token) {
-                      setFormData((prevstate) => {
-                        return {
-                          ...prevstate,
-                          spotifyAccessToken: access_token,
-                          // spotifyRefreshToken: refresh_token,
-                        };
-                      });
-                    }
+                    formData.spotifyAccessToken = accessToken;
+                    formData.spotifyRefreshToken = refreshToken;
+                    formData.expiresIn = expiresIn;
+                    
                   }
                 }
               });
