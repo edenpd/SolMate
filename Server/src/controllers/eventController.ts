@@ -200,6 +200,11 @@ export const getMatchingEvents = async (req: Request, res: Response) => {
           spotifyApi.setAccessToken(decrypt(user1.spotifyAccessToken, user1.iv));
           // Try accessing the spotify API only if there is an access token
           if (spotifyApi.getAccessToken()) {
+            const token = await checkAccessToken(user1);
+
+            if (token) {
+              spotifyApi.setAccessToken(token);
+            }
             const artistsArray = await spotifyApi.getMyTopArtists({ limit: 5 });
 
             for (let item of artistsArray.body.items) {
@@ -219,6 +224,10 @@ export const getMatchingEvents = async (req: Request, res: Response) => {
           spotifyApi.setAccessToken(decrypt(user2.spotifyAccessToken, user2.iv));
           // Try accessing the spotify API only if there is an access token
           if (spotifyApi.getAccessToken()) {
+            const token = await checkAccessToken(user2);
+            if (token) {
+              spotifyApi.setAccessToken(token);
+            }
             const artistsArray = await spotifyApi.getMyTopArtists({ limit: 5 });
 
             for (let item of artistsArray.body.items) {
