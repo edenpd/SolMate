@@ -259,17 +259,16 @@ export const MatchAlgorithm = async (email: String) => {
 
       if (users && currentUser) {
         if (currentUser.spotifyAccessToken) {
-          
-                // Get the matches from spotify.
-      spotifyApi.setAccessToken(
-        decrypt(currentUser.spotifyAccessToken, currentUser.iv)
-      );
-      if (spotifyApi.getAccessToken()) {
-        const token = await checkAccessToken(currentUser);
+          // Get the matches from spotify.
+          spotifyApi.setAccessToken(
+            decrypt(currentUser.spotifyAccessToken, currentUser.iv)
+          );
+          if (spotifyApi.getAccessToken()) {
+            const token = await checkAccessToken(currentUser);
 
-        if (token) {
-          spotifyApi.setAccessToken(token);
-        }
+            if (token) {
+              spotifyApi.setAccessToken(token);
+            }
             const cuur_artists = await spotifyApi.getFollowedArtists();
             const curr_SavedSongs = await spotifyApi.getMySavedTracks();
             const curr_TopSongs = await spotifyApi.getMyTopTracks();
@@ -341,16 +340,16 @@ export const MatchAlgorithm = async (email: String) => {
               var finalGrade = 0;
 
               if (user.spotifyAccessToken) {
-                          spotifyApi.setAccessToken(
-                decrypt(user.spotifyAccessToken, user.iv)
-              );
+                spotifyApi.setAccessToken(
+                  decrypt(user.spotifyAccessToken, user.iv)
+                );
 
-              if (spotifyApi.getAccessToken()) {
-                const token = await checkAccessToken(user);
+                if (spotifyApi.getAccessToken()) {
+                  const token = await checkAccessToken(user);
 
-                if (token) {
-                  spotifyApi.setAccessToken(token);
-                }
+                  if (token) {
+                    spotifyApi.setAccessToken(token);
+                  }
                   const user_artists = await spotifyApi.getFollowedArtists();
                   const user_SavedSongs = await spotifyApi.getMySavedTracks();
                   const user_TopSongs = await spotifyApi.getMyTopTracks();
@@ -410,9 +409,9 @@ export const MatchAlgorithm = async (email: String) => {
                 ) {
                   songGrade =
                     similarSongs /
-                    (currentUserTopSongs.length + userTopSongs.length) +
+                      (currentUserTopSongs.length + userTopSongs.length) +
                     similarSavedSongs /
-                    (currentUserSavedSongs.length + userSavedSongs.length);
+                      (currentUserSavedSongs.length + userSavedSongs.length);
                 }
 
                 // similar related artists amount
@@ -440,18 +439,18 @@ export const MatchAlgorithm = async (email: String) => {
                 // calc artists match grade
                 if (
                   currentUserRelatedArtists.length +
-                  userRelatedArtists.length !==
-                  0 &&
+                    userRelatedArtists.length !==
+                    0 &&
                   currentUserFollowArtists.length + userFollowArtists.length !==
-                  0
+                    0
                 ) {
                   artistsGrade =
                     similarArtists /
-                    (currentUserRelatedArtists.length +
-                      userRelatedArtists.length) +
+                      (currentUserRelatedArtists.length +
+                        userRelatedArtists.length) +
                     similarFollowArtists /
-                    (currentUserFollowArtists.length +
-                      userFollowArtists.length);
+                      (currentUserFollowArtists.length +
+                        userFollowArtists.length);
                 }
 
                 // similar album amount
