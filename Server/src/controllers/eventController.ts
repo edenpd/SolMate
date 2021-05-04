@@ -44,11 +44,6 @@ export const getEvents = async (req: Request, res: Response) => {
 
   console.log("Getting events for user id: " + req.query.userId);
 
-  // if (req.query.artists == undefined) {
-  //   res.status(500).send("Error");
-  //   return;
-  // }
-
   await User.find({ _id: req.query.userId }, async (err: CallbackError, userArray: IUser[]) => {
     let user = userArray[0];
     if (err) {
@@ -75,6 +70,8 @@ export const getEvents = async (req: Request, res: Response) => {
       } catch (error) {
         console.log("Error with spotify token");
       }
+
+      // If there are no artists from spotify, add artists from user's artists attribute
       if (artists.length == 0) {
         artists = user.Artists;
       }
@@ -160,10 +157,6 @@ export const getEvents = async (req: Request, res: Response) => {
         })
 
       res.status(200).json(events);
-
-      // } else { // If there is no token, return the mataches without the users' top artists.
-      //   res.status(500).send("No aritists found");
-      // }
     }
 
 
@@ -200,6 +193,11 @@ export const getMatchingEvents = async (req: Request, res: Response) => {
           spotifyApi.setAccessToken(decrypt(user1.spotifyAccessToken, user1.iv));
           // Try accessing the spotify API only if there is an access token
           if (spotifyApi.getAccessToken()) {
+            const token = await checkAccessToken(user1);
+
+            if (token) {
+              spotifyApi.setAccessToken(token);
+            }
             const artistsArray = await spotifyApi.getMyTopArtists({ limit: 5 });
 
             for (let item of artistsArray.body.items) {
@@ -219,6 +217,10 @@ export const getMatchingEvents = async (req: Request, res: Response) => {
           spotifyApi.setAccessToken(decrypt(user2.spotifyAccessToken, user2.iv));
           // Try accessing the spotify API only if there is an access token
           if (spotifyApi.getAccessToken()) {
+            const token = await checkAccessToken(user2);
+            if (token) {
+              spotifyApi.setAccessToken(token);
+            }
             const artistsArray = await spotifyApi.getMyTopArtists({ limit: 5 });
 
             for (let item of artistsArray.body.items) {

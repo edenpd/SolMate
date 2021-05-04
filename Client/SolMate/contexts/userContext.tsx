@@ -66,7 +66,11 @@ const StateProvider = ({ children }) => {
 
         return currentState;
       case "LOGOUT":
-        currentState.user = null;
+        console.log("Logging out");
+        currentState.user = {
+          _id: "",
+          email: ""
+        };
         return currentState;
       default:
         throw new Error();

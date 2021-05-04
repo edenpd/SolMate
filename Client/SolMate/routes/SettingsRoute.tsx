@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useContext } from "react";
 import { StyleSheet, View, Text, ScrollView } from "react-native";
 import { Avatar, TextInput } from "react-native-paper";
 import { CheckBox, Divider, Image, SearchBar } from "react-native-elements";
@@ -17,6 +17,8 @@ import Thumb from "../components/RangeSlider/Thumb";
 import Rail from "../components/RangeSlider/Rail";
 import RailSelected from "../components/RangeSlider/RailSelected";
 import Notch from "../components/RangeSlider/Notch";
+import { userContext } from "../contexts/userContext";
+import { tokenContext } from "../contexts/tokenContext";
 
 const settings = StyleSheet.create({
   userImage: {
@@ -40,6 +42,8 @@ const settings = StyleSheet.create({
 });
 
 const SettingRoute = () => {
+  const { dispatch } = useContext(userContext);
+  const { dispatchToken } = useContext(tokenContext);
   const renderThumb = useCallback(() => <Thumb />, []);
   const renderRail = useCallback(() => <Rail />, []);
   const renderRailSelected = useCallback(() => <RailSelected />, []);
@@ -56,6 +60,7 @@ const SettingRoute = () => {
   }, []);
   var currentDateMoreThan18 = new Date();
   currentDateMoreThan18.setFullYear(new Date().getFullYear() - 18);
+
   return (
     <View>
       <Avatar.Image
@@ -214,6 +219,9 @@ const SettingRoute = () => {
           <FormGroup>
             <Button>save</Button>
           </FormGroup>
+          <FormGroup>
+            <Button onPress={() => {dispatchToken({type: 'LOGOUT'}); dispatch({type: 'LOGOUT'});}} >Log Out</Button>
+          </FormGroup>
         </FieldsContainer>
       </View>
     </View>
@@ -221,3 +229,5 @@ const SettingRoute = () => {
 };
 
 export default SettingRoute;
+
+
