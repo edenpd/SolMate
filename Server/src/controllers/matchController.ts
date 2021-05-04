@@ -249,14 +249,18 @@ export const MatchAlgorithm = async (email: String) => {
     let currentUser = users.find((user) => user.email === email);
     users = users.filter((user) => user.email !== email);
 
-    let currentUserSavedSongs: string[] = [];
-    let currentUserTopSongs: string[] = [];
-    let currentUserFollowArtists: string[] = [];
-    let currentUserRelatedArtists: string[] = [];
-    let currentUserAlbums: string[] = [];
+    // cuurent user is with spotify
+    if (currentUser?.spotifyAccessToken) {
+      let currentUserSavedSongs: string[] = [];
+      let currentUserTopSongs: string[] = [];
+      let currentUserFollowArtists: string[] = [];
+      let currentUserRelatedArtists: string[] = [];
+      let currentUserAlbums: string[] = [];
 
-    if (users && currentUser) {
-      // Get the matches from spotify.
+      if (users && currentUser) {
+        if (currentUser.spotifyAccessToken) {
+          
+                // Get the matches from spotify.
       spotifyApi.setAccessToken(
         decrypt(currentUser.spotifyAccessToken, currentUser.iv)
       );
@@ -266,32 +270,38 @@ export const MatchAlgorithm = async (email: String) => {
         if (token) {
           spotifyApi.setAccessToken(token);
         }
+            const cuur_artists = await spotifyApi.getFollowedArtists();
+            const curr_SavedSongs = await spotifyApi.getMySavedTracks();
+            const curr_TopSongs = await spotifyApi.getMyTopTracks();
+            const curr_Albums = await spotifyApi.getMySavedAlbums();
 
-        const cuur_artists = await spotifyApi.getFollowedArtists();
-        const curr_SavedSongs = await spotifyApi.getMySavedTracks();
-        const curr_TopSongs = await spotifyApi.getMyTopTracks();
-        const curr_Albums = await spotifyApi.getMySavedAlbums();
+            curr_SavedSongs.body.items.forEach((item) => {
+              currentUserSavedSongs.push(item.track.name);
+            });
 
-        curr_SavedSongs.body.items.forEach((item) => {
-          currentUserSavedSongs.push(item.track.name);
-        });
+            curr_TopSongs.body.items.forEach((item) => {
+              currentUserTopSongs.push(item.name);
+            });
 
-        curr_TopSongs.body.items.forEach((item) => {
-          currentUserTopSongs.push(item.name);
-        });
+            curr_Albums.body.items.forEach((item) => {
+              currentUserAlbums.push(item.album.name);
+            });
 
-        curr_Albums.body.items.forEach((item) => {
-          currentUserAlbums.push(item.album.name);
-        });
-
-        cuur_artists.body.artists.items.forEach(async (item) => {
-          currentUserFollowArtists.push(item.name);
-          await (
-            await spotifyApi.getArtistRelatedArtists(item.id)
-          ).body.artists.forEach((item) => {
-            currentUserRelatedArtists.push(item.name);
-          });
-        });
+            cuur_artists.body.artists.items.forEach(async (item) => {
+              currentUserFollowArtists.push(item.name);
+              await (
+                await spotifyApi.getArtistRelatedArtists(item.id)
+              ).body.artists.forEach((item) => {
+                currentUserRelatedArtists.push(item.name);
+              });
+            });
+          }
+        }
+        // cuurent user is without spotify
+        else {
+          let currentUserSongs: string[] = currentUser.Songs;
+          let currentUserArtists: string[] = currentUser.Artists;
+        }
 
         users = users.filter((user) => {
           const ageDifMs = Date.now() - user.birthday.getTime();
@@ -318,6 +328,7 @@ export const MatchAlgorithm = async (email: String) => {
             try {
               let matchFound: IMatch;
               // var age = Date.now() - user.birthday.getTime();
+
               let userSavedSongs: string[] = [];
               let userTopSongs: string[] = [];
               let userFollowArtists: string[] = [];
@@ -327,11 +338,10 @@ export const MatchAlgorithm = async (email: String) => {
               var songGrade = 0;
               var artistsGrade = 0;
               var albumGrade = 0;
-              var genereGrade = 0;
               var finalGrade = 0;
 
-              // Get the user data from spotify.
-              spotifyApi.setAccessToken(
+              if (user.spotifyAccessToken) {
+                          spotifyApi.setAccessToken(
                 decrypt(user.spotifyAccessToken, user.iv)
               );
 
@@ -341,31 +351,35 @@ export const MatchAlgorithm = async (email: String) => {
                 if (token) {
                   spotifyApi.setAccessToken(token);
                 }
+                  const user_artists = await spotifyApi.getFollowedArtists();
+                  const user_SavedSongs = await spotifyApi.getMySavedTracks();
+                  const user_TopSongs = await spotifyApi.getMyTopTracks();
+                  const user_Albums = await spotifyApi.getMySavedAlbums();
+                  // const user_Genre = await spotifyApi.getAvailableGenreSeeds();
 
-                const user_artists = await spotifyApi.getFollowedArtists();
-                const user_SavedSongs = await spotifyApi.getMySavedTracks();
-                const user_TopSongs = await spotifyApi.getMyTopTracks();
-                const user_Albums = await spotifyApi.getMySavedAlbums();
-                // const user_Genre = await spotifyApi.getAvailableGenreSeeds();
-
-                user_SavedSongs.body.items.forEach((item) => {
-                  userSavedSongs.push(item.track.name);
-                });
-                user_TopSongs.body.items.forEach((item) => {
-                  userTopSongs.push(item.name);
-                });
-                user_Albums.body.items.forEach((item) => {
-                  userAlbums.push(item.album.name);
-                });
-
-                user_artists.body.artists.items.forEach(async (item) => {
-                  userFollowArtists.push(item.name);
-                  await (
-                    await spotifyApi.getArtistRelatedArtists(item.id)
-                  ).body.artists.forEach((item) => {
-                    userRelatedArtists.push(item.name);
+                  user_SavedSongs.body.items.forEach((item) => {
+                    userSavedSongs.push(item.track.name);
                   });
-                });
+                  user_TopSongs.body.items.forEach((item) => {
+                    userTopSongs.push(item.name);
+                  });
+                  user_Albums.body.items.forEach((item) => {
+                    userAlbums.push(item.album.name);
+                  });
+
+                  user_artists.body.artists.items.forEach(async (item) => {
+                    userFollowArtists.push(item.name);
+                    await (
+                      await spotifyApi.getArtistRelatedArtists(item.id)
+                    ).body.artists.forEach((item) => {
+                      userRelatedArtists.push(item.name);
+                    });
+                  });
+                } // cuurent user is without spotify
+                else {
+                  let userSongs: string[] = user.Songs;
+                  let userArtists: string[] = user.Artists;
+                }
 
                 // similar songs amount
                 var similarSongs = 0;

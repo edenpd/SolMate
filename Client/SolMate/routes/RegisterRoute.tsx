@@ -31,10 +31,14 @@ import useDate, { LOCALE } from "../hooks/useDate";
 import { userContext } from "../contexts/userContext";
 import { tokenContext } from "../contexts/tokenContext";
 import { SERVER_ADDRESS, SERVER_PORT } from "@env";
-import { EXPO_ADDRESS, EXPO_PORT,SPOTIFY_CLIENT_SECRET,SPOTIFY_CLIENT_ID } from "@env";
+import {
+  EXPO_ADDRESS,
+  EXPO_PORT,
+  SPOTIFY_CLIENT_SECRET,
+  SPOTIFY_CLIENT_ID,
+} from "@env";
 import * as ImagePicker from "expo-image-picker";
-import { encode as btoa } from 'base-64';
-// import GetLocation from "react-native-get-location";
+import { encode as btoa } from "base-64";
 import * as Location from "expo-location";
 import * as Permissions from "expo-permissions";
 WebBrowser.maybeCompleteAuthSession();
@@ -566,14 +570,17 @@ export default function Register({ navigation }) {
                     const credsB64 = btoa(
                       `${SPOTIFY_CLIENT_ID}:${SPOTIFY_CLIENT_SECRET}`
                     );
-                    const tokenResponse = await fetch("https://accounts.spotify.com/api/token", {
-                      method: "POST",
-                      headers: {
-                        Authorization: `Basic ${credsB64}`,
-                        "Content-Type": "application/x-www-form-urlencoded",
-                      },
-                      body: `grant_type=authorization_code&code=${code}&redirect_uri=${`exp://${EXPO_ADDRESS}:${EXPO_PORT}`}`,
-                    });
+                    const tokenResponse = await fetch(
+                      "https://accounts.spotify.com/api/token",
+                      {
+                        method: "POST",
+                        headers: {
+                          Authorization: `Basic ${credsB64}`,
+                          "Content-Type": "application/x-www-form-urlencoded",
+                        },
+                        body: `grant_type=authorization_code&code=${code}&redirect_uri=${`exp://${EXPO_ADDRESS}:${EXPO_PORT}`}`,
+                      }
+                    );
                     const responseJson = await tokenResponse.json();
                     // destructure the response and rename the properties to be in camelCase to satisfy my linter ;)
                     const {
@@ -581,12 +588,10 @@ export default function Register({ navigation }) {
                       refresh_token: refreshToken,
                       expires_in: expiresIn,
                     } = responseJson;
-                
 
                     formData.spotifyAccessToken = accessToken;
                     formData.spotifyRefreshToken = refreshToken;
                     formData.expiresIn = expiresIn;
-                    
                   }
                 }
               });

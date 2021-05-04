@@ -14,6 +14,8 @@ import useToken from "../hooks/useToken";
 import { userContext } from "../contexts/userContext";
 import { tokenContext } from "../contexts/tokenContext";
 import { SERVER_ADDRESS, SERVER_PORT } from "@env";
+import * as Location from "expo-location";
+import * as Permissions from "expo-permissions";
 
 export default function LoginRoute({ navigation }) {
   const [email, setEmail] = useState("");
@@ -28,6 +30,10 @@ export default function LoginRoute({ navigation }) {
   }, [token]);
 
   async function loginUser(credentials) {
+    // formData.location = {
+    //   latitude: location.coords.latitude,
+    //   longitude: location.coords.longitude,
+    // };
     return axios
       .post(`${SERVER_ADDRESS}:${SERVER_PORT}/user/login`, credentials, {
         headers: { "Content-Type": "application/json" },
@@ -35,11 +41,34 @@ export default function LoginRoute({ navigation }) {
       .then(async (response) => {
         dispatch({ type: "SET_USER", payload: response.data.user });
         dispatchToken({ type: "SET_TOKEN", payload: response.data.token });
+
+        // // update location
+        // console.log("permmision!");
+        // const { status } = await Permissions.askAsync(Permissions.LOCATION);
+        // if (status != "granted") {
+        //   console.log("PERMISSION NOT GRANRED");
+        // }
+        // const location = await Location.getCurrentPositionAsync();
+        // console.log("location is ", location);
+
+        // // const userLocation = {
+        // //   email: email,
+        // //   location: location,
+        // // };
+        // response.data.user.location = location;
+        // axios.put(
+        //   `${SERVER_ADDRESS}:${SERVER_PORT}/user/updateUser`,
+        //   response.data.user,
+        //   {
+        //     headers: { "Content-Type": "application/json" },
+        //   }
+        // );
       })
       .catch((error) => Alert.alert(error.message));
   }
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     const res = await loginUser({
       email,
       password,
@@ -52,7 +81,7 @@ export default function LoginRoute({ navigation }) {
         display: "flex",
         justifyContent: "center",
         // alignContent: "center",
-        marginTop:80,
+        marginTop: 80,
         alignItems: "center",
       }}
     >
@@ -87,14 +116,13 @@ export default function LoginRoute({ navigation }) {
           leftIcon={<Icon name="lock" size={24} color="black" />}
         />
       </View>
-      <View style={{ width: "60%", minWidth: 200,marginTop:10 }}>
+      <View style={{ width: "60%", minWidth: 200, marginTop: 10 }}>
         <Button
           title="Login"
           titleStyle={{ fontSize: 20 }}
           loading={isLoading}
           onPress={handleSubmit}
-          containerStyle={{borderRadius: 50,}}
-
+          containerStyle={{ borderRadius: 50 }}
           buttonStyle={{
             backgroundColor: "purple",
             borderRadius: 50,
@@ -107,16 +135,15 @@ export default function LoginRoute({ navigation }) {
             shadowRadius: 7.49,
           }}
         />
-        <View style={{ marginVertical: 20 ,width:"100%"}}>
+        <View style={{ marginVertical: 20, width: "100%" }}>
           <Button
             title="Register"
-            titleStyle={{ fontSize: 20, color: "purple" ,
-         }}
+            titleStyle={{ fontSize: 20, color: "purple" }}
             loading={isLoading}
             onPress={() => {
               navigation.navigate("Register");
             }}
-            containerStyle={{borderRadius: 50,}}
+            containerStyle={{ borderRadius: 50 }}
             buttonStyle={{
               backgroundColor: "white",
               borderColor: "purple",
