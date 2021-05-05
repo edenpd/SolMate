@@ -45,7 +45,8 @@ router.post("/register", async (req, res, next) => {
 router.get("/", authenticateJWT, getUserByEmail);
 router.post("/uploadProfile", authenticateJWT, upload, uploadProfile);
 router.post("/uploadMedia", authenticateJWT, upload, uploadMedia);
-router.put("/", authenticateJWT, updateUser);
+//router.put("/", authenticateJWT, updateUser);
+router.put("/", updateUser);
 // router.get("/statistic", getStatistics);
 router.delete("/", deleteUser);
 router.get("/getuser", getUserByid);
