@@ -134,10 +134,12 @@ export const uploadProfile = async (req: Request, res: Response) => {
 };
 
 export const updateUser = async (req: Request, res: Response) => {
+  console.log("UPDATE");
   console.log(req.body);
   const userId = req.body._id;
   const firstName = req.body.firstName;
   const lastName = req.body.lastName;
+  const email = req.body.email;
   const Songs = req.body.Songs;
   const description = req.body.description;
   const interestedAgeMin = req.body.interestedAgeMin;
@@ -146,7 +148,10 @@ export const updateUser = async (req: Request, res: Response) => {
   const sex = req.body.sex;
   const birthday = req.body.birthday;
   const interestedSex = req.body.interestedSex;
-  const { encryptedAccessToken, encryptedRefreshToken, iv } = encryptTokens(req.body.spotifyAccessToken,req.body.spotifyRefreshToken);
+  const { encryptedAccessToken, encryptedRefreshToken, iv } = encryptTokens(
+    req.body.spotifyAccessToken,
+    req.body.spotifyRefreshToken
+  );
   try {
     await User.updateOne(
       {
@@ -156,6 +161,7 @@ export const updateUser = async (req: Request, res: Response) => {
         $set: {
           firstName: firstName,
           lastName: lastName,
+          email: email,
           Songs: Songs,
           description: description,
           interestedAgeMin: interestedAgeMin,
@@ -166,10 +172,8 @@ export const updateUser = async (req: Request, res: Response) => {
           interestedSex: interestedSex,
           spotifyAccessToken: encryptedAccessToken,
           spotifyRefreshToken: encryptedRefreshToken,
-          iv: iv?.toString('hex'),
+          iv: iv?.toString("hex"),
           spotifyTokenExpiryDate: req.body.spotifyTokenExpiryDate,
-
-
         },
       }
     ).exec((err: CallbackError, user: any) => {
@@ -198,7 +202,10 @@ export const updateUserWithNoResponse = async (req: Request) => {
   const sex = req.body.sex;
   const birthday = req.body.birthday;
   const interestedSex = req.body.interestedSex;
-  const { encryptedAccessToken, encryptedRefreshToken, iv } = encryptTokens(req.body.spotifyAccessToken,req.body.spotifyRefreshToken);
+  const { encryptedAccessToken, encryptedRefreshToken, iv } = encryptTokens(
+    req.body.spotifyAccessToken,
+    req.body.spotifyRefreshToken
+  );
 
   try {
     await User.updateOne(
@@ -219,7 +226,7 @@ export const updateUserWithNoResponse = async (req: Request) => {
           interestedSex: interestedSex,
           spotifyAccessToken: encryptedAccessToken,
           spotifyRefreshToken: encryptedRefreshToken,
-          iv: iv?.toString('hex'),
+          iv: iv?.toString("hex"),
           spotifyTokenExpiryDate: req.body.spotifyTokenExpiryDate,
         },
       }
@@ -306,7 +313,7 @@ export const getUserByid = async (req: Request, res: Response) => {
           res.status(200).json(newUser);
         } catch (e) {
           // TODO: Implement error handling.
-          console.log("[getUserByid2] oops");
+          console.log("[getUserByid] oops");
           res.status(500).send(e);
         }
     }
