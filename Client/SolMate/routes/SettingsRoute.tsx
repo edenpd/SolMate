@@ -6,7 +6,6 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import useDate, { LOCALE } from "../hooks/useDate";
 import { SERVER_ADDRESS, SERVER_PORT } from "@env";
 import axios from "axios";
-import { userContext } from "../contexts/userContext";
 
 import {
   Button,
@@ -21,6 +20,8 @@ import Thumb from "../components/RangeSlider/Thumb";
 import Rail from "../components/RangeSlider/Rail";
 import RailSelected from "../components/RangeSlider/RailSelected";
 import Notch from "../components/RangeSlider/Notch";
+import { userContext } from "../contexts/userContext";
+import { tokenContext } from "../contexts/tokenContext";
 
 export interface IUserForm {
   _id: string;
@@ -77,6 +78,8 @@ const settings = StyleSheet.create({
 
 const SettingRoute = () => {
   const { date, show, showDatepicker, onChangeDate, setShow } = useDate();
+  const { dispatch } = useContext(userContext);
+  const { dispatchToken } = useContext(tokenContext);
   const renderThumb = useCallback(() => <Thumb />, []);
   const renderRail = useCallback(() => <Rail />, []);
   const renderRailSelected = useCallback(() => <RailSelected />, []);
@@ -393,6 +396,16 @@ const SettingRoute = () => {
               </FormGroup>
               <FormGroup>
                 <Button onPress={() => onSave()}>save</Button>
+              </FormGroup>
+              <FormGroup>
+                <Button
+                  onPress={() => {
+                    dispatchToken({ type: "LOGOUT" });
+                    dispatch({ type: "LOGOUT" });
+                  }}
+                >
+                  Log Out
+                </Button>
               </FormGroup>
             </FieldsContainer>
           </View>
