@@ -178,7 +178,7 @@ const SettingRoute = () => {
   currentDateMoreThan18.setFullYear(new Date().getFullYear() - 18);
 
   if (formData.firstName === "s") {
-    return <Text>Shiri is my mqueen!</Text>;
+    return <Text>loading</Text>;
   } else {
     return (
       <ScrollView
