@@ -18,7 +18,7 @@ export const registerUser = async (req: Request, res: Response) => {
 
   const { encryptedAccessToken, encryptedRefreshToken, iv } = encryptTokens(
     req.body.spotifyAccessToken,
-    req.body.spotifyAccessToken
+    req.body.spotifyRefreshToken
   );
   const expirationDate = new Date(
     new Date().getTime() + req.body.expiresIn * 1000
