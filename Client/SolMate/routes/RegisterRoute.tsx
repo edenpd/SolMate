@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Alert,
   ScrollView,
+  FlatList,
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome5";
 import {
@@ -15,6 +16,8 @@ import {
   Image,
   SearchBar,
   Button,
+  ListItem,
+  Avatar,
 } from "react-native-elements";
 import axios from "axios";
 import * as WebBrowser from "expo-web-browser";
@@ -41,6 +44,7 @@ import * as ImagePicker from "expo-image-picker";
 import { encode as btoa } from "base-64";
 import * as Location from "expo-location";
 import * as Permissions from "expo-permissions";
+
 WebBrowser.maybeCompleteAuthSession();
 
 export interface IUserForm {
@@ -69,12 +73,13 @@ export default function Register({ navigation }) {
   var currentDateMoreThan18 = new Date();
   currentDateMoreThan18.setFullYear(new Date().getFullYear() - 18);
   const [isLoading, setIsLoading] = useState(false);
-  const [search, updateSearch] = useState("");
+  const [search, setSearch] = useState("");
   const [noSpotify, setNoSpotify] = useState(false);
   const [errors, setErrors] = useState({});
   const { dispatch } = useContext(userContext);
   const { dispatchToken } = useContext(tokenContext);
   const [image, setImage] = useState(null);
+  const [songList, setSongList] = useState([{}]);
 
   const [formData, setFormData] = useState<IUserForm>({
     email: "",
@@ -324,6 +329,27 @@ export default function Register({ navigation }) {
     });
   }, []);
 
+  const updateSearch = async (search) => {
+    setSearch(search);
+  };
+
+  const keyExtractor = (item, index) => index.toString();
+
+  const renderItem = ({ item }) => (
+    <ListItem bottomDivider >
+      <CheckBox/>
+      <Avatar
+        title={item.name[0]}
+        source={item.avatar_url && { uri: item.avatar_url }}
+      />
+      <ListItem.Content>
+        <ListItem.Title>{item.name}</ListItem.Title>
+        <ListItem.Subtitle>{item.subtitle}</ListItem.Subtitle>
+      </ListItem.Content>
+      <ListItem.Chevron />
+    </ListItem>
+  );
+
   return (
     <ScrollView
       contentContainerStyle={{
@@ -558,10 +584,10 @@ export default function Register({ navigation }) {
           <TouchableOpacity
             style={[
               registerStyle.SpotifyButton,
-              response ? { opacity: 0.3 } : { opacity: 1 },
+              response || noSpotify ? { opacity: 0.3 } : { opacity: 1 },
             ]}
-            activeOpacity={response ? 0.5 : 1}
-            disabled={response !== null}
+            activeOpacity={response || noSpotify ? 0.5 : 1}
+            disabled={response !== null || noSpotify}
             onPress={() => {
               promptAsync().then(async (response) => {
                 if (response) {
@@ -684,7 +710,18 @@ export default function Register({ navigation }) {
                         backgroundColor: "#333333",
                         marginTop: 20,
                       }}
+                      onChangeText={updateSearch}
+                      value={search}
                     />
+                    <View
+                      style={{ borderRadius: 40, backgroundColor: "#333333" }}
+                    >
+                      <FlatList
+                        keyExtractor={this.keyExtractor}
+                        data={songList}
+                        renderItem={this.renderItem}
+                      />
+                    </View>
                   </View>
                 )}
               </View>
