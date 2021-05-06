@@ -18,7 +18,7 @@ export const registerUser = async (req: Request, res: Response) => {
 
   const { encryptedAccessToken, encryptedRefreshToken, iv } = encryptTokens(
     req.body.spotifyAccessToken,
-    req.body.spotifyAccessToken
+    req.body.spotifyRefreshToken
   );
   const expirationDate = new Date(
     new Date().getTime() + req.body.expiresIn * 1000
@@ -138,6 +138,7 @@ export const updateUser = async (req: Request, res: Response) => {
   const userId = req.body._id;
   const firstName = req.body.firstName;
   const lastName = req.body.lastName;
+  const email = req.body.email;
   const Songs = req.body.Songs;
   const description = req.body.description;
   const interestedAgeMin = req.body.interestedAgeMin;
@@ -159,6 +160,7 @@ export const updateUser = async (req: Request, res: Response) => {
         $set: {
           firstName: firstName,
           lastName: lastName,
+          email: email,
           Songs: Songs,
           description: description,
           interestedAgeMin: interestedAgeMin,
