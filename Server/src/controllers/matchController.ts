@@ -4,7 +4,7 @@ import Match, { IMatch, IMatchModel } from "../modules/matchModel";
 import { IChat } from "../modules/chatModel";
 import { addChatAfterMatch } from "../controllers/chatController";
 import { decrypt, spotifyApi } from "../Util/spotifyAccess";
-import User, { IUser, IUserModel } from "../modules/userModel";
+import User, { IArtist, IUser, IUserModel } from "../modules/userModel";
 import { getUsersDistance } from "../Util/general";
 import { checkAccessToken } from "../controllers/spotifyController";
 export const addMatch = async (req: Request, res: Response) => {
@@ -299,7 +299,7 @@ export const MatchAlgorithm = async (email: String) => {
         // cuurent user is without spotify
         else {
           let currentUserSongs: string[] = currentUser.Songs;
-          let currentUserArtists: string[] = currentUser.Artists;
+          let currentUserArtists: IArtist[] = currentUser.Artists;
         }
 
         users = users.filter((user) => {
@@ -377,7 +377,7 @@ export const MatchAlgorithm = async (email: String) => {
                 } // cuurent user is without spotify
                 else {
                   let userSongs: string[] = user.Songs;
-                  let userArtists: string[] = user.Artists;
+                  let userArtists: IArtist[] = user.Artists;
                 }
 
                 // similar songs amount

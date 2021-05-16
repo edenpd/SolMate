@@ -64,11 +64,11 @@ export interface IUserForm {
   interestedSex: number;
   interestedAgeMin: number;
   interestedAgeMax: number;
-  Songs: Array<string>;
+  Artists: Array<Object>;
   location: Object;
 }
 
-export default function Register({ navigation }) {
+export default function Register({ navigation }): JSX.Element {
   const { date, show, showDatepicker, onChangeDate, setShow } = useDate();
   var currentDateMoreThan18 = new Date();
   currentDateMoreThan18.setFullYear(new Date().getFullYear() - 18);
@@ -79,7 +79,10 @@ export default function Register({ navigation }) {
   const { dispatch } = useContext(userContext);
   const { dispatchToken } = useContext(tokenContext);
   const [image, setImage] = useState(null);
-  const [songList, setSongList] = useState([{}]);
+  const [artistList, setArtistList] = useState([]);
+  const [checkedArtistList, setCheckedArtistList] = useState([
+    { id: "", name: "", images: [{ url: "" }] },
+  ]);
 
   const [formData, setFormData] = useState<IUserForm>({
     email: "",
@@ -98,7 +101,7 @@ export default function Register({ navigation }) {
     interestedSex: 1,
     interestedAgeMin: 18,
     interestedAgeMax: 24,
-    Songs: [""],
+    Artists: [],
     location: "",
   });
 
@@ -274,12 +277,22 @@ export default function Register({ navigation }) {
       if (status != "granted") {
         console.log("PERMISSION NOT GRANRED");
       }
-      const location = await Location.getCurrentPositionAsync();
-      console.log("location is ", location);
-      formData.location = {
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-      };
+
+      for (var i = 0; i < checkedArtistList.length; i++) {
+        if (checkedArtistList[i].id) {
+          formData.Artists.push({
+            id: checkedArtistList[i].id,
+            name: checkedArtistList[i].name,
+            image: checkedArtistList[i].images[0].url,
+          });
+        }
+      }
+      // const location = await Location.getCurrentPositionAsync();
+      // console.log("location is ", location);
+      // formData.location = {
+      //   latitude: location.coords.latitude,
+      //   longitude: location.coords.longitude,
+      // };
       await axios
         .post(`${SERVER_ADDRESS}:${SERVER_PORT}/user/register`, formData, {
           headers: { "Content-Type": "application/json" },
@@ -331,24 +344,62 @@ export default function Register({ navigation }) {
 
   const updateSearch = async (search) => {
     setSearch(search);
+    await axios
+      .post(
+        `${SERVER_ADDRESS}:${SERVER_PORT}/spotify/search/artist`,
+        { artistName: search },
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      )
+      .then((response) => {
+        setArtistList(response.data.items);
+      })
+      .catch((err) => {
+        Alert.alert(JSON.stringify(err));
+      });
+  };
+
+  const updateChecked = (item) => {
+    if (checkedArtistList.find((x) => x.id == item.id) == undefined) {
+      setCheckedArtistList((state) => {
+        return [...state, item];
+      });
+    } else {
+      setCheckedArtistList((state) =>
+        state.filter((item2) => item2.id !== item.id)
+      );
+    }
   };
 
   const keyExtractor = (item, index) => index.toString();
 
-  const renderItem = ({ item }) => (
-    <ListItem bottomDivider >
-      <CheckBox/>
-      <Avatar
-        title={item.name[0]}
-        source={item.avatar_url && { uri: item.avatar_url }}
-      />
-      <ListItem.Content>
-        <ListItem.Title>{item.name}</ListItem.Title>
-        <ListItem.Subtitle>{item.subtitle}</ListItem.Subtitle>
-      </ListItem.Content>
-      <ListItem.Chevron />
-    </ListItem>
-  );
+  const renderItem = ({ item }) => {
+    if (item && item.images && item.name) {
+      return (
+        <ListItem
+          bottomDivider
+          containerStyle={{ borderRadius: 20, backgroundColor: "#333333" }}
+        >
+          <CheckBox
+            onPress={() => updateChecked(item)}
+            checkedColor={"purple"}
+            checked={
+              checkedArtistList.find((x) => x.id == item.id) ? true : false
+            }
+          />
+          {item.images[0] && (
+            <Avatar rounded source={{ uri: item.images[0].url }} />
+          )}
+          <ListItem.Content>
+            <ListItem.Title style={{ color: "white", fontWeight: "bold" }}>
+              {item.name}
+            </ListItem.Title>
+          </ListItem.Content>
+        </ListItem>
+      );
+    }
+  };
 
   return (
     <ScrollView
@@ -357,6 +408,7 @@ export default function Register({ navigation }) {
         display: "flex",
         paddingTop: 30,
       }}
+      scrollEnabled={true}
     >
       <View style={registerStyle.registerContainer}>
         {show && (
@@ -714,12 +766,14 @@ export default function Register({ navigation }) {
                       value={search}
                     />
                     <View
-                      style={{ borderRadius: 40, backgroundColor: "#333333" }}
+                      style={{
+                        width: "100%",
+                      }}
                     >
                       <FlatList
-                        keyExtractor={this.keyExtractor}
-                        data={songList}
-                        renderItem={this.renderItem}
+                        keyExtractor={keyExtractor}
+                        data={checkedArtistList.concat(artistList)}
+                        renderItem={renderItem}
                       />
                     </View>
                   </View>

@@ -4,6 +4,7 @@ import {
   searchSong,
   getTopTracks,
   getTopArtists,
+  searchArtist,
 } from "../controllers/spotifyController";
 import { encode as btoa } from "base-64";
 import fetch from 'node-fetch';
@@ -74,7 +75,8 @@ const router = Router();
 
 router.post("/auth", authorizeSpotify);
 router.post("/search",checkAccessToken, authorizeSpotify);
-router.post("/search/song",checkAccessToken ,searchSong);
+router.post("/search/song" ,searchSong);
+router.post("/search/artist" ,searchArtist);
 router.post("/toptracks",checkAccessToken ,getTopTracks);
 router.post("/topartists",checkAccessToken ,getTopArtists);
 

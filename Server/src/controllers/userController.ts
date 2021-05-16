@@ -25,6 +25,7 @@ export const registerUser = async (req: Request, res: Response) => {
   );
 
   var userBody: IUser = req.body;
+  console.log(userBody.Artists);
   const user = await User.create({
     email: userBody.email,
     password: hashedPassword,
