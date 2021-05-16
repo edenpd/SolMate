@@ -8,13 +8,16 @@ import { userContext } from "../contexts/userContext";
 import { IUser } from "../util/Types";
 
 const ProfileRoute = (props) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState();
   const [isLoading, setLoading] = useState(true);
   const { state } = useContext(userContext);
   let userId = undefined;
 
   useEffect(() => {
-    getUser();
+    const loadUser = async () => {
+      await getUser();
+    };
+    loadUser();
   }, []);
 
   const getUser = async () => {
@@ -32,7 +35,6 @@ const ProfileRoute = (props) => {
         .then((res) => {
           setUser(res.data);
           setLoading(false);
-          // console.log(user);
         })
         .catch((err) => {
           console.log("Error");
@@ -44,7 +46,7 @@ const ProfileRoute = (props) => {
   return (
     <Container>
       {isLoading ? (
-        <ActivityIndicator />
+        <ActivityIndicator size='small' color='#dee2ff' />
       ) : (
         <View>{<Profile user={user} />}</View>
       )}
