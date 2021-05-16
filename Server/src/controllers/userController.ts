@@ -9,6 +9,7 @@ import { deleteChatsOfUser } from "../controllers/chatController";
 import { deleteMatchesOfUser } from "../controllers/matchController";
 import crypto from "crypto";
 import { decrypt, spotifyApi, encryptTokens } from "../Util/spotifyAccess";
+import { checkAccessToken } from "../controllers/spotifyController";
 
 export const registerUser = async (req: Request, res: Response) => {
   const hashedPassword = bcrypt.hashSync(
@@ -292,7 +293,7 @@ export const deleteUser = async (req: Request, res: Response) => {
   }
 };
 
-export const getUserByid = async (req: Request, res: Response) => {
+export const getUserByid2 = async (req: Request, res: Response) => {
   const userId = req.query.userId?.toString();
 
   await User.find({ _id: userId }, async (err: CallbackError, user: any) => {
@@ -306,7 +307,7 @@ export const getUserByid = async (req: Request, res: Response) => {
 
       if (spotifyApi.getAccessToken())
         try {
-          const artists = await spotifyApi.getMyTopArtists({ limit: 3 });
+          const artists = await spotifyApi.getMyTopArtists({ limit: 6 });
           let newUser = { Artists: artists, user: user[0]._doc };
           console.log(newUser.user);
           res.status(200).json(newUser);
@@ -315,6 +316,37 @@ export const getUserByid = async (req: Request, res: Response) => {
           console.log("[getUserByid2] oops");
           res.status(500).send(e);
         }
+    }
+  });
+};
+
+export const getUserByid = async (req: Request, res: Response) => {
+  const userId = req.query.userId?.toString();
+
+  await User.find({ _id: userId }, async (err: CallbackError, user: any) => {
+    if (err) {
+      res.status(500).send(err);
+    } else {
+      const currUser = user[0];
+      let newUser = { Artists: currUser.Artists, user: currUser._doc };
+      try {
+        spotifyApi.setAccessToken(
+          decrypt(currUser.spotifyAccessToken, currUser.iv)
+        );
+
+        if (spotifyApi.getAccessToken()) {
+          const token = await checkAccessToken(currUser);
+
+          if (token) {
+            spotifyApi.setAccessToken(token);
+          }
+          const artists = await spotifyApi.getMyTopArtists({ limit: 10 });
+          newUser = { Artists: artists.body.items, user: currUser._doc };
+        }
+      } catch (e) {
+        console.log(e);
+      }
+      res.status(200).json(newUser);
     }
   });
 };

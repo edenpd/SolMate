@@ -10,6 +10,8 @@ import {
 } from "react-native-paper";
 import { userContext } from "../contexts/userContext";
 import { IUser } from "../util/Types";
+import { SERVER_ADDRESS, SERVER_PORT } from "@env";
+import { Card, Divider, ListItem } from "react-native-elements";
 
 interface ProfileProps {
   user: any;
@@ -17,7 +19,6 @@ interface ProfileProps {
 
 const Profile = (props) => {
   const [index, setIndex] = useState(0);
-  // console.log(props.user.Artists.body.items.images[0]);
 
   const styles = StyleSheet.create({
     root: {
@@ -67,22 +68,49 @@ const Profile = (props) => {
       fontSize: 24,
       fontFamily: "Poppins_500Medium_Italic",
     },
+    artistImage: {
+      margin: 30,
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: 5,
+      },
+      shadowOpacity: 0.34,
+      shadowRadius: 6.27,
+      elevation: 10,
+      //
+
+      // marginTop: 40,
+      // alignSelf: "center",
+      // width: 120,
+      // height: 120,
+      // borderRadius: 140,
+    },
+    artist: {
+      // display: "flex",
+      // flexDirection: "row",
+      // alignItems: "center",
+      // color: "#cbc0d3",
+      // backgroundColor: "#cbc0d3",
+    },
   });
 
   const renderArtists = () => {
     const artistsDOM = [];
-
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < props.user.Artists.length; i++) {
       artistsDOM.push(
-        <View key={i}>
-          <Image
-            style={styles.image}
-            source={{ uri: props.user.Artists.body.items[i].images[0].url }}
+        <ListItem key={i} bottomDivider style={{ width: 380, height: 130 }}>
+          <Avatar.Image
+            source={{ uri: props.user.Artists[i].images[0].url }}
+            size={100}
           />
-        </View>
+          <ListItem.Content>
+            <ListItem.Title>{props.user.Artists[i].name}</ListItem.Title>
+          </ListItem.Content>
+        </ListItem>
       );
     }
-
+    //}
     return artistsDOM;
   };
 
@@ -109,7 +137,12 @@ const Profile = (props) => {
 
   return (
     <View style={styles.root}>
-      <Avatar.Image size={180} source={{ uri: props.user.user.picture }} />
+      <Avatar.Image
+        size={180}
+        source={{
+          uri: `${SERVER_ADDRESS}:${SERVER_PORT}/static/${props.user.user.picture}`,
+        }}
+      />
       <Title style={styles.title}>
         {props.user.user.firstName + " " + props.user.user.lastName}
       </Title>
@@ -127,7 +160,7 @@ const Profile = (props) => {
       </View>
 
       <ScrollView>
-        <View style={styles.content}>{content}</View>
+        <View style={{ flexDirection: "column" }}>{content}</View>
       </ScrollView>
     </View>
   );
