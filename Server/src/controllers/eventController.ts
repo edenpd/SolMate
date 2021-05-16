@@ -64,7 +64,7 @@ export const getEvents = async (req: Request, res: Response) => {
           const artistsArray = await spotifyApi.getMyTopArtists({ limit: 5 });
 
           for (let item of artistsArray.body.items) {
-            artists.push({id: item.id,name: item.name,image: item.images[0].url});
+            artists.push({id: item.id,name: item.name,images: item.images});
           }
         }
       } catch (error) {
@@ -201,7 +201,7 @@ export const getMatchingEvents = async (req: Request, res: Response) => {
             const artistsArray = await spotifyApi.getMyTopArtists({ limit: 5 });
 
             for (let item of artistsArray.body.items) {
-              artists1.push({id: item.id,name: item.name,image: item.images[0].url});
+              artists1.push({id: item.id,name: item.name,images: item.images});
             }
           }
         } catch (error) {
@@ -224,7 +224,7 @@ export const getMatchingEvents = async (req: Request, res: Response) => {
             const artistsArray = await spotifyApi.getMyTopArtists({ limit: 5 });
 
             for (let item of artistsArray.body.items) {
-              artists2.push({id: item.id,name: item.name,image: item.images[0].url});
+              artists2.push({id: item.id,name: item.name,images: item.images});
             }
           }
         } catch (error) {

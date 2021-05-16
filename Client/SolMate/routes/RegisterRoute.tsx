@@ -283,7 +283,7 @@ export default function Register({ navigation }): JSX.Element {
           formData.Artists.push({
             id: checkedArtistList[i].id,
             name: checkedArtistList[i].name,
-            image: checkedArtistList[i].images[0].url,
+            images: checkedArtistList[i].images,
           });
         }
       }
