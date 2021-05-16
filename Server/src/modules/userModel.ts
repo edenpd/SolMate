@@ -1,9 +1,14 @@
 import { model, Schema, Document } from "mongoose";
 import bcrypt from "bcrypt";
+export interface IImage {
+  url: string;
+  height?: number | undefined;
+  width?: number | undefined;
+}
 export interface IArtist {
   id: string;
   name: string;
-  image: string;
+  images: Array<IImage>;
 }
 export interface IUser {
   email: string;
@@ -107,9 +112,19 @@ const schema = new Schema({
       name: {
         type: String,
       },
-      image: {
-        type: String,
-      },
+      images: [
+        {
+          url: {
+            type: String,
+          },
+          height: {
+            type: String,
+          },
+          width: {
+            type: String,
+          },
+        },
+      ],
     },
   ],
   Chats: [

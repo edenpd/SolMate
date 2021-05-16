@@ -286,11 +286,11 @@ export const MatchAlgorithm = async (email: String) => {
           });
 
           cuur_artists.body.artists.items.forEach(async (item) => {
-            currentUserFollowArtists.push({id:item.id,name: item.name,image: item.images[0].url});
+            currentUserFollowArtists.push({id: item.id,name: item.name,images: item.images});
             await (
               await spotifyApi.getArtistRelatedArtists(item.id)
             ).body.artists.forEach((item) => {
-              currentUserRelatedArtists.push({id:item.id,name: item.name,image: item.images[0].url});
+              currentUserRelatedArtists.push({id: item.id,name: item.name,images: item.images});
             });
           });
         }
@@ -362,11 +362,11 @@ export const MatchAlgorithm = async (email: String) => {
                 });
 
                 user_artists.body.artists.items.forEach(async (item) => {
-                  userFollowArtists.push({id:item.id,name: item.name,image: item.images[0].url});
+                  userFollowArtists.push({id: item.id,name: item.name,images: item.images});
                   await (
                     await spotifyApi.getArtistRelatedArtists(item.id)
                   ).body.artists.forEach((item) => {
-                    userRelatedArtists.push({id:item.id,name: item.name,image: item.images[0].url});
+                    userRelatedArtists.push({id: item.id,name: item.name,images: item.images});
                   });
                 });
                 if (currentUser?.spotifyAccessToken) {
