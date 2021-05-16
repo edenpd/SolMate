@@ -3,7 +3,7 @@ import { CallbackError } from "mongoose";
 import Event, { IEvent } from "../modules/eventModel";
 import axios from "axios";
 import { decrypt, spotifyApi } from "../Util/spotifyAccess";
-import User, { IUser, IUserModel } from "../modules/userModel";
+import User, { IArtist, IUser, IUserModel } from "../modules/userModel";
 import { checkAccessToken } from "../controllers/spotifyController";
 
 const client_id = "MjE2NDYzNTF8MTYxNjkxOTA0OS4yODI1MjUz";
@@ -50,7 +50,7 @@ export const getEvents = async (req: Request, res: Response) => {
       res.status(500).send(err);
     } else {
 
-      let artists: string[] = [];
+      let artists: IArtist[] = [];
 
       try {
         // Get the artists from spotify
@@ -64,7 +64,7 @@ export const getEvents = async (req: Request, res: Response) => {
           const artistsArray = await spotifyApi.getMyTopArtists({ limit: 5 });
 
           for (let item of artistsArray.body.items) {
-            artists.push(item.name);
+            artists.push({id: item.id,name: item.name,image: item.images[0].url});
           }
         }
       } catch (error) {
@@ -184,8 +184,8 @@ export const getMatchingEvents = async (req: Request, res: Response) => {
         res.status(500).send(err);
       } else {
 
-        let artists1: string[] = [];
-        let artists2: string[] = [];
+        let artists1: IArtist[] = [];
+        let artists2: IArtist[] = [];
 
         // Get the first user's artists.
         try {
@@ -201,7 +201,7 @@ export const getMatchingEvents = async (req: Request, res: Response) => {
             const artistsArray = await spotifyApi.getMyTopArtists({ limit: 5 });
 
             for (let item of artistsArray.body.items) {
-              artists1.push(item.name);
+              artists1.push({id: item.id,name: item.name,image: item.images[0].url});
             }
           }
         } catch (error) {
@@ -224,7 +224,7 @@ export const getMatchingEvents = async (req: Request, res: Response) => {
             const artistsArray = await spotifyApi.getMyTopArtists({ limit: 5 });
 
             for (let item of artistsArray.body.items) {
-              artists2.push(item.name);
+              artists2.push({id: item.id,name: item.name,image: item.images[0].url});
             }
           }
         } catch (error) {

@@ -1,15 +1,16 @@
 import { Request, Response } from "express";
-import { decrypt, spotifyApi,encryptTokens } from "../Util/spotifyAccess";
+import { decrypt, spotifyApi, encryptTokens } from "../Util/spotifyAccess";
 import { encode as btoa } from "base-64";
-import fetch from 'node-fetch';
-import { updateUser, updateUserWithNoResponse } from "../controllers/userController";
+import fetch from "node-fetch";
+import {
+  updateUser,
+  updateUserWithNoResponse,
+} from "../controllers/userController";
 
-export const checkAccessToken = async (
-  user: any,
-) => {
+export const checkAccessToken = async (user: any) => {
   if (user.spotifyRefreshToken) {
     if (user.spotifyTokenExpiryDate < new Date()) {
-      const spotifyRefreshToken = decrypt(user.spotifyRefreshToken,user.iv);
+      const spotifyRefreshToken = decrypt(user.spotifyRefreshToken, user.iv);
       try {
         const credsB64 = btoa(
           `${process.env.SPOTIFY_CLIENT_ID}:${process.env.SPOTIFY_CLIENT_SECRET}`
@@ -24,7 +25,7 @@ export const checkAccessToken = async (
         });
         const responseJson = await response.json();
         if (responseJson.error) {
-          console.log(responseJson)
+          console.log(responseJson);
         } else {
           const {
             access_token: newAccessToken,
@@ -32,14 +33,16 @@ export const checkAccessToken = async (
             expires_in: expiresIn,
           } = responseJson;
 
-          const expirationDate = new Date(new Date().getTime() + expiresIn * 1000);
+          const expirationDate = new Date(
+            new Date().getTime() + expiresIn * 1000
+          );
           if (newRefreshToken) {
             user.spotifyRefreshToken = newRefreshToken;
           }
           user.spotifyAccessToken = newAccessToken;
           user.spotifyTokenExpiryDate = expirationDate;
           user.token = newAccessToken;
-          let userBody : any = {};
+          let userBody: any = {};
           userBody.body = user;
           const userupdRes = await updateUserWithNoResponse(userBody);
           return newAccessToken;
@@ -81,19 +84,81 @@ export const getUserInfo = async (req: Request, res: Response) => {
 };
 
 export const searchSong = async (req: Request, res: Response) => {
-  spotifyApi.setAccessToken(decrypt(req.body.token, req.body.iv));
-  if (spotifyApi.getAccessToken()) {
+  // spotifyApi.setAccessToken(decrypt(req.body.token, req.body.iv));
+//   console.log('asd')
+// console.log(spotifyApi.getAccessToken())
+//   if (!spotifyApi.getAccessToken()) {
+    const credsB64 = btoa(
+      `${process.env.SPOTIFY_CLIENT_ID}:${process.env.SPOTIFY_CLIENT_SECRET}`
+    );
+    const response = await fetch("https://accounts.spotify.com/api/token", {
+      method: "POST",
+      headers: {
+        Authorization: `Basic ${credsB64}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: `grant_type=client_credentials`,
+    });
+    const responseJson = await response.json();
+    if (responseJson.error) {
+      return res.status(401).json({
+        status: "error",
+        code: "You don't have autorization to spotify",
+      });
+    } else {
+      const { access_token: newAccessToken, expires_in: expiresIn } =
+        responseJson;
+      spotifyApi.setAccessToken(newAccessToken);
+
+    }
     await spotifyApi.searchTracks(req.body.songName).then(
       function (data) {
-        return res.status(200).json(data);
+        return res.status(200).json(data.body.tracks);
       },
       function (err) {
         return res.status(403).json(err);
       }
     );
-  } else {
-    return res.status(403).json("No auth");
-  }
+};
+
+
+
+export const searchArtist = async (req: Request, res: Response) => {
+  // spotifyApi.setAccessToken(decrypt(req.body.token, req.body.iv));
+//   console.log('asd')
+// console.log(spotifyApi.getAccessToken())
+//   if (!spotifyApi.getAccessToken()) {
+    const credsB64 = btoa(
+      `${process.env.SPOTIFY_CLIENT_ID}:${process.env.SPOTIFY_CLIENT_SECRET}`
+    );
+    const response = await fetch("https://accounts.spotify.com/api/token", {
+      method: "POST",
+      headers: {
+        Authorization: `Basic ${credsB64}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: `grant_type=client_credentials`,
+    });
+    const responseJson = await response.json();
+    if (responseJson.error) {
+      return res.status(401).json({
+        status: "error",
+        code: "You don't have autorization to spotify",
+      });
+    } else {
+      const { access_token: newAccessToken, expires_in: expiresIn } =
+        responseJson;
+      spotifyApi.setAccessToken(newAccessToken);
+
+    }
+    await spotifyApi.searchArtists(req.body.artistName, { limit : 20, market : 'IL' }).then(
+      function (data) {
+        return res.status(200).json(data.body.artists);
+      },
+      function (err) {
+        return res.status(403).json(err);
+      }
+    );
 };
 
 export const getTopTracks = async (req: Request, res: Response) => {
