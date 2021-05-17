@@ -624,12 +624,12 @@ export default function Register({ navigation }): JSX.Element {
           <TouchableOpacity
             style={[
               registerStyle.SpotifyButton,
-              response || noSpotify || checkedArtistList
+              response || noSpotify || checkedArtistList[1]
                 ? { opacity: 0.3 }
                 : { opacity: 1 },
             ]}
-            activeOpacity={response || noSpotify || checkedArtistList ? 0.5 : 1}
-            disabled={response !== null || noSpotify || checkedArtistList}
+            activeOpacity={response || noSpotify || checkedArtistList[1] ? 0.5 : 1}
+            disabled={response !== null || noSpotify || checkedArtistList[1]}
             onPress={() => {
               promptAsync().then(async (response) => {
                 if (response) {
