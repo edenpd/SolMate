@@ -77,7 +77,7 @@ const MatchCard = ({
     },
     artistName: {
       color: "white",
-      fontFamily: "Poppins_100Thin",
+      fontFamily: "Poppins_300Light",
     },
     artistImage: {
       margin: 10,

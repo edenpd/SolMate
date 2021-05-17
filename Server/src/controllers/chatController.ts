@@ -144,7 +144,6 @@ export const getChatsByUser = async (req: Request, res: Response) => {
   var userID = req.query.UserId?.toString();
 
   await Chat.find({ $or: [{ UserId1: userID }, { UserId2: userID }] })
-
     .populate("UserId1")
     .populate("UserId2")
     .populate({
@@ -154,12 +153,15 @@ export const getChatsByUser = async (req: Request, res: Response) => {
         model: 'users'
       }
     })
-    .exec((err: CallbackError, user: any) => {
+    .exec((err: CallbackError, chats: any) => {
       if (err) {
         res.status(500).send(err);
         console.log(err);
       } else {
-        res.status(200).json(user);
+
+        // Sort the chats accorcding tot he last message senet.
+        const chatsRes = (chats as IChat[]).sort((prevChat, curChat) => prevChat.Messages.reduce((prev, cur) => prev.msgDate > cur.msgDate ? prev : cur).msgDate.localeCompare(prevChat.Messages.reduce((prev, cur) => prev.msgDate > cur.msgDate ? prev : cur).msgDate ));
+        res.status(200).json(chatsRes);
       }
     });
 };

@@ -184,8 +184,8 @@ export const getMatchingEvents = async (req: Request, res: Response) => {
         res.status(500).send(err);
       } else {
 
-        let artists1: IArtist[] = [];
-        let artists2: IArtist[] = [];
+        let artists1: string[] = [];
+        let artists2: string[] = [];
 
         // Get the first user's artists.
         try {
@@ -201,14 +201,14 @@ export const getMatchingEvents = async (req: Request, res: Response) => {
             const artistsArray = await spotifyApi.getMyTopArtists({ limit: 5 });
 
             for (let item of artistsArray.body.items) {
-              artists1.push({id: item.id,name: item.name,images: item.images});
+              artists1.push(item.name);
             }
           }
         } catch (error) {
           console.log("Error with spotify token");
         }
         if (artists1.length == 0) {
-          artists1 = user1.Artists;
+          artists1 = user1.Artists.map(ar => ar.name);
         }
 
         // Get the second user's artists.
@@ -224,14 +224,14 @@ export const getMatchingEvents = async (req: Request, res: Response) => {
             const artistsArray = await spotifyApi.getMyTopArtists({ limit: 5 });
 
             for (let item of artistsArray.body.items) {
-              artists2.push({id: item.id,name: item.name,images: item.images});
+              artists2.push(item.name);
             }
           }
         } catch (error) {
           console.log("Error with spotify token");
         }
         if (artists2.length == 0) {
-          artists2 = user2.Artists;
+          artists2 = user2.Artists.map(ar => ar.name);
         }
 
         // Find shared artists between both users.
