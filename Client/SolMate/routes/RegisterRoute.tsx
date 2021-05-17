@@ -275,6 +275,12 @@ export default function Register({ navigation }): JSX.Element {
       if (status != "granted") {
         console.log("PERMISSION NOT GRANRED");
       }
+      const location = await Location.getCurrentPositionAsync();
+      console.log("location is ", location);
+      formData.location = {
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      };
 
       for (var i = 0; i < checkedArtistList.length; i++) {
         if (checkedArtistList[i].id) {
