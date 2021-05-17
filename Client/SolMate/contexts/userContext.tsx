@@ -5,6 +5,7 @@ import * as SecureStore from "expo-secure-store";
 import { UserContextState } from "../util/Types";
 import { SERVER_ADDRESS, SERVER_PORT } from "@env";
 import { string } from "prop-types";
+import { DevSettings } from "react-native";
 
 const STORAGE_KEY = "userIfo";
 const persistState = async (storageKey, state) => {
@@ -30,8 +31,8 @@ const providerValue = {
   state: {
     user: { _id: undefined, email: undefined },
   },
-  dispatch: (action) => {}, // << This will be overwritten
-  fetch: (action) => {},
+  dispatch: (action) => { }, // << This will be overwritten
+  fetch: (action) => { },
   data: {},
 };
 
