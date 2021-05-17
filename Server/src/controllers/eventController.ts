@@ -81,7 +81,7 @@ export const getEvents = async (req: Request, res: Response) => {
 
       //  Gets the artists id
       for (let artist of artists) {
-        await axios.get('https://api.seatgeek.com/2/performers?q=' + artist + '&client_id=' + client_id)
+        await axios.get('https://api.seatgeek.com/2/performers?q=' + artist.name + '&client_id=' + client_id)
           .then(async function (response: any) {
             // console.log(artist + ":" + response.data.performers[0].id);
             suggestionsArtistsUrl += "&performers.id=" + response.data.performers[0].id;
