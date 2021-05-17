@@ -271,7 +271,6 @@ export default function Register({ navigation }): JSX.Element {
     if (validate()) {
       formData.firstName = formData.fullName.split(" ").slice(0, -1).join(" ");
       formData.lastName = formData.fullName.split(" ").slice(-1).join(" ");
-      console.log(formData);
       console.log("permmision!");
       const { status } = await Permissions.askAsync(Permissions.LOCATION);
       if (status != "granted") {
@@ -287,12 +286,7 @@ export default function Register({ navigation }): JSX.Element {
           });
         }
       }
-      // const location = await Location.getCurrentPositionAsync();
-      // console.log("location is ", location);
-      // formData.location = {
-      //   latitude: location.coords.latitude,
-      //   longitude: location.coords.longitude,
-      // };
+
       await axios
         .post(`${SERVER_ADDRESS}:${SERVER_PORT}/user/register`, formData, {
           headers: { "Content-Type": "application/json" },
@@ -310,19 +304,6 @@ export default function Register({ navigation }): JSX.Element {
         .catch((err) => {
           Alert.alert(JSON.stringify(err));
         });
-
-      // GetLocation.getCurrentPosition({
-      //   enableHighAccuracy: true,
-      //   timeout: 15000,
-      // })
-      //   .then((location) => {
-      //     formData.location = location;
-      //     console.log(location);
-      //   })
-      //   .catch((error) => {
-      //     const { code, message } = error;
-      //     console.warn(code, message);
-      //   });
     }
   };
 
@@ -344,20 +325,24 @@ export default function Register({ navigation }): JSX.Element {
 
   const updateSearch = async (search) => {
     setSearch(search);
-    await axios
-      .post(
-        `${SERVER_ADDRESS}:${SERVER_PORT}/spotify/search/artist`,
-        { artistName: search },
-        {
-          headers: { "Content-Type": "application/json" },
-        }
-      )
-      .then((response) => {
-        setArtistList(response.data.items);
-      })
-      .catch((err) => {
-        Alert.alert(JSON.stringify(err));
-      });
+    if (search !== "") {
+      await axios
+        .post(
+          `${SERVER_ADDRESS}:${SERVER_PORT}/spotify/search/artist`,
+          { artistName: search },
+          {
+            headers: { "Content-Type": "application/json" },
+          }
+        )
+        .then((response) => {
+          setArtistList(response.data.items);
+        })
+        .catch((err) => {
+          Alert.alert(JSON.stringify(err));
+        });
+    } else {
+      setArtistList([]);
+    }
   };
 
   const updateChecked = (item) => {
@@ -404,9 +389,7 @@ export default function Register({ navigation }): JSX.Element {
   return (
     <ScrollView
       contentContainerStyle={{
-        flexGrow: 1,
-        display: "flex",
-        paddingTop: 30,
+        paddingTop: 10,
       }}
       scrollEnabled={true}
     >
@@ -636,10 +619,12 @@ export default function Register({ navigation }): JSX.Element {
           <TouchableOpacity
             style={[
               registerStyle.SpotifyButton,
-              response || noSpotify ? { opacity: 0.3 } : { opacity: 1 },
+              response || noSpotify || checkedArtistList
+                ? { opacity: 0.3 }
+                : { opacity: 1 },
             ]}
-            activeOpacity={response || noSpotify ? 0.5 : 1}
-            disabled={response !== null || noSpotify}
+            activeOpacity={response || noSpotify || checkedArtistList ? 0.5 : 1}
+            disabled={response !== null || noSpotify || checkedArtistList}
             onPress={() => {
               promptAsync().then(async (response) => {
                 if (response) {
@@ -746,7 +731,7 @@ export default function Register({ navigation }): JSX.Element {
                         color: "#333333",
                       }}
                     >
-                      Search your favorite songs:
+                      Search your favorite artists:
                     </Text>
                     <SearchBar
                       platform="default"
@@ -772,7 +757,12 @@ export default function Register({ navigation }): JSX.Element {
                     >
                       <FlatList
                         keyExtractor={keyExtractor}
-                        data={checkedArtistList.concat(artistList)}
+                        data={checkedArtistList.concat(
+                          artistList.filter(
+                            (item) =>
+                              !checkedArtistList.find((x) => x.id == item.id)
+                          )
+                        )}
                         renderItem={renderItem}
                       />
                     </View>
@@ -805,7 +795,7 @@ const registerStyle = StyleSheet.create({
   registerContainer: {
     width: "100%",
     color: "#fff",
-
+    flex: 1,
     alignItems: "center",
     alignContent: "center",
     display: "flex",
@@ -818,10 +808,11 @@ const registerStyle = StyleSheet.create({
     backgroundColor: "#1ed65f",
     opacity: 0.3,
     alignSelf: "center",
+    paddingHorizontal: 10,
     justifyContent: "space-between",
-    width: "55%",
+    width: 300,
     borderColor: "#fff",
-    height: "15%",
+    height: 50,
     borderRadius: 50,
     shadowColor: "#000",
     shadowOffset: {
@@ -830,7 +821,6 @@ const registerStyle = StyleSheet.create({
     },
     shadowOpacity: 0.37,
     shadowRadius: 7.49,
-
     elevation: 12,
     margin: 5,
   },
