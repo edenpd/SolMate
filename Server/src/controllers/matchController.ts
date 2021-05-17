@@ -110,6 +110,8 @@ export const getMatchesById = async (req: Request, res: Response) => {
         },
       ],
     })
+      .sort({ grade: -1 })
+      .limit(50)
       .populate({
         path: "firstUser",
         model: "users",
@@ -286,11 +288,11 @@ export const MatchAlgorithm = async (email: String) => {
           });
 
           cuur_artists.body.artists.items.forEach(async (item) => {
-            currentUserFollowArtists.push({id: item.id,name: item.name,images: item.images});
+            currentUserFollowArtists.push({ id: item.id, name: item.name, images: item.images });
             await (
               await spotifyApi.getArtistRelatedArtists(item.id)
             ).body.artists.forEach((item) => {
-              currentUserRelatedArtists.push({id: item.id,name: item.name,images: item.images});
+              currentUserRelatedArtists.push({ id: item.id, name: item.name, images: item.images });
             });
           });
         }
@@ -362,11 +364,11 @@ export const MatchAlgorithm = async (email: String) => {
                 });
 
                 user_artists.body.artists.items.forEach(async (item) => {
-                  userFollowArtists.push({id: item.id,name: item.name,images: item.images});
+                  userFollowArtists.push({ id: item.id, name: item.name, images: item.images });
                   await (
                     await spotifyApi.getArtistRelatedArtists(item.id)
                   ).body.artists.forEach((item) => {
-                    userRelatedArtists.push({id: item.id,name: item.name,images: item.images});
+                    userRelatedArtists.push({ id: item.id, name: item.name, images: item.images });
                   });
                 });
                 if (currentUser?.spotifyAccessToken) {
@@ -699,9 +701,9 @@ const bothWithSpotify = (
   ) {
     artistsGrade =
       similarArtists /
-        (user1RelatedArtists.length + user2RelatedArtists.length) +
+      (user1RelatedArtists.length + user2RelatedArtists.length) +
       similarFollowArtists /
-        (user1FollowArtists.length + user2FollowArtists.length);
+      (user1FollowArtists.length + user2FollowArtists.length);
   }
 
   // similar album amount

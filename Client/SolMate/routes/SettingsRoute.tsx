@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState, useContext } from "react";
-import { StyleSheet, View, Text, ScrollView, Alert } from "react-native";
+import { StyleSheet, View, Text, ScrollView, Alert, DevSettings } from "react-native";
 import { Avatar, TextInput } from "react-native-paper";
 import { CheckBox, Divider, Image, SearchBar } from "react-native-elements";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -402,6 +402,7 @@ const SettingRoute = () => {
                   onPress={() => {
                     dispatchToken({ type: "LOGOUT" });
                     dispatch({ type: "LOGOUT" });
+                    DevSettings.reload();
                   }}
                 >
                   Log Out

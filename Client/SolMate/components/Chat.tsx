@@ -67,7 +67,7 @@ const Chat = (props) => {
     }, [chat]);
 
     useEffect(() => {
-        let toValue = 100;
+        let toValue = 120;
 
         if (recAreOpen)
             toValue = 0;
@@ -220,17 +220,40 @@ const Chat = (props) => {
         }
 
         return (
+            // <View style={style.footer}>
+            //     <View>
+            //         <Text style={style.footerText} onPress={() => setRecAreOpen(!recAreOpen)}>
+            //             {text}
+            //         </Text>
+            //     </View>
+            //     <Animated.View style={[style.eventsContainer, { transform: [{ translateY: bounceValue }] }]}>
+            //         {eventsDOM}
+
+            //     </Animated.View>
+            // </View>
+
             <View style={style.footer}>
+                <Animated.View style={[style.eventsContainer, { transform: [{ translateY: bounceValue }] }]}>
+                    {eventsDOM}
+
+                </Animated.View>
                 <View>
                     <Text style={style.footerText} onPress={() => setRecAreOpen(!recAreOpen)}>
                         {text}
                     </Text>
                 </View>
-                <Animated.View style={[style.eventsContainer, { transform: [{ translateY: bounceValue }] }]}>
-                    {eventsDOM}
-
-                </Animated.View>
             </View>
+            // <Animated.View style={{...style.footer, transform: [{ translateY: bounceValue }] }}>
+            //     <View>
+            //         <Text style={style.footerText} onPress={() => setRecAreOpen(!recAreOpen)}>
+            //             {text}
+            //         </Text>
+            //     </View>
+            //     <View style={[style.eventsContainer]}>
+            //         {eventsDOM}
+
+            //     </View>
+            // </Animated.View>
         );
     };
 
