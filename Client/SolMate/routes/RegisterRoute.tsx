@@ -272,7 +272,6 @@ export default function Register({ navigation }): JSX.Element {
       formData.firstName = formData.fullName.split(" ").slice(0, -1).join(" ");
       formData.lastName = formData.fullName.split(" ").slice(-1).join(" ");
       console.log(formData);
-      console.log("permmision!");
       const { status } = await Permissions.askAsync(Permissions.LOCATION);
       if (status != "granted") {
         console.log("PERMISSION NOT GRANRED");
