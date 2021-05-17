@@ -336,8 +336,8 @@ export default function Register({ navigation }) {
   const keyExtractor = (item, index) => index.toString();
 
   const renderItem = ({ item }) => (
-    <ListItem bottomDivider >
-      <CheckBox/>
+    <ListItem bottomDivider>
+      <CheckBox />
       <Avatar
         title={item.name[0]}
         source={item.avatar_url && { uri: item.avatar_url }}
