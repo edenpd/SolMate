@@ -149,10 +149,10 @@ export const updateUser = async (req: Request, res: Response) => {
   const sex = req.body.sex;
   const birthday = req.body.birthday;
   const interestedSex = req.body.interestedSex;
-  const { encryptedAccessToken, encryptedRefreshToken, iv } = encryptTokens(
-    req.body.spotifyAccessToken,
-    req.body.spotifyRefreshToken
-  );
+  // const { encryptedAccessToken, encryptedRefreshToken, iv } = encryptTokens(
+  //   req.body.spotifyAccessToken,
+  //   req.body.spotifyRefreshToken
+  // );
   try {
     await User.updateOne(
       {
@@ -171,10 +171,10 @@ export const updateUser = async (req: Request, res: Response) => {
           sex: sex,
           birthday: birthday,
           interestedSex: interestedSex,
-          spotifyAccessToken: encryptedAccessToken,
-          spotifyRefreshToken: encryptedRefreshToken,
-          iv: iv?.toString("hex"),
-          spotifyTokenExpiryDate: req.body.spotifyTokenExpiryDate,
+          // spotifyAccessToken: encryptedAccessToken,
+          // spotifyRefreshToken: encryptedRefreshToken,
+          // iv: iv?.toString("hex"),
+          // spotifyTokenExpiryDate: req.body.spotifyTokenExpiryDate,
         },
       }
     ).exec((err: CallbackError, user: any) => {

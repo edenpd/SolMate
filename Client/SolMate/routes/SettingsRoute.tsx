@@ -1,17 +1,28 @@
 import React, { useCallback, useEffect, useState, useContext } from "react";
-import { StyleSheet, View, Text, ScrollView, Alert, DevSettings } from "react-native";
-import { Avatar, TextInput } from "react-native-paper";
-import { CheckBox, Divider, Image, SearchBar } from "react-native-elements";
+import { StyleSheet, View, Text, ScrollView, Alert } from "react-native";
+import {
+  ActivityIndicator,
+  Avatar,
+  TextInput,
+  Button,
+} from "react-native-paper";
+import {
+  CheckBox,
+  Image,
+  SearchBar,
+  Input,
+  Divider,
+  ListItem,
+} from "react-native-elements";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import useDate, { LOCALE } from "../hooks/useDate";
 import { SERVER_ADDRESS, SERVER_PORT } from "@env";
 import axios from "axios";
 
 import {
-  Button,
   FieldsContainer,
   FormGroup,
-  Input,
+  //Input,
   Label,
 } from "react-native-clean-form";
 
@@ -22,28 +33,12 @@ import RailSelected from "../components/RangeSlider/RailSelected";
 import Notch from "../components/RangeSlider/Notch";
 import { userContext } from "../contexts/userContext";
 import { tokenContext } from "../contexts/tokenContext";
-
-export interface IUserForm {
-  _id: string;
-  email: string;
-  // password: string;
-  // confirmPassword: string;
-  firstName: string;
-  lastName: string;
-  //fullName: string;
-  spotifyAccessToken: string;
-  spotifyRefreshToken: string;
-  expiresIn: number;
-  description: string;
-  sex: number;
-  birthday: Date;
-  picture: string;
-  interestedSex: number;
-  interestedAgeMin: number;
-  interestedAgeMax: number;
-  Songs: Array<string>;
-  location: Object;
-}
+import { IUser } from "../util/Types";
+import { Container } from "../styles/ChatStyles";
+//import { ListItem } from "react-native-elements/dist/list/ListItem";
+import { black } from "react-native-paper/lib/typescript/styles/colors";
+import { Tile } from "react-native-elements/dist/tile/Tile";
+import { NavigationContainer } from "@react-navigation/native";
 
 const settings = StyleSheet.create({
   userImage: {
@@ -65,6 +60,19 @@ const settings = StyleSheet.create({
     fontSize: 12,
   },
   SettingsContainer: {
+    // width: "100%",
+    // color: "#fff",
+    // //paddingTop: 50,
+    // alignItems: "center",
+    // alignContent: "center",
+    // display: "flex",
+    // justifyContent: "center",
+    // flexDirection: "column",
+    // marginTop: 30,
+    // //flexDirection: "row",
+    // //justifyContent: "center",
+    // //alignItems: "center",
+    // flexWrap: "wrap",
     width: "100%",
     color: "#fff",
 
@@ -74,9 +82,16 @@ const settings = StyleSheet.create({
     justifyContent: "center",
     flexDirection: "column",
   },
+  button: {
+    width: 200,
+    backgroundColor: "#8860D0",
+    fontFamily: "Poppins_300Light",
+    marginVertical: 10,
+    alignSelf: "center",
+  },
 });
 
-const SettingRoute = () => {
+const SettingsRout = () => {
   const { date, show, showDatepicker, onChangeDate, setShow } = useDate();
   const { dispatch } = useContext(userContext);
   const { dispatchToken } = useContext(tokenContext);
@@ -87,26 +102,33 @@ const SettingRoute = () => {
   const renderNotch = useCallback(() => <Notch />, []);
   const [user, setUser] = useState();
   const { state } = useContext(userContext);
+  const [formData, setFormData] = useState<IUser>();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchUser = async () => {
-      axios
-        .get(
-          `${SERVER_ADDRESS}:${SERVER_PORT}/user/getuser?userId=${state.user._id}`,
-          {
-            headers: { "Content-Type": "application/json" },
-          }
-        )
-        .then((res) => {
-          setFormData(res.data.user);
-        })
-        .catch((err) => {
-          console.log("Error");
-          console.log(err);
-        });
+    const loadUser = async () => {
+      await fetchUser();
     };
-    fetchUser();
+    loadUser();
   }, []);
+
+  const fetchUser = async () => {
+    axios
+      .get(
+        `${SERVER_ADDRESS}:${SERVER_PORT}/user/getuser?userId=${state.user._id}`,
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      )
+      .then((res) => {
+        setFormData(res.data.user);
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        console.log("Error");
+        console.log(err);
+      });
+  };
 
   const handleValueChange = useCallback((low, high) => {
     setFormData((prevstate) => {
@@ -124,43 +146,26 @@ const SettingRoute = () => {
         headers: { "Content-Type": "application/json" },
       })
       .then((res) => {
-        console.log(res);
+        //console.log(res);
+        Alert.alert("Success", "Changes Saved Successfuly", [
+          { text: "OK", onPress: () => console.log("OK Pressed") },
+        ]);
       })
       .catch((err) => {
-        Alert.alert(JSON.stringify(err));
+        Alert.alert("Error", "error", [
+          { text: "OK", onPress: () => console.log("OK Pressed") },
+        ]);
       });
   };
-
-  const [formData, setFormData] = useState<IUserForm>({
-    _id: "",
-    email: "",
-    //password: "",
-    //confirmPassword: "",
-    spotifyAccessToken: "",
-    spotifyRefreshToken: "",
-    expiresIn: 0,
-    firstName: "s",
-    lastName: "",
-    //fullName: "shiri",
-    description: "",
-    sex: 0,
-    birthday: date,
-    picture: "",
-    interestedSex: 1,
-    interestedAgeMin: 18,
-    interestedAgeMax: 24,
-    Songs: [""],
-    location: "",
-  });
-
   const handleChange = (name, value) => {
     setFormData((prevstate) => {
       return {
         ...prevstate,
-        [name]: value as Pick<IUserForm, keyof IUserForm>,
+        [name]: value as Pick<IUser, keyof IUser>,
       };
     });
-    console.log(formData);
+    //console.log(formData);
+    // console.log(value);
   };
 
   const onChangeDateInput = (event, selectedDate) => {
@@ -173,247 +178,243 @@ const SettingRoute = () => {
         birthday: currentDate,
       };
     });
-
-    // console.log(formData);
   };
 
   var currentDateMoreThan18 = new Date();
   currentDateMoreThan18.setFullYear(new Date().getFullYear() - 18);
 
-  if (formData.firstName === "s") {
-    return <Text>loading</Text>;
-  } else {
-    return (
-      <ScrollView
-        contentContainerStyle={{
-          flexGrow: 1,
-          display: "flex",
-          paddingTop: 30,
-        }}
-      >
-        <View style={settings.SettingsContainer}>
-          <Avatar.Image
-            style={settings.userImage}
-            source={{ uri: "https://picsum.photos/700" }}
-          />
-          <Text style={settings.Title}>{formData.firstName}</Text>
-          <View>
-            <FieldsContainer>
-              <FormGroup>
-                <Label>
-                  <Text style={settings.label}>First name</Text>
-                </Label>
-                <Input
-                  style={settings.input}
-                  placeholder={""}
-                  onChangeText={(value) => handleChange("firstName", value)}
+  return (
+    <Container>
+      {isLoading ? (
+        <ActivityIndicator size='small' color='#dee2ff' />
+      ) : (
+        <ScrollView
+          contentContainerStyle={{
+            flexGrow: 1,
+            display: "flex",
+            paddingTop: 30,
+          }}
+        >
+          <View style={settings.SettingsContainer}>
+            <View
+              style={{
+                width: "100%",
+                display: "flex",
+                flex: 1,
+                alignItems: "center",
+                //marginTop: 10,
+              }}
+            >
+              <Avatar.Image
+                style={settings.userImage}
+                size={120}
+                source={{
+                  uri: `${SERVER_ADDRESS}:${SERVER_PORT}/static/${formData.picture}`,
+                }}
+              />
+
+              <Input
+                label='First Name'
+                value={formData.firstName}
+                onChangeText={(value) => handleChange("firstName", value)}
+              />
+              <Input
+                label='Last Name'
+                value={formData.lastName}
+                onChangeText={(value) => handleChange("lastName", value)}
+              />
+              <Input
+                label='Description'
+                value={formData.description}
+                onChangeText={(value) => handleChange("description", value)}
+              />
+              <Input
+                label='Email'
+                value={formData.email}
+                onChangeText={(value) => handleChange("email", value)}
+              />
+
+              <Input
+                label='Birthday'
+                value={date.toLocaleDateString(LOCALE)}
+                onTouchStart={showDatepicker}
+              />
+
+              {show && (
+                <DateTimePicker
+                  maximumDate={currentDateMoreThan18}
+                  testID='dateTimePicker'
+                  value={currentDateMoreThan18}
+                  mode={"date"}
+                  display='default'
+                  onChange={onChangeDateInput}
                 />
-              </FormGroup>
-              <FormGroup>
-                <Label>
-                  <Text style={settings.label}>Last name</Text>
-                </Label>
-                <Input
-                  style={settings.input}
-                  placeholder={""}
-                  onChangeText={(value) => handleChange("lastName", value)}
+              )}
+              <Text
+                style={{
+                  width: "77%",
+                  alignSelf: "center",
+                  textAlign: "left",
+                  fontWeight: "bold",
+                  fontSize: 17,
+                  color: "#87949f",
+                }}
+              >
+                Sex
+              </Text>
+              <View
+                style={{
+                  flexDirection: "row",
+                  width: "80%",
+                  justifyContent: "flex-start",
+                  alignContent: "flex-start",
+                }}
+              >
+                <CheckBox
+                  center
+                  title='Male'
+                  checkedIcon='dot-circle-o'
+                  uncheckedIcon='circle-o'
+                  checkedColor='purple'
+                  checked={formData.sex == 0}
+                  onPress={(value) => handleChange("sex", 0)}
+                  containerStyle={{
+                    backgroundColor: "rgba(0, 0, 0, 0)",
+                    borderColor: "rgba(0, 0, 0, 0)",
+                    justifyContent: "flex-start",
+                  }}
                 />
-              </FormGroup>
-              <FormGroup>
-                <Label>
-                  <Text style={settings.label}>Email</Text>
-                </Label>
-                <Input
-                  style={settings.input}
-                  placeholder={""}
-                  onChangeText={(value) => handleChange("email", value)}
+                <CheckBox
+                  center
+                  title='Female'
+                  checkedIcon='dot-circle-o'
+                  uncheckedIcon='circle-o'
+                  checkedColor='purple'
+                  checked={formData.sex == 1}
+                  onPress={(value) => handleChange("sex", 1)}
+                  containerStyle={{
+                    backgroundColor: "rgba(0, 0, 0, 0)",
+                    borderColor: "rgba(0, 0, 0, 0)",
+                    justifyContent: "flex-start",
+                  }}
                 />
-              </FormGroup>
-              <FormGroup>
-                <Label>
-                  <Text style={settings.label}>Birthday</Text>
-                </Label>
-                <View
+              </View>
+              <Text
+                style={{
+                  width: "77%",
+                  alignSelf: "center",
+                  textAlign: "left",
+                  fontWeight: "bold",
+                  fontSize: 17,
+                  color: "#87949f",
+                }}
+              >
+                Intrested Sex
+              </Text>
+              <View
+                style={{
+                  flexDirection: "row",
+                  width: "80%",
+                  justifyContent: "flex-start",
+                  alignContent: "flex-start",
+                }}
+              >
+                <CheckBox
+                  center
+                  title='Male'
+                  checkedIcon='dot-circle-o'
+                  uncheckedIcon='circle-o'
+                  checkedColor='purple'
+                  onPress={(value) => handleChange("interestedSex", 0)}
+                  checked={formData.interestedSex == 0}
+                  containerStyle={{
+                    backgroundColor: "rgba(0, 0, 0, 0)",
+                    borderColor: "rgba(0, 0, 0, 0)",
+                  }}
+                />
+                <CheckBox
+                  center
+                  title='Female'
+                  checkedIcon='dot-circle-o'
+                  uncheckedIcon='circle-o'
+                  checkedColor='purple'
+                  checked={formData.interestedSex == 1}
+                  onPress={(value) => handleChange("interestedSex", 1)}
+                  containerStyle={{
+                    backgroundColor: "rgba(0, 0, 0, 0)",
+                    borderColor: "rgba(0, 0, 0, 0)",
+                  }}
+                />
+              </View>
+              <View
+                style={{
+                  width: "100%",
+                  flex: 1,
+                  margin: 15,
+                  alignContent: "center",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Text
                   style={{
-                    width: "50%",
+                    width: "77%",
+                    alignSelf: "center",
+                    textAlign: "left",
+                    color: "#87949f",
+                    fontWeight: "bold",
+                    fontSize: 17,
                   }}
                 >
-                  <Input
-                    label='Date'
-                    value={date.toLocaleDateString(LOCALE)}
-                    //editable={false}
-                    style={{ padding: 0 }}
-                    onTouchStart={showDatepicker}
-                  />
-
-                  {show && (
-                    <DateTimePicker
-                      maximumDate={currentDateMoreThan18}
-                      testID='dateTimePicker'
-                      value={currentDateMoreThan18}
-                      mode={"date"}
-                      display='default'
-                      onChange={onChangeDateInput}
-                    />
-                  )}
-
-                  {/* <DateTimePicker
-                maximumDate={currentDateMoreThan18}
-                testID='dateTimePicker'
-                value={currentDateMoreThan18}
-                mode={"date"}
-                display='default'
-                //   onChange={onChangeDateInput}
-              /> */}
-                </View>
-              </FormGroup>
-              <FormGroup>
-                <Label>
-                  <Text style={settings.label}>Description</Text>
-                </Label>
-                <Input
-                  style={settings.input}
-                  placeholder={""}
-                  onChangeText={(value) => handleChange("description", value)}
+                  What the range of ages you are looking for :
+                </Text>
+                <RangeSlider
+                  style={{ width: "80%", marginVertical: 20 }}
+                  min={18}
+                  max={120}
+                  step={1}
+                  floatingLabel
+                  low={formData.interestedAgeMin}
+                  high={formData.interestedAgeMax}
+                  renderThumb={renderThumb}
+                  renderRail={renderRail}
+                  renderRailSelected={renderRailSelected}
+                  renderLabel={renderLabel}
+                  renderNotch={renderNotch}
+                  onValueChanged={handleValueChange}
                 />
-              </FormGroup>
-              <FormGroup>
-                <Label>
-                  <Text style={settings.label}>Sex</Text>
-                </Label>
-                <View>
-                  <CheckBox
-                    title='Male'
-                    checkedIcon='dot-circle-o'
-                    uncheckedIcon='circle-o'
-                    checkedColor='purple'
-                    checked={formData.sex == 0}
-                    onPress={(value) => handleChange("sex", 0)}
-                    containerStyle={{
-                      backgroundColor: "rgba(0, 0, 0, 0)",
-                      borderColor: "rgba(0, 0, 0, 0)",
-                      justifyContent: "flex-start",
-                      marginBottom: -20,
-                      marginTop: -20,
-                      marginLeft: 50,
-                    }}
-                  ></CheckBox>
-                </View>
-                <View>
-                  <CheckBox
-                    title='Female'
-                    checkedIcon='dot-circle-o'
-                    uncheckedIcon='circle-o'
-                    checkedColor='purple'
-                    checked={formData.sex == 1}
-                    onPress={(value) => handleChange("sex", 1)}
-                    containerStyle={{
-                      backgroundColor: "rgba(0, 0, 0, 0)",
-                      borderColor: "rgba(0, 0, 0, 0)",
-                      justifyContent: "flex-start",
-                      marginBottom: -20,
-                      marginTop: -20,
-                    }}
-                  ></CheckBox>
-                </View>
-              </FormGroup>
-              <FormGroup>
-                <Text style={settings.label}>Intrested in</Text>
-
-                <View>
-                  <CheckBox
-                    title='Male'
-                    checkedIcon='dot-circle-o'
-                    uncheckedIcon='circle-o'
-                    checkedColor='purple'
-                    checked={formData.interestedSex == 0}
-                    onPress={(value) => handleChange("interestedSex", 0)}
-                    containerStyle={{
-                      backgroundColor: "rgba(0, 0, 0, 0)",
-                      borderColor: "rgba(0, 0, 0, 0)",
-                      justifyContent: "flex-start",
-                      marginBottom: -20,
-                      marginTop: -20,
-                      marginLeft: 50,
-                    }}
-                  ></CheckBox>
-                </View>
-                <View>
-                  <CheckBox
-                    title='Female'
-                    checkedIcon='dot-circle-o'
-                    uncheckedIcon='circle-o'
-                    checkedColor='purple'
-                    checked={formData.interestedSex == 1}
-                    onPress={(value) => handleChange("interestedSex", 1)}
-                    containerStyle={{
-                      backgroundColor: "rgba(0, 0, 0, 0)",
-                      borderColor: "rgba(0, 0, 0, 0)",
-                      justifyContent: "flex-start",
-                      marginBottom: -20,
-                      marginTop: -20,
-                    }}
-                  ></CheckBox>
-                </View>
-              </FormGroup>
-              <FormGroup>
-                <Label>
-                  <Text
-                    style={{
-                      width: "77%",
-                      alignSelf: "center",
-                      textAlign: "left",
-                      color: "#87949f",
-                      fontWeight: "bold",
-                      fontSize: 17,
-                    }}
-                  >
-                    Intrested Age
-                  </Text>
-                </Label>
-                <View
-                  style={{
-                    width: "40%",
-                    marginBottom: 10,
-                  }}
+              </View>
+              <View
+                style={{
+                  marginVertical: 10,
+                  width: "100%",
+                  alignSelf: "center",
+                }}
+              >
+                <Button
+                  style={settings.button}
+                  mode='contained'
+                  onPress={() => onSave()}
                 >
-                  <RangeSlider
-                    style={{ width: "80%", marginVertical: 20, height: 10 }}
-                    min={18}
-                    max={120}
-                    step={1}
-                    floatingLabel
-                    low={formData.interestedAgeMin}
-                    high={formData.interestedAgeMax}
-                    renderThumb={renderThumb}
-                    renderRail={renderRail}
-                    renderRailSelected={renderRailSelected}
-                    renderLabel={renderLabel}
-                    renderNotch={renderNotch}
-                    onValueChanged={handleValueChange}
-                  />
-                </View>
-              </FormGroup>
-              <FormGroup>
-                <Button onPress={() => onSave()}>save</Button>
-              </FormGroup>
-              <FormGroup>
+                  save
+                </Button>
                 <Button
                   onPress={() => {
                     dispatchToken({ type: "LOGOUT" });
                     dispatch({ type: "LOGOUT" });
-                    DevSettings.reload();
                   }}
+                  style={settings.button}
+                  mode='contained'
                 >
                   Log Out
                 </Button>
-              </FormGroup>
-            </FieldsContainer>
+              </View>
+            </View>
           </View>
-        </View>
-      </ScrollView>
-    );
-  }
+        </ScrollView>
+      )}
+    </Container>
+  );
 };
 
-export default SettingRoute;
+export default SettingsRout;
