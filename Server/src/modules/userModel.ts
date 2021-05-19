@@ -1,6 +1,15 @@
 import { model, Schema, Document } from "mongoose";
 import bcrypt from "bcrypt";
-
+export interface IImage {
+  url: string;
+  height?: number | undefined;
+  width?: number | undefined;
+}
+export interface IArtist {
+  id: string;
+  name: string;
+  images: Array<IImage>;
+}
 export interface IUser {
   email: string;
   password: string;
@@ -20,7 +29,7 @@ export interface IUser {
   interestedAgeMin: number;
   interestedAgeMax: number;
   Genre: Array<string>;
-  Artists: Array<string>;
+  Artists: Array<IArtist>;
   Chats: Array<number>;
   Songs: Array<string>;
   Media: Array<string>;
@@ -95,7 +104,27 @@ const schema = new Schema({
   ],
   Artists: [
     {
-      type: String,
+      id: {
+        type: String,
+        required: true,
+        unique: true,
+      },
+      name: {
+        type: String,
+      },
+      images: [
+        {
+          url: {
+            type: String,
+          },
+          height: {
+            type: String,
+          },
+          width: {
+            type: String,
+          },
+        },
+      ],
     },
   ],
   Chats: [

@@ -64,11 +64,11 @@ export interface IUserForm {
   interestedSex: number;
   interestedAgeMin: number;
   interestedAgeMax: number;
-  Songs: Array<string>;
+  Artists: Array<Object>;
   location: Object;
 }
 
-export default function Register({ navigation }) {
+export default function Register({ navigation }): JSX.Element {
   const { date, show, showDatepicker, onChangeDate, setShow } = useDate();
   var currentDateMoreThan18 = new Date();
   currentDateMoreThan18.setFullYear(new Date().getFullYear() - 18);
@@ -79,7 +79,11 @@ export default function Register({ navigation }) {
   const { dispatch } = useContext(userContext);
   const { dispatchToken } = useContext(tokenContext);
   const [image, setImage] = useState(null);
-  const [songList, setSongList] = useState([{}]);
+  const [artistList, setArtistList] = useState([]);
+  const [checkedArtistList, setCheckedArtistList] = useState([
+    { id: "", name: "", images: [{ url: "" }] },
+  ]);
+  const [acceptTerms, setAcceptTerms] = useState(false);
 
   const [formData, setFormData] = useState<IUserForm>({
     email: "",
@@ -98,7 +102,7 @@ export default function Register({ navigation }) {
     interestedSex: 1,
     interestedAgeMin: 18,
     interestedAgeMax: 24,
-    Songs: [""],
+    Artists: [],
     location: "",
   });
 
@@ -178,7 +182,10 @@ export default function Register({ navigation }) {
     //   isValid = false;
     //   errors["picture"] = "Please choose profile pic.";
     // }
-
+    if (!acceptTerms) {
+      isValid = false;
+      errors["acceptTerms"] = "Please accept our terms to register.";
+    }
     if (
       typeof input["password"] !== "undefined" &&
       typeof input["confirmPassword"] !== "undefined"
@@ -268,8 +275,6 @@ export default function Register({ navigation }) {
     if (validate()) {
       formData.firstName = formData.fullName.split(" ").slice(0, -1).join(" ");
       formData.lastName = formData.fullName.split(" ").slice(-1).join(" ");
-      console.log(formData);
-      console.log("permmision!");
       const { status } = await Permissions.askAsync(Permissions.LOCATION);
       if (status != "granted") {
         console.log("PERMISSION NOT GRANRED");
@@ -280,6 +285,17 @@ export default function Register({ navigation }) {
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
       };
+
+      for (var i = 0; i < checkedArtistList.length; i++) {
+        if (checkedArtistList[i].id) {
+          formData.Artists.push({
+            id: checkedArtistList[i].id,
+            name: checkedArtistList[i].name,
+            images: checkedArtistList[i].images,
+          });
+        }
+      }
+
       await axios
         .post(`${SERVER_ADDRESS}:${SERVER_PORT}/user/register`, formData, {
           headers: { "Content-Type": "application/json" },
@@ -297,19 +313,6 @@ export default function Register({ navigation }) {
         .catch((err) => {
           Alert.alert(JSON.stringify(err));
         });
-
-      // GetLocation.getCurrentPosition({
-      //   enableHighAccuracy: true,
-      //   timeout: 15000,
-      // })
-      //   .then((location) => {
-      //     formData.location = location;
-      //     console.log(location);
-      //   })
-      //   .catch((error) => {
-      //     const { code, message } = error;
-      //     console.warn(code, message);
-      //   });
     }
   };
 
@@ -331,32 +334,73 @@ export default function Register({ navigation }) {
 
   const updateSearch = async (search) => {
     setSearch(search);
+    if (search !== "") {
+      await axios
+        .post(
+          `${SERVER_ADDRESS}:${SERVER_PORT}/spotify/search/artist`,
+          { artistName: search },
+          {
+            headers: { "Content-Type": "application/json" },
+          }
+        )
+        .then((response) => {
+          setArtistList(response.data.items);
+        })
+        .catch((err) => {
+          Alert.alert(JSON.stringify(err));
+        });
+    } else {
+      setArtistList([]);
+    }
+  };
+
+  const updateChecked = (item) => {
+    if (checkedArtistList.find((x) => x.id == item.id) == undefined) {
+      setCheckedArtistList((state) => {
+        return [...state, item];
+      });
+    } else {
+      setCheckedArtistList((state) =>
+        state.filter((item2) => item2.id !== item.id)
+      );
+    }
   };
 
   const keyExtractor = (item, index) => index.toString();
 
-  const renderItem = ({ item }) => (
-    <ListItem bottomDivider>
-      <CheckBox />
-      <Avatar
-        title={item.name[0]}
-        source={item.avatar_url && { uri: item.avatar_url }}
-      />
-      <ListItem.Content>
-        <ListItem.Title>{item.name}</ListItem.Title>
-        <ListItem.Subtitle>{item.subtitle}</ListItem.Subtitle>
-      </ListItem.Content>
-      <ListItem.Chevron />
-    </ListItem>
-  );
+  const renderItem = ({ item }) => {
+    if (item && item.images && item.name) {
+      return (
+        <ListItem
+          bottomDivider
+          containerStyle={{ borderRadius: 20, backgroundColor: "#333333" }}
+        >
+          <CheckBox
+            onPress={() => updateChecked(item)}
+            checkedColor={"purple"}
+            checked={
+              checkedArtistList.find((x) => x.id == item.id) ? true : false
+            }
+          />
+          {item.images[0] && (
+            <Avatar rounded source={{ uri: item.images[0].url }} />
+          )}
+          <ListItem.Content>
+            <ListItem.Title style={{ color: "white", fontWeight: "bold" }}>
+              {item.name}
+            </ListItem.Title>
+          </ListItem.Content>
+        </ListItem>
+      );
+    }
+  };
 
   return (
     <ScrollView
       contentContainerStyle={{
-        flexGrow: 1,
-        display: "flex",
-        paddingTop: 30,
+        paddingTop: 10,
       }}
+      scrollEnabled={true}
     >
       <View style={registerStyle.registerContainer}>
         {show && (
@@ -584,10 +628,14 @@ export default function Register({ navigation }) {
           <TouchableOpacity
             style={[
               registerStyle.SpotifyButton,
-              response || noSpotify ? { opacity: 0.3 } : { opacity: 1 },
+              response || noSpotify || checkedArtistList[1]
+                ? { opacity: 0.3 }
+                : { opacity: 1 },
             ]}
-            activeOpacity={response || noSpotify ? 0.5 : 1}
-            disabled={response !== null || noSpotify}
+            activeOpacity={
+              response || noSpotify || checkedArtistList[1] ? 0.5 : 1
+            }
+            disabled={response !== null || noSpotify || checkedArtistList[1]}
             onPress={() => {
               promptAsync().then(async (response) => {
                 if (response) {
@@ -694,7 +742,7 @@ export default function Register({ navigation }) {
                         color: "#333333",
                       }}
                     >
-                      Search your favorite songs:
+                      Search your favorite artists:
                     </Text>
                     <SearchBar
                       platform="default"
@@ -714,12 +762,19 @@ export default function Register({ navigation }) {
                       value={search}
                     />
                     <View
-                      style={{ borderRadius: 40, backgroundColor: "#333333" }}
+                      style={{
+                        width: "100%",
+                      }}
                     >
                       <FlatList
-                        keyExtractor={this.keyExtractor}
-                        data={songList}
-                        renderItem={this.renderItem}
+                        keyExtractor={keyExtractor}
+                        data={checkedArtistList.concat(
+                          artistList.filter(
+                            (item) =>
+                              !checkedArtistList.find((x) => x.id == item.id)
+                          )
+                        )}
+                        renderItem={renderItem}
                       />
                     </View>
                   </View>
@@ -728,7 +783,31 @@ export default function Register({ navigation }) {
             </>
           )}
           <View
-            style={{ marginVertical: 40, width: "70%", alignSelf: "center" }}
+            style={{
+              flexDirection: "row",
+              alignContent: "center",
+              justifyContent: "center",
+              alignItems: "center",
+              paddingHorizontal: 40,
+              paddingTop: 20,
+            }}
+          >
+            <CheckBox
+              onPress={() => setAcceptTerms((prev) => !prev)}
+              checkedColor={"purple"}
+              containerStyle={{ paddingHorizontal: 0 }}
+              checked={acceptTerms}
+            />
+            <Text numberOfLines={1}>
+              I accept to share my personal information on the "SolMate" app{" "}
+            </Text>
+          </View>
+          <Text style={{ color: "red", paddingHorizontal: 40 }}>
+            {errors["acceptTerms"]}
+          </Text>
+
+          <View
+            style={{ marginVertical: 20, width: "70%", alignSelf: "center" }}
           >
             <Button
               title="Submit"
@@ -751,7 +830,7 @@ const registerStyle = StyleSheet.create({
   registerContainer: {
     width: "100%",
     color: "#fff",
-
+    flex: 1,
     alignItems: "center",
     alignContent: "center",
     display: "flex",
@@ -764,10 +843,11 @@ const registerStyle = StyleSheet.create({
     backgroundColor: "#1ed65f",
     opacity: 0.3,
     alignSelf: "center",
+    paddingHorizontal: 10,
     justifyContent: "space-between",
-    width: "55%",
+    width: 300,
     borderColor: "#fff",
-    height: "15%",
+    height: 50,
     borderRadius: 50,
     shadowColor: "#000",
     shadowOffset: {
@@ -776,7 +856,6 @@ const registerStyle = StyleSheet.create({
     },
     shadowOpacity: 0.37,
     shadowRadius: 7.49,
-
     elevation: 12,
     margin: 5,
   },

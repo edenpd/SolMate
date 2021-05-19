@@ -3,7 +3,7 @@ import { CallbackError } from "mongoose";
 import Event, { IEvent } from "../modules/eventModel";
 import axios from "axios";
 import { decrypt, spotifyApi } from "../Util/spotifyAccess";
-import User, { IUser, IUserModel } from "../modules/userModel";
+import User, { IArtist, IUser, IUserModel } from "../modules/userModel";
 import { checkAccessToken } from "../controllers/spotifyController";
 
 const client_id = "MjE2NDYzNTF8MTYxNjkxOTA0OS4yODI1MjUz";
@@ -50,7 +50,7 @@ export const getEvents = async (req: Request, res: Response) => {
       res.status(500).send(err);
     } else {
 
-      let artists: string[] = [];
+      let artists: IArtist[] = [];
 
       try {
         // Get the artists from spotify
@@ -64,7 +64,7 @@ export const getEvents = async (req: Request, res: Response) => {
           const artistsArray = await spotifyApi.getMyTopArtists({ limit: 5 });
 
           for (let item of artistsArray.body.items) {
-            artists.push(item.name);
+            artists.push({id: item.id,name: item.name,images: item.images});
           }
         }
       } catch (error) {
@@ -81,7 +81,7 @@ export const getEvents = async (req: Request, res: Response) => {
 
       //  Gets the artists id
       for (let artist of artists) {
-        await axios.get('https://api.seatgeek.com/2/performers?q=' + artist + '&client_id=' + client_id)
+        await axios.get('https://api.seatgeek.com/2/performers?q=' + artist.name + '&client_id=' + client_id)
           .then(async function (response: any) {
             // console.log(artist + ":" + response.data.performers[0].id);
             suggestionsArtistsUrl += "&performers.id=" + response.data.performers[0].id;
@@ -208,7 +208,7 @@ export const getMatchingEvents = async (req: Request, res: Response) => {
           console.log("Error with spotify token");
         }
         if (artists1.length == 0) {
-          artists1 = user1.Artists;
+          artists1 = user1.Artists.map(ar => ar.name);
         }
 
         // Get the second user's artists.
@@ -231,7 +231,7 @@ export const getMatchingEvents = async (req: Request, res: Response) => {
           console.log("Error with spotify token");
         }
         if (artists2.length == 0) {
-          artists2 = user2.Artists;
+          artists2 = user2.Artists.map(ar => ar.name);
         }
 
         // Find shared artists between both users.

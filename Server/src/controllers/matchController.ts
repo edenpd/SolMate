@@ -4,7 +4,7 @@ import Match, { IMatch, IMatchModel } from "../modules/matchModel";
 import { IChat } from "../modules/chatModel";
 import { addChatAfterMatch } from "../controllers/chatController";
 import { decrypt, spotifyApi } from "../Util/spotifyAccess";
-import User, { IUser, IUserModel } from "../modules/userModel";
+import User, { IArtist, IUser, IUserModel } from "../modules/userModel";
 import { getUsersDistance } from "../Util/general";
 import { checkAccessToken } from "../controllers/spotifyController";
 export const addMatch = async (req: Request, res: Response) => {
@@ -110,6 +110,8 @@ export const getMatchesById = async (req: Request, res: Response) => {
         },
       ],
     })
+      .sort({ grade: -1 })
+      .limit(50)
       .populate({
         path: "firstUser",
         model: "users",
@@ -249,11 +251,11 @@ export const MatchAlgorithm = async (email: String) => {
     let currentUser = users.find((user) => user.email === email);
     users = users.filter((user) => user.email !== email);
     let curr_Songs: string[];
-    let curr_Artists: string[];
+    let curr_Artists: IArtist[];
     let currentUserSavedSongs: string[] = [];
     let currentUserTopSongs: string[] = [];
-    let currentUserFollowArtists: string[] = [];
-    let currentUserRelatedArtists: string[] = [];
+    let currentUserFollowArtists: IArtist[] = [];
+    let currentUserRelatedArtists: IArtist[] = [];
     let currentUserAlbums: string[] = [];
 
     if (users && currentUser) {
@@ -286,11 +288,19 @@ export const MatchAlgorithm = async (email: String) => {
           });
 
           cuur_artists.body.artists.items.forEach(async (item) => {
-            currentUserFollowArtists.push(item.name);
+            currentUserFollowArtists.push({
+              id: item.id,
+              name: item.name,
+              images: item.images,
+            });
             await (
               await spotifyApi.getArtistRelatedArtists(item.id)
             ).body.artists.forEach((item) => {
-              currentUserRelatedArtists.push(item.name);
+              currentUserRelatedArtists.push({
+                id: item.id,
+                name: item.name,
+                images: item.images,
+              });
             });
           });
         }
@@ -328,11 +338,11 @@ export const MatchAlgorithm = async (email: String) => {
             let matchFound: IMatch;
             let userSavedSongs: string[] = [];
             let userTopSongs: string[] = [];
-            let userFollowArtists: string[] = [];
-            let userRelatedArtists: string[] = [];
+            let userFollowArtists: IArtist[] = [];
+            let userRelatedArtists: IArtist[] = [];
             let userAlbums: string[] = [];
             let userSongs: string[] = user.Songs;
-            let userArtists: string[] = user.Artists;
+            let userArtists: IArtist[] = user.Artists;
             var finalGrade = 0;
 
             if (user.spotifyAccessToken) {
@@ -362,11 +372,19 @@ export const MatchAlgorithm = async (email: String) => {
                 });
 
                 user_artists.body.artists.items.forEach(async (item) => {
-                  userFollowArtists.push(item.name);
+                  userFollowArtists.push({
+                    id: item.id,
+                    name: item.name,
+                    images: item.images,
+                  });
                   await (
                     await spotifyApi.getArtistRelatedArtists(item.id)
                   ).body.artists.forEach((item) => {
-                    userRelatedArtists.push(item.name);
+                    userRelatedArtists.push({
+                      id: item.id,
+                      name: item.name,
+                      images: item.images,
+                    });
                   });
                 });
                 if (currentUser?.spotifyAccessToken) {
@@ -516,9 +534,9 @@ export const MatchAlgorithm = async (email: String) => {
 
 const bothWithoutSpotify = (
   user1Songs: string[],
-  user1Artists: string[],
+  user1Artists: IArtist[],
   user2Songs: string[],
-  user2Artists: string[]
+  user2Artists: IArtist[]
 ) => {
   var finalGrade = 0;
 
@@ -547,7 +565,7 @@ const bothWithoutSpotify = (
     similarArtists = user1Artists.filter(
       (item) =>
         user2Artists.findIndex((artist) => {
-          return artist === item;
+          return artist.id === item.id;
         }) !== -1
     ).length;
   }
@@ -565,11 +583,11 @@ const bothWithoutSpotify = (
 const withVsWithoutSpotify = (
   user1SavedSongs: string[],
   user1TopSongs: string[],
-  user1FollowArtists: string[],
-  user1RelatedArtists: string[],
+  user1FollowArtists: IArtist[],
+  user1RelatedArtists: IArtist[],
   user1Albums: string[],
   user2Songs: string[],
-  user2Artists: string[]
+  user2Artists: IArtist[]
 ) => {
   var finalGrade = 0;
   var songGrade = 0;
@@ -579,7 +597,7 @@ const withVsWithoutSpotify = (
   var similarArtists = 0;
 
   let user1TotalSongs: string[] = [];
-  let user1TotalArtists: string[] = [];
+  let user1TotalArtists: IArtist[] = [];
 
   user1TotalSongs.concat(user1TopSongs, user1SavedSongs);
   user1TotalArtists.concat(user1FollowArtists, user1RelatedArtists);
@@ -606,7 +624,7 @@ const withVsWithoutSpotify = (
     similarArtists = user1TotalArtists.filter(
       (item) =>
         user2Artists.findIndex((artist) => {
-          return artist === item;
+          return artist.id === item.id;
         }) !== -1
     ).length;
   }
@@ -625,13 +643,13 @@ const withVsWithoutSpotify = (
 const bothWithSpotify = (
   user1SavedSongs: string[],
   user1TopSongs: string[],
-  user1FollowArtists: string[],
-  user1RelatedArtists: string[],
+  user1FollowArtists: IArtist[],
+  user1RelatedArtists: IArtist[],
   user1Albums: string[],
   user2SavedSongs: string[],
   user2TopSongs: string[],
-  user2FollowArtists: string[],
-  user2RelatedArtists: string[],
+  user2FollowArtists: IArtist[],
+  user2RelatedArtists: IArtist[],
   user2Albums: string[]
 ) => {
   var finalGrade = 0;

@@ -8,6 +8,7 @@ import {
   // getStatistics,
   deleteUser,
   getUserByid,
+  getUserByid2,
 } from "../controllers/userController";
 import { response, Router } from "express";
 import multer from "multer";
