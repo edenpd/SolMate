@@ -83,6 +83,7 @@ export default function Register({ navigation }): JSX.Element {
   const [checkedArtistList, setCheckedArtistList] = useState([
     { id: "", name: "", images: [{ url: "" }] },
   ]);
+  const [acceptTerms, setAcceptTerms] = useState(false);
 
   const [formData, setFormData] = useState<IUserForm>({
     email: "",
@@ -181,7 +182,10 @@ export default function Register({ navigation }): JSX.Element {
     //   isValid = false;
     //   errors["picture"] = "Please choose profile pic.";
     // }
-
+    if (!acceptTerms) {
+      isValid = false;
+      errors["acceptTerms"] = "Please accept our terms to register.";
+    }
     if (
       typeof input["password"] !== "undefined" &&
       typeof input["confirmPassword"] !== "undefined"
@@ -628,7 +632,9 @@ export default function Register({ navigation }): JSX.Element {
                 ? { opacity: 0.3 }
                 : { opacity: 1 },
             ]}
-            activeOpacity={response || noSpotify || checkedArtistList[1] ? 0.5 : 1}
+            activeOpacity={
+              response || noSpotify || checkedArtistList[1] ? 0.5 : 1
+            }
             disabled={response !== null || noSpotify || checkedArtistList[1]}
             onPress={() => {
               promptAsync().then(async (response) => {
@@ -777,7 +783,31 @@ export default function Register({ navigation }): JSX.Element {
             </>
           )}
           <View
-            style={{ marginVertical: 40, width: "70%", alignSelf: "center" }}
+            style={{
+              flexDirection: "row",
+              alignContent: "center",
+              justifyContent: "center",
+              alignItems: "center",
+              paddingHorizontal: 40,
+              paddingTop: 20,
+            }}
+          >
+            <CheckBox
+              onPress={() => setAcceptTerms((prev) => !prev)}
+              checkedColor={"purple"}
+              containerStyle={{ paddingHorizontal: 0 }}
+              checked={acceptTerms}
+            />
+            <Text numberOfLines={1}>
+              I accept to share my personal information on the "SolMate" app{" "}
+            </Text>
+          </View>
+          <Text style={{ color: "red", paddingHorizontal: 40 }}>
+            {errors["acceptTerms"]}
+          </Text>
+
+          <View
+            style={{ marginVertical: 20, width: "70%", alignSelf: "center" }}
           >
             <Button
               title="Submit"
