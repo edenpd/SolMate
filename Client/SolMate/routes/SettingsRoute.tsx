@@ -1,5 +1,12 @@
 import React, { useCallback, useEffect, useState, useContext } from "react";
-import { StyleSheet, View, Text, ScrollView, Alert } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Text,
+  ScrollView,
+  Alert,
+  TouchableOpacity,
+} from "react-native";
 import {
   ActivityIndicator,
   Avatar,
@@ -25,6 +32,7 @@ import {
   //Input,
   Label,
 } from "react-native-clean-form";
+import * as ImagePicker from "expo-image-picker";
 
 import RangeSlider from "rn-range-slider";
 import Thumb from "../components/RangeSlider/Thumb";
@@ -89,6 +97,17 @@ const settings = StyleSheet.create({
     marginVertical: 10,
     alignSelf: "center",
   },
+  media: {
+    width: 180,
+    height: 180,
+  },
+  mediaView: {
+    marginTop: 30,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    flexWrap: "wrap",
+  },
 });
 
 const SettingsRout = () => {
@@ -104,6 +123,9 @@ const SettingsRout = () => {
   const { state } = useContext(userContext);
   const [formData, setFormData] = useState<IUser>();
   const [isLoading, setIsLoading] = useState(true);
+  const [image, setImage] = useState(null);
+  const [media, setMedia] = useState([]);
+  const [mediaArr, setMediaArr] = useState([]);
 
   useEffect(() => {
     const loadUser = async () => {
@@ -180,6 +202,61 @@ const SettingsRout = () => {
     });
   };
 
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 1,
+    });
+
+    if (!result.cancelled) {
+      setImage(result.uri);
+    }
+  };
+
+  const pickMedia = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 1,
+    });
+
+    if (!result.cancelled) {
+      let newMedia = media;
+      newMedia.push(result.uri);
+      setMedia(newMedia);
+      setMediaArr(renderMedia());
+    }
+  };
+
+  const renderMedia = () => {
+    const mediaDOM = [];
+
+    for (let i = 0; i < formData.Media.length; i++) {
+      mediaDOM.push(
+        <View key={"media" + i}>
+          <Image
+            style={settings.media}
+            source={{
+              uri: `${SERVER_ADDRESS}:${SERVER_PORT}/static/${formData.Media[i]}`,
+            }}
+          />
+        </View>
+      );
+    }
+    if (media.length !== 0) {
+      for (let i = 0; i < media.length; i++) {
+        mediaDOM.push(
+          <View key={"uploadMedia" + i}>
+            <Image style={settings.media} source={{ uri: media[i] }} />
+          </View>
+        );
+      }
+    }
+    setMediaArr(mediaDOM);
+    return mediaDOM;
+  };
+
   var currentDateMoreThan18 = new Date();
   currentDateMoreThan18.setFullYear(new Date().getFullYear() - 18);
 
@@ -205,14 +282,29 @@ const SettingsRout = () => {
                 //marginTop: 10,
               }}
             >
-              <Avatar.Image
-                style={settings.userImage}
-                size={120}
-                source={{
-                  uri: `${SERVER_ADDRESS}:${SERVER_PORT}/static/${formData.picture}`,
+              <TouchableOpacity
+                activeOpacity={0.5}
+                style={{
+                  borderRadius: 30,
                 }}
-              />
-
+                disabled={image}
+                onPress={pickImage}
+              >
+                {image && (
+                  <Image
+                    source={{ uri: image }}
+                    style={{ width: 200, height: 200, borderRadius: 100 }}
+                  />
+                )}
+                {!image && (
+                  <Image
+                    source={{
+                      uri: `${SERVER_ADDRESS}:${SERVER_PORT}/static/${formData.picture}`,
+                    }}
+                    style={{ width: 200, height: 200, borderRadius: 100 }}
+                  />
+                )}
+              </TouchableOpacity>
               <Input
                 label='First Name'
                 value={formData.firstName}
@@ -383,6 +475,30 @@ const SettingsRout = () => {
                   renderNotch={renderNotch}
                   onValueChanged={handleValueChange}
                 />
+              </View>
+              <View
+                style={{
+                  marginVertical: 10,
+                  width: "100%",
+                  alignSelf: "center",
+                }}
+              >
+                <Text
+                  style={{
+                    width: "77%",
+                    alignSelf: "center",
+                    textAlign: "left",
+                    color: "#87949f",
+                    fontWeight: "bold",
+                    fontSize: 17,
+                  }}
+                >
+                  Media
+                </Text>
+                <ScrollView>
+                  <View style={settings.mediaView}>{mediaArr}</View>
+                </ScrollView>
+                <Button onPress={pickMedia}>Upload Media</Button>
               </View>
               <View
                 style={{
