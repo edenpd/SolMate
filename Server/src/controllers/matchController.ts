@@ -250,7 +250,7 @@ export const MatchAlgorithm = async (email: String) => {
     let users = await getUsersForMatches(email as string);
     let currentUser = users.find((user) => user.email === email);
     users = users.filter((user) => user.email !== email);
-    let curr_Songs: string[];
+    // let curr_Songs: string[];
     let curr_Artists: IArtist[];
     let currentUserSavedSongs: string[] = [];
     let currentUserTopSongs: string[] = [];
@@ -308,7 +308,7 @@ export const MatchAlgorithm = async (email: String) => {
 
       // cuurent user is without spotify
       else {
-        curr_Songs = currentUser.Songs;
+        // curr_Songs = currentUser.Songs;
         curr_Artists = currentUser.Artists;
       }
 
@@ -341,7 +341,7 @@ export const MatchAlgorithm = async (email: String) => {
             let userFollowArtists: IArtist[] = [];
             let userRelatedArtists: IArtist[] = [];
             let userAlbums: string[] = [];
-            let userSongs: string[] = user.Songs;
+            // let userSongs: string[] = user.Songs;
             let userArtists: IArtist[] = user.Artists;
             var finalGrade = 0;
 
@@ -404,37 +404,37 @@ export const MatchAlgorithm = async (email: String) => {
                 } else {
                   // with Spotify VS without Spotify
                   finalGrade = withVsWithoutSpotify(
-                    userSavedSongs,
-                    userTopSongs,
+                    // userSavedSongs,
+                    // userTopSongs,
                     userFollowArtists,
                     userRelatedArtists,
-                    userAlbums,
-                    curr_Songs,
+                    // userAlbums,
+                    // curr_Songs,
                     curr_Artists
                   );
                 }
               }
             } //  user is without spotify
             else {
-              userSongs = user.Songs;
+              // userSongs = user.Songs;
               userArtists = user.Artists;
               if (currentUser) {
                 if (currentUser.spotifyAccessToken) {
                   finalGrade = withVsWithoutSpotify(
-                    currentUserSavedSongs,
-                    currentUserTopSongs,
+                    // currentUserSavedSongs,
+                    // currentUserTopSongs,
                     currentUserFollowArtists,
                     currentUserRelatedArtists,
-                    currentUserAlbums,
-                    userSongs,
+                    // currentUserAlbums,
+                    // userSongs,
                     userArtists
                   );
                 } else {
                   // both without Spotify
                   finalGrade = bothWithoutSpotify(
-                    curr_Songs,
+                    // curr_Songs,
                     curr_Artists,
-                    userSongs,
+                    // userSongs,
                     userArtists
                   );
                 }
@@ -533,32 +533,32 @@ export const MatchAlgorithm = async (email: String) => {
 };
 
 const bothWithoutSpotify = (
-  user1Songs: string[],
+  // user1Songs: string[],
   user1Artists: IArtist[],
-  user2Songs: string[],
+  // user2Songs: string[],
   user2Artists: IArtist[]
 ) => {
   var finalGrade = 0;
 
-  var songGrade = 0;
+  // var songGrade = 0;
   var artistsGrade = 0;
 
-  var similarSongs = 0;
+  // var similarSongs = 0;
   var similarArtists = 0;
 
-  if (user1Songs) {
-    similarSongs = user1Songs.filter(
-      (item) =>
-        user2Songs.findIndex((song) => {
-          return song === item;
-        }) !== -1
-    ).length;
-  }
+  // if (user1Songs) {
+  //   similarSongs = user1Songs.filter(
+  //     (item) =>
+  //       user2Songs.findIndex((song) => {
+  //         return song === item;
+  //       }) !== -1
+  //   ).length;
+  // }
 
-  // calc songs match grade
-  if (user1Songs.length + user2Songs.length !== 0) {
-    songGrade = similarSongs / (user1Songs.length + user2Songs.length);
-  }
+  // // calc songs match grade
+  // if (user1Songs.length + user2Songs.length !== 0) {
+  //   songGrade = similarSongs / (user1Songs.length + user2Songs.length);
+  // }
 
   // similar  artists amount
   if (user1Artists) {
@@ -575,49 +575,50 @@ const bothWithoutSpotify = (
     artistsGrade = similarArtists / (user1Artists.length + user2Artists.length);
   }
 
-  finalGrade = (songGrade + artistsGrade) / 2;
+  // finalGrade = (songGrade + artistsGrade) / 2;
+  finalGrade = artistsGrade;
 
   return finalGrade;
 };
 
 const withVsWithoutSpotify = (
-  user1SavedSongs: string[],
-  user1TopSongs: string[],
+  // user1SavedSongs: string[],
+  // user1TopSongs: string[],
   user1FollowArtists: IArtist[],
   user1RelatedArtists: IArtist[],
-  user1Albums: string[],
-  user2Songs: string[],
+  // user1Albums: string[],
+  // user2Songs: string[],
   user2Artists: IArtist[]
 ) => {
   var finalGrade = 0;
-  var songGrade = 0;
+  // var songGrade = 0;
   var artistsGrade = 0;
 
-  var similarSongs = 0;
+  // var similarSongs = 0;
   var similarArtists = 0;
 
-  let user1TotalSongs: string[] = [];
+  // let user1TotalSongs: string[] = [];
   let user1TotalArtists: IArtist[] = [];
 
-  user1TotalSongs.concat(user1TopSongs, user1SavedSongs);
+  // user1TotalSongs.concat(user1TopSongs, user1SavedSongs);
   user1TotalArtists.concat(user1FollowArtists, user1RelatedArtists);
   // distinct
-  user1TotalSongs = [...new Set(user1TotalSongs)];
+  // user1TotalSongs = [...new Set(user1TotalSongs)];
   user1TotalArtists = [...new Set(user1TotalArtists)];
 
-  if (user1TotalSongs) {
-    similarSongs = user1TotalSongs.filter(
-      (item) =>
-        user2Songs.findIndex((song) => {
-          return song === item;
-        }) !== -1
-    ).length;
-  }
+  // if (user1TotalSongs) {
+  //   similarSongs = user1TotalSongs.filter(
+  //     (item) =>
+  //       user2Songs.findIndex((song) => {
+  //         return song === item;
+  //       }) !== -1
+  //   ).length;
+  // }
 
-  // calc songs match grade
-  if (user1TotalSongs.length + user2Songs.length !== 0) {
-    songGrade = similarSongs / (user1TotalSongs.length + user2Songs.length);
-  }
+  // // calc songs match grade
+  // if (user1TotalSongs.length + user2Songs.length !== 0) {
+  //   songGrade = similarSongs / (user1TotalSongs.length + user2Songs.length);
+  // }
 
   // similar  artists amount
   if (user1TotalArtists) {
@@ -635,7 +636,8 @@ const withVsWithoutSpotify = (
       similarArtists / (user1TotalArtists.length + user2Artists.length);
   }
 
-  finalGrade = (songGrade + artistsGrade) / 2;
+  finalGrade = artistsGrade;
+  // finalGrade = (songGrade + artistsGrade) / 2;
 
   return finalGrade;
 };
