@@ -167,9 +167,22 @@ const SettingsRout = () => {
       .put(`${SERVER_ADDRESS}:${SERVER_PORT}/user`, formData, {
         headers: { "Content-Type": "application/json" },
       })
-      .then((res) => {
+      .then(async (response) => {
         //console.log(res);
-        Alert.alert("Success", "Changes Saved Successfuly", [
+        // Alert.alert("Success", "Changes Saved Successfully", [
+        //   { text: "OK", onPress: () => console.log("OK Pressed") },
+        // ]);
+        dispatch({ type: "SET_USER", payload: response.data.user });
+        dispatchToken({ type: "SET_TOKEN", payload: response.data.token });
+        if (image != null) {
+          await uploadPic(
+            { email: response.data.user.email, pictureFile: image },
+            response.data.token
+          );
+        }
+      })
+      .then((res) => {
+        Alert.alert("Success", "Changes Saved Successfully", [
           { text: "OK", onPress: () => console.log("OK Pressed") },
         ]);
       })
@@ -213,6 +226,43 @@ const SettingsRout = () => {
       setImage(result.uri);
     }
   };
+
+  async function uploadPic(credentials, token) {
+    const formData = new FormData();
+    let filename = credentials.pictureFile.split("/").pop();
+
+    // Infer the type of the image
+    let match = /\.(\w+)$/.exec(filename);
+    let type = match ? `image/${match[1]}` : `image`;
+
+    formData.append("myImage", {
+      uri: credentials.pictureFile,
+      name: filename,
+      type,
+    });
+    formData.append("userId", credentials.email);
+    console.log("hey");
+
+    const config = {
+      headers: {
+        "content-type": "multipart/form-data",
+      },
+    };
+    axios.defaults.headers.common["Authorization"] = "Bearer " + token;
+    axios
+      .post(
+        `${SERVER_ADDRESS}:${SERVER_PORT}/user/uploadProfile`,
+        formData,
+        config
+      )
+      .then((response) => {
+        return response;
+      })
+      .catch((error) => {
+        Alert.alert(JSON.stringify(error));
+        console.log(error);
+      });
+  }
 
   const pickMedia = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
