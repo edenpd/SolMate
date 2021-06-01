@@ -180,6 +180,16 @@ const SettingsRout = () => {
             response.data.token
           );
         }
+        if (media != []) {
+          console.log("Save Media");
+          console.log(media.length);
+          for (let index = 0; index < media.length; index++) {
+            await uploadMedia(
+              { email: response.data.user.email, pictureFile: media[index] },
+              response.data.token
+            );
+          }
+        }
       })
       .then((res) => {
         Alert.alert("Success", "Changes Saved Successfully", [
@@ -252,6 +262,46 @@ const SettingsRout = () => {
     axios
       .post(
         `${SERVER_ADDRESS}:${SERVER_PORT}/user/uploadProfile`,
+        formData,
+        config
+      )
+      .then((response) => {
+        return response;
+      })
+      .catch((error) => {
+        Alert.alert(JSON.stringify(error));
+        console.log(error);
+      });
+  }
+
+  async function uploadMedia(credentials, token) {
+    const formData = new FormData();
+    let filename = credentials.pictureFile.split("/").pop();
+
+    // Infer the type of the image
+    let match = /\.(\w+)$/.exec(filename);
+    let type = match ? `image/${match[1]}` : `image`;
+
+    formData.append("userId", credentials.email);
+    console.log("hey");
+
+    const config = {
+      headers: {
+        "content-type": "multipart/form-data",
+      },
+    };
+
+    axios.defaults.headers.common["Authorization"] = "Bearer " + token;
+
+    formData.append("myImage", {
+      uri: credentials.pictureFile,
+      name: filename,
+      type,
+    });
+
+    axios
+      .post(
+        `${SERVER_ADDRESS}:${SERVER_PORT}/user/uploadMedia`,
         formData,
         config
       )
@@ -337,6 +387,7 @@ const SettingsRout = () => {
                 style={{
                   borderRadius: 30,
                 }}
+                //check this
                 disabled={image}
                 onPress={pickImage}
               >
