@@ -125,7 +125,7 @@ const SettingsRout = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [image, setImage] = useState(null);
   const [media, setMedia] = useState([]);
-  const [mediaArr, setMediaArr] = useState([]);
+  //const [mediaArr, setMediaArr] = useState([]);
 
   useEffect(() => {
     const loadUser = async () => {
@@ -195,6 +195,9 @@ const SettingsRout = () => {
         Alert.alert("Success", "Changes Saved Successfully", [
           { text: "OK", onPress: () => console.log("OK Pressed") },
         ]);
+        setIsLoading(true);
+        fetchUser();
+        renderMedia();
       })
       .catch((err) => {
         Alert.alert("Error", "error", [
@@ -306,6 +309,7 @@ const SettingsRout = () => {
         config
       )
       .then((response) => {
+        setMedia([]);
         return response;
       })
       .catch((error) => {
@@ -325,7 +329,7 @@ const SettingsRout = () => {
       let newMedia = media;
       newMedia.push(result.uri);
       setMedia(newMedia);
-      setMediaArr(renderMedia());
+      //setMediaArr(renderMedia());
     }
   };
 
@@ -353,7 +357,7 @@ const SettingsRout = () => {
         );
       }
     }
-    setMediaArr(mediaDOM);
+    //setMediaArr(mediaDOM);
     return mediaDOM;
   };
 
@@ -597,7 +601,7 @@ const SettingsRout = () => {
                   Media
                 </Text>
                 <ScrollView>
-                  <View style={settings.mediaView}>{mediaArr}</View>
+                  <View style={settings.mediaView}>{renderMedia()}</View>
                 </ScrollView>
                 <Button onPress={pickMedia}>Upload Media</Button>
               </View>
