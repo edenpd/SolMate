@@ -719,9 +719,9 @@ const bothWithSpotify = (
   ) {
     artistsGrade =
       similarArtists /
-        (user1RelatedArtists.length + user2RelatedArtists.length) +
+      (user1RelatedArtists.length + user2RelatedArtists.length) +
       similarFollowArtists /
-        (user1FollowArtists.length + user2FollowArtists.length);
+      (user1FollowArtists.length + user2FollowArtists.length);
   }
 
   // similar album amount
@@ -771,3 +771,19 @@ export const deleteMatchesOfUser = async (req: Request, res: Response) => {
     }
   }
 };
+
+export const resetMatches = async (req: Request, res: Response) => {
+  await Match.updateMany(
+    {
+
+    },
+    {
+      "Approve1": "waiting",
+      "Approve2": "waiting"
+    }
+  ).then((val) => {
+    res.status(200).json({ message: "All Matches were reset successfuly" });
+  }).catch((err) => {
+    res.status(500).send(err);
+  });
+}
