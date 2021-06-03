@@ -19,6 +19,7 @@ const Chat = (props) => {
     const [messages, setMessages] = useState<Array<any>>([]);
     const [chat, setChat] = useState({ Messages: [] } as IChat);
     const [recEvents, setRecEvents] = useState([]);
+    const [recArtists, setRecArtists] = useState([]);
     const [recAreOpen, setRecAreOpen] = useState(false);
     const [bounceValue, setBounceValue] = useState(new Animated.Value(0));
     const [otherUser, setOtherUser] = useState<IUser>({} as IUser);
@@ -44,6 +45,7 @@ const Chat = (props) => {
             .then((res) => {
                 setChat(res.data);
                 getDateRecommendation(res.data);
+                getArtistsRecommendation(res.data);
             })
             .catch((err) => {
                 console.log("Error");
@@ -94,6 +96,21 @@ const Chat = (props) => {
         axios.get(`${SERVER_ADDRESS}:${SERVER_PORT}/event/shared?userId1=${chatData.UserId1._id}&userId2=${chatData.UserId2._id}`)
             .then((res) => {
                 setRecEvents(res.data);
+            })
+            .catch((err) => {
+                console.log("Error");
+                console.log(err);
+            });
+    };
+
+    const getArtistsRecommendation = (chatData: IChat) => {
+        var chatUser = chatData.UserId1;
+        if (chatUser._id == state.user._id)
+            chatUser = chatData.UserId2;
+
+        axios.get(`${SERVER_ADDRESS}:${SERVER_PORT}/user/getuser?userId=${chatUser._id}`)
+            .then((res) => {
+                setRecArtists(res.data.Artists);
             })
             .catch((err) => {
                 console.log("Error");
@@ -254,6 +271,45 @@ const Chat = (props) => {
         );
     };
 
+    const renderChatEmpty = () => {
+        var msg = "You can talk about ";
+
+        for (let i = 0; i < 3 && i < recArtists.length; i++) {
+            if (i == 2 || i == recArtists.length - 1) {
+                msg = msg.slice(0, -2);
+                msg = msg.concat(' and ' + recArtists[i].name)
+            } else
+                msg = msg.concat(recArtists[i].name + ", ")
+        }
+        return (
+            <View
+                style={{
+                    flex: 1,
+                    alignSelf: 'center',
+                    justifyContent: 'center'
+
+                }}
+            >
+
+                <Text style={{
+                    fontFamily: "Poppins_300Light",
+                    color: "#8860D0",
+                    marginTop: 20,
+                    textAlign: 'center',
+                    transform: [{ scaleY: -1 }]
+                }}>  {msg}</Text>
+                <Text style={{
+                    fontFamily: "Poppins_300Light",
+                    color: "#8860D0",
+                    marginBottom: 20,
+                    fontSize: 25,
+                    textAlign: 'center',
+                    transform: [{ scaleY: -1 }]
+                }}>New solmate was found!</Text>
+            </View>
+        );
+    };
+
     const onProfilePress = () => {
         props.navigation.navigate('Profile', { user: otherUser._id });
     }
@@ -276,7 +332,10 @@ const Chat = (props) => {
                 renderSend={renderSend}
                 listViewProps={{ style: { backgroundColor: '#f6f6f6' } }}
                 renderComposer={renderComposer}
-                renderFooter={renderFooter} />
+                renderFooter={renderFooter} 
+                renderChatEmpty={renderChatEmpty}
+            />
+
         </View >
     );
 }
