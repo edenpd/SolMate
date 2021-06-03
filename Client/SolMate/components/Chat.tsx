@@ -1,14 +1,16 @@
 import axios from 'axios';
 import React, { useState, useEffect, useCallback, useContext, ReactNode } from 'react';
-import { Bubble, Composer, GiftedChat, Send } from 'react-native-gifted-chat';
+import { Bubble, Composer, GiftedChat, MessageText, Send } from 'react-native-gifted-chat';
 import { io } from 'socket.io-client';
-import { IChat } from '../util/Types';
+import { IChat, IUser } from '../util/Types';
 import { SERVER_ADDRESS, SERVER_PORT, CHAT_SOCKET_ADDRESS, CHAT_SOCKET_PORT } from '@env';
 import { userContext } from '../contexts/userContext';
-import { Text } from 'react-native-elements';
-import { Animated, Linking, StyleSheet, View } from 'react-native';
+import { Card, Text } from 'react-native-elements';
+import { Animated, Linking, StyleSheet, Touchable, View } from 'react-native';
 import { Avatar } from 'react-native-paper';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import moment from 'moment';
+import { UserInfo, UserImgWrapper, UserImg, TextSection, UserInfoText, UserName, PostTime } from '../styles/ChatStyles';
 
 const Chat = (props) => {
 
@@ -19,6 +21,7 @@ const Chat = (props) => {
     const [recEvents, setRecEvents] = useState([]);
     const [recAreOpen, setRecAreOpen] = useState(false);
     const [bounceValue, setBounceValue] = useState(new Animated.Value(0));
+    const [otherUser, setOtherUser] = useState<IUser>({} as IUser);
 
     const chatId = props.route.params.chatId;
     const user = {
@@ -64,6 +67,7 @@ const Chat = (props) => {
         })));
 
         setMessages(newMsg);
+        setOtherUser(chat.UserId1 === user._id ? chat.UserId1 : chat.UserId2);
     }, [chat]);
 
     useEffect(() => {
@@ -193,6 +197,18 @@ const Chat = (props) => {
         eventsContainer: {
             display: 'flex',
             flexDirection: 'row'
+        },
+        headerContainer: {
+            display: 'flex',
+            width: '100%',
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center'
+        },
+        otherUserImage: {
+        },
+        otherUserName: {
+            margin: 10
         }
     });
 
@@ -220,22 +236,9 @@ const Chat = (props) => {
         }
 
         return (
-            // <View style={style.footer}>
-            //     <View>
-            //         <Text style={style.footerText} onPress={() => setRecAreOpen(!recAreOpen)}>
-            //             {text}
-            //         </Text>
-            //     </View>
-            //     <Animated.View style={[style.eventsContainer, { transform: [{ translateY: bounceValue }] }]}>
-            //         {eventsDOM}
-
-            //     </Animated.View>
-            // </View>
-
             <View style={style.footer}>
                 <Animated.View style={[style.eventsContainer, { transform: [{ translateY: bounceValue }] }]}>
                     {eventsDOM}
-
                 </Animated.View>
                 <View>
                     <Text style={style.footerText} onPress={() => setRecAreOpen(!recAreOpen)}>
@@ -243,33 +246,34 @@ const Chat = (props) => {
                     </Text>
                 </View>
             </View>
-            // <Animated.View style={{...style.footer, transform: [{ translateY: bounceValue }] }}>
-            //     <View>
-            //         <Text style={style.footerText} onPress={() => setRecAreOpen(!recAreOpen)}>
-            //             {text}
-            //         </Text>
-            //     </View>
-            //     <View style={[style.eventsContainer]}>
-            //         {eventsDOM}
-
-            //     </View>
-            // </Animated.View>
         );
     };
 
+    const onProfilePress = () => {
+        props.navigation.navigate('Profile', { user: otherUser._id });
+    }
+
     return (
-        <GiftedChat
-            // showUserAvatar={true}
-            // renderAvatarOnTop={true}
-            messages={messages}
-            onSend={onSend}
-            user={user}
-            renderBubble={renderBubble}
-            renderSend={renderSend}
-            listViewProps={{ style: { backgroundColor: '#f6f6f6' } }}
-            renderComposer={renderComposer}
-            renderFooter={renderFooter}
-        />
+        <View>
+            <TouchableOpacity style={style.headerContainer} onPress={onProfilePress}>
+                <UserImgWrapper onPress style={style.otherUserImage}>
+                    <UserImg source={{ uri: `${SERVER_ADDRESS}:${SERVER_PORT}/static/${otherUser?.picture}` }} />
+                </UserImgWrapper>
+                <UserName style={style.otherUserName}>{`${otherUser?.firstName} ${otherUser?.lastName}`}</UserName>
+            </TouchableOpacity>
+            <GiftedChat
+                // showUserAvatar={true}
+                // renderAvatarOnTop={true}
+                messages={messages}
+                onSend={onSend}
+                user={user}
+                renderBubble={renderBubble}
+                renderSend={renderSend}
+                listViewProps={{ style: { backgroundColor: '#f6f6f6' } }}
+                renderComposer={renderComposer}
+                renderFooter={renderFooter}
+            />
+        </View >
     );
 }
 

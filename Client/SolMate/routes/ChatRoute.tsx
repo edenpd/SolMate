@@ -5,6 +5,9 @@ import Chat from '../components/Chat';
 import ChatList from '../components/ChatList';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
+import Profile from '../components/Profile';
+import { IUser } from '../util/Types';
+import ProfileRoute from './ProfileRoute';
 
 const Stack = createStackNavigator();
 
@@ -21,6 +24,12 @@ const ChatRoute = () => {
                     component={Chat}
                     options={({route}) => ({
                         title: (route.params as { userName: string}).userName,
+                        headerShown: false
+                })} />
+                <Stack.Screen name="Profile"
+                    component={ProfileRoute}
+                    options={({route}) => ({
+                        title: `${(route.params as { user: IUser}).user.firstName} ${(route.params as { user: IUser}).user.lastName}` ,
                         headerShown: false
                 })} />
             </Stack.Navigator>
