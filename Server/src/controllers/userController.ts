@@ -134,7 +134,33 @@ export const uploadProfile = async (req: Request, res: Response) => {
   //   res.sendStatus(500);
   // }
 };
-
+export const updateLocation = async (req: Request, res: Response) => {
+  const userId = req.body._id;
+  const email = req.body.email;
+  const location = req.body.location;
+  try {
+    await User.updateOne(
+      {
+        _id: userId,
+        email: email,
+      },
+      {
+        $set: {
+          location: location,
+        },
+      }
+    ).exec((err: CallbackError, user: any) => {
+      if (err) {
+        res.status(500).send(err);
+      } else {
+        res.status(200).json(user);
+      }
+    });
+  } catch (e) {
+    console.log(e);
+    res.sendStatus(500);
+  }
+};
 export const updateUser = async (req: Request, res: Response) => {
   console.log(req.body);
   const userId = req.body._id;

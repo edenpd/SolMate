@@ -9,6 +9,7 @@ import {
   deleteUser,
   getUserByid,
   getUserByid2,
+  updateLocation,
 } from "../controllers/userController";
 import { response, Router } from "express";
 import multer from "multer";
@@ -51,5 +52,6 @@ router.put("/", updateUser);
 // router.get("/statistic", getStatistics);
 router.delete("/", deleteUser);
 router.get("/getuser", getUserByid);
+router.put("/updateLocation", updateLocation);
 
 export default router;
