@@ -168,6 +168,9 @@ const Chat = (props) => {
     }
 
     const style = StyleSheet.create({
+        container: {
+            height: '100%'
+        },
         footer: {
             width: '100%',
             padding: 10,
@@ -203,7 +206,9 @@ const Chat = (props) => {
             width: '100%',
             flexDirection: 'row',
             justifyContent: 'center',
-            alignItems: 'center'
+            alignItems: 'center',
+            height: 50,
+            backgroundColor: '#f6f6f6'
         },
         otherUserImage: {
         },
@@ -254,7 +259,7 @@ const Chat = (props) => {
     }
 
     return (
-        <View>
+        <View style={style.container}>
             <TouchableOpacity style={style.headerContainer} onPress={onProfilePress}>
                 <UserImgWrapper onPress style={style.otherUserImage}>
                     <UserImg source={{ uri: `${SERVER_ADDRESS}:${SERVER_PORT}/static/${otherUser?.picture}` }} />
@@ -271,8 +276,7 @@ const Chat = (props) => {
                 renderSend={renderSend}
                 listViewProps={{ style: { backgroundColor: '#f6f6f6' } }}
                 renderComposer={renderComposer}
-                renderFooter={renderFooter}
-            />
+                renderFooter={renderFooter} />
         </View >
     );
 }
