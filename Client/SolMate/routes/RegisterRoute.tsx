@@ -799,7 +799,7 @@ export default function Register({ navigation }): JSX.Element {
               checked={acceptTerms}
             />
             <Text numberOfLines={1}>
-              I accept to share my personal information on the "SolMate" app{" "}
+              I accept to share my personal information on "SolMate" app
             </Text>
           </View>
           <Text style={{ color: "red", paddingHorizontal: 40 }}>

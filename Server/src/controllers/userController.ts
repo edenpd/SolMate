@@ -175,6 +175,7 @@ export const updateUser = async (req: Request, res: Response) => {
   const sex = req.body.sex;
   const birthday = req.body.birthday;
   const interestedSex = req.body.interestedSex;
+
   // const { encryptedAccessToken, encryptedRefreshToken, iv } = encryptTokens(
   //   req.body.spotifyAccessToken,
   //   req.body.spotifyRefreshToken
@@ -205,9 +206,13 @@ export const updateUser = async (req: Request, res: Response) => {
       }
     ).exec((err: CallbackError, user: any) => {
       if (err) {
-        res.status(500).send(err);
+        res.status(500).json(err);
       } else {
-        res.status(200).json(user);
+        const token = jwt.sign({ email: req.body.email }, config.secret, {
+          expiresIn: 86400, // expires in 24 hours
+        });
+
+        res.status(200).send({ token: token, user: req.body });
       }
     });
   } catch (e) {
