@@ -214,11 +214,7 @@ export const updateUser = async (req: Request, res: Response) => {
       if (err) {
         res.status(500).json(err);
       } else {
-        const token = jwt.sign({ email: req.body.email }, config.secret, {
-          expiresIn: 86400, // expires in 24 hours
-        });
-
-        res.status(200).send({ token: token, user: req.body });
+        res.status(200).send({ user: req.body });
       }
     });
   } catch (e) {
