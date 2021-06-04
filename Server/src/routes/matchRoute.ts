@@ -5,6 +5,7 @@ import {
   getMatchesById,
   updateMatch,
   MatchAlgorithmAfterReg,
+  resetMatches
 } from "../controllers/matchController";
 
 const router = Router();
@@ -13,5 +14,6 @@ router.post("/", addMatch);
 router.post("/calc/", MatchAlgorithmAfterReg);
 router.get("/", getMatchesById);
 router.put("/", updateMatch);
+router.put("/reset/", resetMatches);
 
 export default router;
