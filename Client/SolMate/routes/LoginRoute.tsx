@@ -153,6 +153,25 @@ export default function LoginRoute({ navigation }) {
           />
         </View>
       </View>
+      <View
+        style={{
+          width: "100%",
+          flexDirection: "row",
+          justifyContent: "flex-end",
+          alignItems: "flex-end",
+          
+        }}
+      >
+        <Image
+          style={{
+            width: "40%",
+            height: undefined,
+            aspectRatio: 1,
+            marginHorizontal: "1%",
+          }}
+          source={require("../assets/giphy.gif")}
+        />
+      </View>
     </View>
   );
 }

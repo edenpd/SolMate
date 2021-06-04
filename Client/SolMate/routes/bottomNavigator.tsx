@@ -79,10 +79,7 @@ export default function App({ navigation }) {
   );
 
   const handleBackButton = () => {
-    if (token.token) {
-      return true;
-    }
-    return false;
+    return token.token;
   };
 
   useEffect(() => {
