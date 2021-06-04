@@ -80,7 +80,11 @@ const MatchPage = ({ navigation }) => {
         {matches.length === 0 && (
           <Text
             style={{
-              fontSize: 20,
+              fontFamily: "Poppins_300Light",
+              color: "#8860D0",
+              marginBottom: 20,
+              fontSize: 25,
+              textAlign: "center",
             }}
           >
             Sorry, we couldn't find any results 😔
