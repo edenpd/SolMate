@@ -25,6 +25,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import useDate, { LOCALE } from "../hooks/useDate";
 import { SERVER_ADDRESS, SERVER_PORT } from "@env";
 import axios from "axios";
+import useToken from "../hooks/useToken";
 
 import {
   FieldsContainer,
@@ -97,6 +98,13 @@ const settings = StyleSheet.create({
     marginVertical: 10,
     alignSelf: "center",
   },
+  logOutButton: {
+    width: 200,
+    backgroundColor: "#d8664d",
+    fontFamily: "Poppins_300Light",
+    marginVertical: 10,
+    alignSelf: "center",
+  },
   media: {
     width: 180,
     height: 180,
@@ -125,14 +133,17 @@ const SettingsRout = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [image, setImage] = useState(null);
   const [media, setMedia] = useState([]);
-  //const [mediaArr, setMediaArr] = useState([]);
+  const [mediaArr, setMediaArr] = useState([]);
+  const [errors, setErrors] = useState({});
+  const { token } = useContext(tokenContext);
 
   useEffect(() => {
     const loadUser = async () => {
       await fetchUser();
+      renderMedia();
     };
     loadUser();
-  }, []);
+  }, [isLoading]);
 
   const fetchUser = async () => {
     axios
@@ -152,6 +163,42 @@ const SettingsRout = () => {
       });
   };
 
+  function validate() {
+    let input = formData;
+    let errors = {};
+    let isValid = true;
+
+    if (!input["firstName"]) {
+      isValid = false;
+      errors["firstName"] = "Please enter your first name.";
+    }
+    if (!input["lastName"]) {
+      isValid = false;
+      errors["lastName"] = "Please enter your last name.";
+    }
+
+    if (!input["email"]) {
+      isValid = false;
+      errors["email"] = "Please enter your email Address.";
+    }
+
+    if (typeof input["email"] !== "undefined") {
+      var pattern = new RegExp(
+        /^(("[\w-\s]+")|([\w-]+(?:\.[\w-]+)*)|("[\w-\s]+")([\w-]+(?:\.[\w-]+)*))(@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$)|(@\[?((25[0-5]\.|2[0-4][0-9]\.|1[0-9]{2}\.|[0-9]{1,2}\.))((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){2}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\]?$)/i
+      );
+      if (!pattern.test(input["email"])) {
+        isValid = false;
+        errors["email"] = "Please enter valid email address.";
+      }
+    }
+
+    console.log(errors);
+
+    setErrors(errors);
+
+    return isValid;
+  }
+
   const handleValueChange = useCallback((low, high) => {
     setFormData((prevstate) => {
       return {
@@ -163,47 +210,51 @@ const SettingsRout = () => {
   }, []);
 
   const onSave = async () => {
-    await axios
-      .put(`${SERVER_ADDRESS}:${SERVER_PORT}/user`, formData, {
-        headers: { "Content-Type": "application/json" },
-      })
-      .then(async (response) => {
-        //console.log(res);
-        // Alert.alert("Success", "Changes Saved Successfully", [
-        //   { text: "OK", onPress: () => console.log("OK Pressed") },
-        // ]);
-        dispatch({ type: "SET_USER", payload: response.data.user });
-        dispatchToken({ type: "SET_TOKEN", payload: response.data.token });
-        if (image != null) {
-          await uploadPic(
-            { email: response.data.user.email, pictureFile: image },
-            response.data.token
-          );
-        }
-        if (media != []) {
-          console.log("Save Media");
-          console.log(media.length);
-          for (let index = 0; index < media.length; index++) {
-            await uploadMedia(
-              { email: response.data.user.email, pictureFile: media[index] },
-              response.data.token
-            );
+    if (validate()) {
+      await axios
+        .put(`${SERVER_ADDRESS}:${SERVER_PORT}/user`, formData, {
+          headers: { "Content-Type": "application/json" },
+        })
+        .then(async (response) => {
+          //console.log(res);
+          // Alert.alert("Success", "Changes Saved Successfully", [
+          //   { text: "OK", onPress: () => console.log("OK Pressed") },
+          // ]);
+          dispatch({ type: "SET_USER", payload: response.data.user });
+          console.log(state.user);
+
+          // dispatchToken({ type: "SET_TOKEN", payload: response.data.token });
+          if (image != null) {
+            await uploadPic({
+              email: response.data.user.email,
+              pictureFile: image,
+            });
           }
-        }
-      })
-      .then((res) => {
-        Alert.alert("Success", "Changes Saved Successfully", [
-          { text: "OK", onPress: () => console.log("OK Pressed") },
-        ]);
-        setIsLoading(true);
-        fetchUser();
-        renderMedia();
-      })
-      .catch((err) => {
-        Alert.alert("Error", "error", [
-          { text: "OK", onPress: () => console.log("OK Pressed") },
-        ]);
-      });
+          if (media != []) {
+            console.log("Save Media");
+            console.log(media.length);
+            for (let index = 0; index < media.length; index++) {
+              await uploadMedia({
+                email: response.data.user.email,
+                pictureFile: media[index],
+              });
+            }
+          }
+        })
+        .then((res) => {
+          Alert.alert("Success", "Changes Saved Successfully", [
+            { text: "OK", onPress: () => console.log("OK Pressed") },
+          ]);
+          setIsLoading(true);
+          //fetchUser();
+          //renderMedia();
+        })
+        .catch((err) => {
+          Alert.alert("Error", "error", [
+            { text: "OK", onPress: () => console.log("OK Pressed") },
+          ]);
+        });
+    }
   };
   const handleChange = (name, value) => {
     setFormData((prevstate) => {
@@ -240,7 +291,7 @@ const SettingsRout = () => {
     }
   };
 
-  async function uploadPic(credentials, token) {
+  async function uploadPic(credentials) {
     const formData = new FormData();
     let filename = credentials.pictureFile.split("/").pop();
 
@@ -261,7 +312,7 @@ const SettingsRout = () => {
         "content-type": "multipart/form-data",
       },
     };
-    axios.defaults.headers.common["Authorization"] = "Bearer " + token;
+    axios.defaults.headers.common["Authorization"] = "Bearer " + token.token;
     axios
       .post(
         `${SERVER_ADDRESS}:${SERVER_PORT}/user/uploadProfile`,
@@ -273,11 +324,11 @@ const SettingsRout = () => {
       })
       .catch((error) => {
         Alert.alert(JSON.stringify(error));
-        console.log(error);
+        return error;
       });
   }
 
-  async function uploadMedia(credentials, token) {
+  async function uploadMedia(credentials) {
     const formData = new FormData();
     let filename = credentials.pictureFile.split("/").pop();
 
@@ -294,7 +345,7 @@ const SettingsRout = () => {
       },
     };
 
-    axios.defaults.headers.common["Authorization"] = "Bearer " + token;
+    axios.defaults.headers.common["Authorization"] = "Bearer " + token.token;
 
     formData.append("myImage", {
       uri: credentials.pictureFile,
@@ -328,8 +379,8 @@ const SettingsRout = () => {
     if (!result.cancelled) {
       let newMedia = media;
       newMedia.push(result.uri);
-      setMedia(newMedia);
-      //setMediaArr(renderMedia());
+      await setMedia(newMedia);
+      renderMedia();
     }
   };
 
@@ -357,8 +408,8 @@ const SettingsRout = () => {
         );
       }
     }
-    //setMediaArr(mediaDOM);
-    return mediaDOM;
+    setMediaArr(mediaDOM);
+    //return mediaDOM;
   };
 
   var currentDateMoreThan18 = new Date();
@@ -414,11 +465,13 @@ const SettingsRout = () => {
                 label='First Name'
                 value={formData.firstName}
                 onChangeText={(value) => handleChange("firstName", value)}
+                errorMessage={errors["firstName"]}
               />
               <Input
                 label='Last Name'
                 value={formData.lastName}
                 onChangeText={(value) => handleChange("lastName", value)}
+                errorMessage={errors["lastName"]}
               />
               <Input
                 label='Description'
@@ -429,12 +482,14 @@ const SettingsRout = () => {
                 label='Email'
                 value={formData.email}
                 onChangeText={(value) => handleChange("email", value)}
+                errorMessage={errors["email"]}
               />
 
               <Input
                 label='Birthday'
                 value={date.toLocaleDateString(LOCALE)}
                 onTouchStart={showDatepicker}
+                errorMessage={errors["birthday"]}
               />
 
               {show && (
@@ -601,7 +656,7 @@ const SettingsRout = () => {
                   Media
                 </Text>
                 <ScrollView>
-                  <View style={settings.mediaView}>{renderMedia()}</View>
+                  <View style={settings.mediaView}>{mediaArr}</View>
                 </ScrollView>
                 <Button onPress={pickMedia}>Upload Media</Button>
               </View>
@@ -624,7 +679,7 @@ const SettingsRout = () => {
                     dispatchToken({ type: "LOGOUT" });
                     dispatch({ type: "LOGOUT" });
                   }}
-                  style={settings.button}
+                  style={settings.logOutButton}
                   mode='contained'
                 >
                   Log Out
