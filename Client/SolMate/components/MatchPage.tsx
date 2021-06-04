@@ -7,6 +7,7 @@ import { IMatch } from "../util/Types";
 import { userContext } from "../contexts/userContext";
 import { SERVER_ADDRESS, SERVER_PORT } from "@env";
 import NewMatchDialog from "./NewMatchDialog";
+import { Container } from "../styles/ChatStyles";
 
 const MatchPage = ({ navigation }) => {
   const [matches, setMatches] = useState<IMatch[]>([]);
@@ -78,17 +79,25 @@ const MatchPage = ({ navigation }) => {
     >
       <View style={appbarStyle.matchesContainer}>
         {matches.length === 0 && (
-          <Text
+          <Container
             style={{
-              fontFamily: "Poppins_300Light",
-              color: "#8860D0",
-              marginBottom: 20,
-              fontSize: 25,
-              textAlign: "center",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
-            Sorry, we couldn't find any results 😔
-          </Text>
+            <Text
+              style={{
+                fontFamily: "Poppins_300Light",
+                color: "#8860D0",
+                marginBottom: 20,
+                fontSize: 25,
+                textAlign: "center",
+              }}
+            >
+              Sorry, we couldn't find any results 😔
+            </Text>
+          </Container>
         )}
         <Carousel
           style={{ marginBottom: 0, paddingBottom: 0 }}
