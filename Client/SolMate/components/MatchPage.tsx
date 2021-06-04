@@ -77,6 +77,15 @@ const MatchPage = ({ navigation }) => {
       style={{ height: "100%", width: "100%", backgroundColor: "transparent" }}
     >
       <View style={appbarStyle.matchesContainer}>
+        {matches.length === 0 && (
+          <Text
+            style={{
+              fontSize: 20,
+            }}
+          >
+            Sorry, we couldn't find any results
+          </Text>
+        )}
         <Carousel
           style={{ marginBottom: 0, paddingBottom: 0 }}
           layout={"tinder"}
@@ -87,7 +96,10 @@ const MatchPage = ({ navigation }) => {
           layoutCardOffset={9}
         />
       </View>
-      <NewMatchDialog setIsVisible={setIsDialogVisible} visible={isDialogVisible} />
+      <NewMatchDialog
+        setIsVisible={setIsDialogVisible}
+        visible={isDialogVisible}
+      />
     </View>
   );
 };
