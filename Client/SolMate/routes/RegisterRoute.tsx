@@ -186,6 +186,11 @@ export default function Register({ navigation }): JSX.Element {
       isValid = false;
       errors["acceptTerms"] = "Please accept our terms to register.";
     }
+
+    if (!checkedArtistList[1] && !response ) {
+      errors["SpotifyOrArtist"] = "Please connect to spotify or Choose your favorite artists"
+    }
+
     if (
       typeof input["password"] !== "undefined" &&
       typeof input["confirmPassword"] !== "undefined"
@@ -196,8 +201,6 @@ export default function Register({ navigation }): JSX.Element {
         errors["confirm_password"] = "Passwords don't match.";
       }
     }
-    console.log(errors);
-
     setErrors(errors);
 
     return isValid;
@@ -218,8 +221,6 @@ export default function Register({ navigation }): JSX.Element {
       allowsEditing: true,
       quality: 1,
     });
-
-    console.log(result);
 
     if (!result.cancelled) {
       setImage(result.uri);
@@ -635,7 +636,11 @@ export default function Register({ navigation }): JSX.Element {
             activeOpacity={
               response || noSpotify || checkedArtistList[1] ? 0.5 : 1
             }
-            disabled={response !== null || noSpotify || checkedArtistList[1]}
+            disabled={
+              response !== null ||
+              noSpotify ||
+              checkedArtistList[1] !== undefined
+            }
             onPress={() => {
               promptAsync().then(async (response) => {
                 if (response) {
@@ -782,6 +787,9 @@ export default function Register({ navigation }): JSX.Element {
               </View>
             </>
           )}
+          <Text style={{ color: "red", paddingHorizontal: 40,paddingTop: 20 }}>
+            {errors["SpotifyOrArtist"]}
+          </Text>
           <View
             style={{
               flexDirection: "row",

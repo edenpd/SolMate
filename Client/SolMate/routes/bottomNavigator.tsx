@@ -1,6 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import React, { useContext, useEffect } from "react";
-import { StyleSheet, Text, View, Dimensions } from "react-native";
+import { StyleSheet, Text, View, Dimensions, BackHandler } from "react-native";
 import { BottomNavigation, Appbar } from "react-native-paper";
 import ChatRoute from "../routes/ChatRoute";
 import EventsRoute from "../routes/EventsRoute";
@@ -41,6 +41,7 @@ WebBrowser.maybeCompleteAuthSession();
 
 export default function App({ navigation }) {
   const [index, setIndex] = React.useState(0);
+  const { token } = useContext(tokenContext);
   const [routes] = React.useState([
     { key: "matches", title: "Matches", icon: "account-multiple" },
     { key: "events", title: "Events", icon: "calendar-blank" },
@@ -49,7 +50,6 @@ export default function App({ navigation }) {
     { key: "setting", title: "Setting", icon: "cog" },
   ]);
 
-  const {state} = useContext(userContext);
   // the same as Font.loadAsync , the hook returns  true | error
   const [isLoaded] = useFonts(customFonts);
   const discovery = {
@@ -78,13 +78,17 @@ export default function App({ navigation }) {
     discovery
   );
 
-  // React.useEffect(() => {
-  //   // if (user.spotifyToken == undefined) {
-  //     promptAsync();
-  //   // }
-  //   return;
-    
-  // }, [navigation]);
+  const handleBackButton = () => {
+    if (token.token) {
+      return true;
+    }
+    return false;
+  };
+
+  useEffect(() => {
+    BackHandler.addEventListener("hardwareBackPress", handleBackButton);
+  }, []);
+
   const renderScene = BottomNavigation.SceneMap({
     matches: MatchesRoute,
     events: EventsRoute,
