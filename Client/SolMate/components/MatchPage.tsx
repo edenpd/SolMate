@@ -83,7 +83,7 @@ const MatchPage = ({ navigation }) => {
               fontSize: 20,
             }}
           >
-            Sorry, we couldn't find any results
+            Sorry, we couldn't find any results 😔
           </Text>
         )}
         <Carousel
