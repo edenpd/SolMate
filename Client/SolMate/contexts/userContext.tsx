@@ -67,7 +67,6 @@ const StateProvider = ({ children }) => {
 
         return currentState;
       case "LOGOUT":
-        console.log("Logging out");
         currentState.user = {
           _id: "",
           email: ""
