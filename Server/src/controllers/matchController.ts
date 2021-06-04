@@ -460,6 +460,7 @@ export const MatchAlgorithm = async (email: String) => {
         })
       );
 
+      console.log("insert matchs");
       matchesToInsert
         .filter((match) => match !== undefined)
         .forEach(async (match) => {

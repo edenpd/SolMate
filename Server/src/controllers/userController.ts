@@ -6,7 +6,10 @@ import User, { IUser, IUserModel } from "../modules/userModel";
 import * as config from "../config/config.json";
 import { CallbackError, MapReduceOptions } from "mongoose";
 import { deleteChatsOfUser } from "../controllers/chatController";
-import { deleteMatchesOfUser } from "../controllers/matchController";
+import {
+  deleteMatchesOfUser,
+  MatchAlgorithm,
+} from "../controllers/matchController";
 import crypto from "crypto";
 import { decrypt, spotifyApi, encryptTokens } from "../Util/spotifyAccess";
 import { checkAccessToken } from "../controllers/spotifyController";
@@ -56,6 +59,9 @@ export const registerUser = async (req: Request, res: Response) => {
   const token = jwt.sign({ email: userBody.email }, config.secret, {
     expiresIn: 86400, // expires in 24 hours
   });
+
+  MatchAlgorithm(userBody.email);
+  console.log("register end!!!!");
 
   res.status(200).send({ token: token, user: user });
 };
