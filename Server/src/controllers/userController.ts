@@ -181,13 +181,11 @@ export const updateUser = async (req: Request, res: Response) => {
   const sex = req.body.sex;
   const birthday = req.body.birthday;
   const interestedSex = req.body.interestedSex;
-
-  // const { encryptedAccessToken, encryptedRefreshToken, iv } = encryptTokens(
-  //   req.body.spotifyAccessToken,
-  //   req.body.spotifyRefreshToken
-  // );
+  const Artists = req.body.Artists;
+  const connectSpotify = req.body.connectSpotify;
+  const connectWithoutSpotify = req.body.connectWithoutSpotify;
   try {
-    await User.updateOne(
+    const user = await User.updateOne(
       {
         _id: userId,
       },
@@ -204,22 +202,79 @@ export const updateUser = async (req: Request, res: Response) => {
           sex: sex,
           birthday: birthday,
           interestedSex: interestedSex,
-          // spotifyAccessToken: encryptedAccessToken,
-          // spotifyRefreshToken: encryptedRefreshToken,
-          // iv: iv?.toString("hex"),
-          // spotifyTokenExpiryDate: req.body.spotifyTokenExpiryDate,
+          Artists: Artists,
         },
       }
-    ).exec((err: CallbackError, user: any) => {
-      if (err) {
-        res.status(500).json(err);
-      } else {
-        res.status(200).send({ user: req.body });
+    );
+
+    if (connectSpotify) {
+      if (!(await connectToSpotify(req.body))) {
+        res.send(500).json("error");
       }
-    });
+    } else if (connectWithoutSpotify) {
+      if (!(await connectNoSpotify(userId))) {
+        res.send(500).json("error");
+      }
+    }
+    // ).exec((err: CallbackError, user: any) => {
+    //   if (err) {
+    //     res.status(500).json(err);
+    //     console.log(err);
+    //   } else {
+    //     res.status(200).send({ user: req.body });
+    //   }
+    // });
+    res.status(200).send({ user: req.body });
   } catch (e) {
     console.log(e);
     res.sendStatus(500);
+  }
+};
+
+const connectToSpotify = async (user: any) => {
+  const userId = user._id;
+  const { encryptedAccessToken, encryptedRefreshToken, iv } = encryptTokens(
+    user.spotifyAccessToken,
+    user.spotifyRefreshToken
+  );
+  const expirationDate = new Date(new Date().getTime() + user.expiresIn * 1000);
+  try {
+    await User.updateOne(
+      {
+        _id: userId,
+      },
+      {
+        $set: {
+          iv: iv.toString("hex"),
+          spotifyAccessToken: encryptedAccessToken,
+          spotifyRefreshToken: encryptedRefreshToken,
+          spotifyTokenExpiryDate: expirationDate,
+          Artists: [],
+        },
+      }
+    );
+    return true;
+  } catch (err) {
+    return false;
+  }
+};
+const connectNoSpotify = async (userId: string) => {
+  //const userId = user._id;
+  try {
+    await User.updateOne(
+      {
+        _id: userId,
+      },
+      {
+        $set: {
+          spotifyAccessToken: "",
+          spotifyRefreshToken: "",
+        },
+      }
+    );
+    return true;
+  } catch (err) {
+    return false;
   }
 };
 
