@@ -121,12 +121,13 @@ const Profile = (props) => {
       );
     } else {
       for (let i = 0; i < props.user.Artists.length; i++) {
+        let img = null;
+        if (props.user.Artists[i].images.length !== 0)
+          img = props.user.Artists[i].images[0].url;
+
         artistsDOM.push(
           <ListItem key={i} bottomDivider style={{ width: 380, height: 120 }}>
-            <Avatar.Image
-              source={{ uri: props.user.Artists[i].images[0].url }}
-              size={80}
-            />
+            <Avatar.Image source={{ uri: img }} size={80} />
             <ListItem.Content>
               <ListItem.Title>{props.user.Artists[i].name}</ListItem.Title>
             </ListItem.Content>
