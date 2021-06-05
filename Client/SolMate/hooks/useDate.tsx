@@ -9,7 +9,7 @@ export default () => {
   const [mode, setMode] = useState("date");
   const [show, setShow] = useState(false);
 
-  const onChange = (event, selectedDate) => {
+  const onChange = (selectedDate) => {
     const currentDate = selectedDate || date;
     setShow(false);
     try {
