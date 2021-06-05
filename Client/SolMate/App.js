@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, I18nManager } from "react-native";
 import { createAppContainer } from "react-navigation";
 import { createStackNavigator } from "react-navigation-stack";
 import AuthNavigator from "./routes/authNavigator";
@@ -23,6 +23,8 @@ export default function App() {
   );
   const AppContainer = createAppContainer(RootStack);
 
+  I18nManager.allowRTL(false);
+  
   return (
     <TokenStateProvider>
       <StateProvider>
