@@ -1,7 +1,5 @@
-import { StatusBar } from "expo-status-bar";
 import React, { useContext, useEffect, useState } from "react";
 import { StyleSheet, Text, View, Dimensions, BackHandler } from "react-native";
-// import { BottomNavigation, Appbar } from "react-native-paper";
 import BottomNavigation, {
   FullTab,
 } from "react-native-material-bottom-navigation";
@@ -10,7 +8,6 @@ import EventsRoute from "../routes/EventsRoute";
 import ProfileRoute from "../routes/ProfileRoute";
 import MatchesRoute from "../routes/MatchesRoute";
 import SettingRoute from "../routes/SettingsRoute";
-import Header from "../components/Header";
 import AppLoading from "expo-app-loading";
 
 // import useFonts hook
@@ -31,7 +28,6 @@ import {
   ResponseType,
 } from "expo-auth-session";
 import { EXPO_ADDRESS, EXPO_PORT } from "@env";
-import { userContext } from "../contexts/userContext";
 import { Icon } from "react-native-elements";
 
 const customFonts = {
@@ -43,8 +39,7 @@ const customFonts = {
 
 WebBrowser.maybeCompleteAuthSession();
 
-export default function App({ navigation }) {
-  const [index, setIndex] = React.useState(0);
+export default function App() {
   const { token } = useContext(tokenContext);
   const [activeTab, setActiveTab] = useState<number | string>("matches");
   // the same as Font.loadAsync , the hook returns  true | error
@@ -59,7 +54,7 @@ export default function App({ navigation }) {
         return <ChatRoute></ChatRoute>;
       case "profile":
         return <ProfileRoute></ProfileRoute>;
-      case "setting":
+      case "settings":
         return <SettingRoute></SettingRoute>;
     }
   };
@@ -67,48 +62,49 @@ export default function App({ navigation }) {
   const tabs = [
     {
       key: "matches",
-      icon: "gamepad-variant",
-      label: "matches",
-      barColor: "#388E3C",
+      icon: "favorite",
+      label: "Matches",
+      barColor: "white",
       pressColor: "rgba(255, 255, 255, 0.16)",
     },
     {
       key: "events",
-      icon: "movie",
-      label: "events",
-      barColor: "#B71C1C",
+      icon: "event",
+      label: "Events",
+      barColor: "white",
       pressColor: "rgba(255, 255, 255, 0.16)",
     },
     {
       key: "chat",
-      icon: "music-note",
-      label: "chat",
-      barColor: "#E64A19",
+      icon: "chat",
+      label: "Chat",
+      barColor: "white",
       pressColor: "rgba(255, 255, 255, 0.16)",
     },
     {
       key: "profile",
-      icon: "music-note",
-      label: "profile",
-      barColor: "#E64A19",
+      icon: "person",
+      label: "Profile",
+      barColor: "white",
       pressColor: "rgba(255, 255, 255, 0.16)",
     },
     {
-      key: "setting",
-      icon: "music-note",
-      label: "setting",
-      barColor: "#E64A19",
+      key: "settings",
+      icon: "settings",
+      label: "Settings",
+      barColor: "white",
       pressColor: "rgba(255, 255, 255, 0.16)",
     },
   ];
 
   const renderIcon =
     (icon) =>
-    ({ isActive }) =>
-      <Icon size={24} color="white" name={icon} />;
+      ({ isActive }) =>
+        <Icon size={24} color={isActive ? "#8860D0" : "grey"} name={icon} />;
 
   const renderTab = ({ tab, isActive }) => (
     <FullTab
+      labelStyle={{ color: isActive ? "#8860D0" : "grey" }}
       isActive={isActive}
       key={tab.key}
       label={tab.label}
@@ -150,14 +146,6 @@ export default function App({ navigation }) {
   useEffect(() => {
     BackHandler.addEventListener("hardwareBackPress", handleBackButton);
   }, []);
-
-  // const renderScene = BottomNavigation.SceneMap({
-  //   matches: MatchesRoute,
-  //   events: EventsRoute,
-  //   chat: ChatRoute,
-  //   profile: ProfileRoute,
-  //   setting: SettingRoute,
-  // });
 
   const navigationStyle = {
     backgroundColor: "white",
@@ -207,8 +195,6 @@ export default function App({ navigation }) {
         height: "100%",
       }}
     >
-      {/* <StatusBar hidden={true} /> */}
-      {/* <Header /> */}
       <WavyHeader
         customStyles={styles.svgCurve}
         customHeight={100}

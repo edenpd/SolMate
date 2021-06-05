@@ -21,9 +21,8 @@ const ProfileRoute = (props) => {
   }, []);
 
   const getUser = async () => {
-    console.log("RENDER");
     if (userId === undefined) {
-      if (props.route.params === undefined) {
+      if (props.route === undefined || props.route.params === undefined) {
         userId = state.user._id;
       } else {
         userId = props.route.params.user;
