@@ -23,7 +23,7 @@ import axios from "axios";
 import * as WebBrowser from "expo-web-browser";
 import { useAuthRequest, ResponseType } from "expo-auth-session";
 import useToken from "../hooks/useToken";
-import DateTimePicker from "@react-native-community/datetimepicker";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 import RangeSlider from "rn-range-slider";
 import Label from "../components/RangeSlider/Label";
 import Rail from "../components/RangeSlider/Rail";
@@ -187,8 +187,9 @@ export default function Register({ navigation }): JSX.Element {
       errors["acceptTerms"] = "Please accept our terms to register.";
     }
 
-    if (!checkedArtistList[1] && !response ) {
-      errors["SpotifyOrArtist"] = "Please connect to spotify or Choose your favorite artists"
+    if (!checkedArtistList[1] && !response) {
+      errors["SpotifyOrArtist"] =
+        "Please connect to spotify or Choose your favorite artists";
     }
 
     if (
@@ -260,10 +261,10 @@ export default function Register({ navigation }): JSX.Element {
       .catch((error) => Alert.alert(JSON.stringify(error)));
   }
 
-  const onChangeDateInput = (event, selectedDate) => {
+  const onChangeDateInput = (selectedDate) => {
     const currentDate = selectedDate || date;
     setShow(false);
-    onChangeDate(event, currentDate);
+    onChangeDate(currentDate);
     setFormData((prevstate) => {
       return {
         ...prevstate,
@@ -404,16 +405,18 @@ export default function Register({ navigation }): JSX.Element {
       scrollEnabled={true}
     >
       <View style={registerStyle.registerContainer}>
-        {show && (
-          <DateTimePicker
-            maximumDate={currentDateMoreThan18}
-            testID="dateTimePicker"
-            value={currentDateMoreThan18}
-            mode={"date"}
-            display="default"
-            onChange={onChangeDateInput}
-          />
-        )}
+        <DateTimePickerModal
+          maximumDate={currentDateMoreThan18}
+          testID="dateTimePicker"
+          date={currentDateMoreThan18}
+          isVisible={show}
+          mode={"date"}
+          display="default"
+          onCancel={() => {
+            setShow(false);
+          }}
+          onConfirm={onChangeDateInput}
+        />
         <View
           style={{
             width: "80%",
@@ -787,7 +790,7 @@ export default function Register({ navigation }): JSX.Element {
               </View>
             </>
           )}
-          <Text style={{ color: "red", paddingHorizontal: 40,paddingTop: 20 }}>
+          <Text style={{ color: "red", paddingHorizontal: 40, paddingTop: 20 }}>
             {errors["SpotifyOrArtist"]}
           </Text>
           <View
