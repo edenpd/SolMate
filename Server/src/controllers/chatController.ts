@@ -160,7 +160,7 @@ export const getChatsByUser = async (req: Request, res: Response) => {
       } else {
 
         // Sort the chats accorcding tot he last message senet.
-        const chatsRes = (chats as IChat[]).sort((prevChat, curChat) => prevChat.Messages.reduce((prev, cur) => prev.msgDate > cur.msgDate ? prev : cur).msgDate.localeCompare(prevChat.Messages.reduce((prev, cur) => prev.msgDate > cur.msgDate ? prev : cur).msgDate ));
+        const chatsRes = (chats as IChat[]).sort((prevChat, curChat) => prevChat.Messages.reduce((prev, cur) => prev.msgDate > cur.msgDate ? prev : cur).msgDate.localeCompare(prevChat.Messages.reduce((prev, cur) => prev.msgDate > cur.msgDate ? prev : cur).msgDate));
         res.status(200).json(chatsRes);
       }
     });
@@ -169,7 +169,7 @@ export const getChatsByUser = async (req: Request, res: Response) => {
 export const getChatsById = async (req: Request, res: Response) => {
   var chatID = req.query.chatId?.toString();
 
-  await Chat.findOne({"_id": chatID})
+  await Chat.findOne({ "_id": chatID })
     .populate("UserId1")
     .populate("UserId2")
     .populate({
@@ -200,6 +200,19 @@ export const deleteChat = async (req: Request, res: Response) => {
     console.log(e);
     res.status(500).send(e);
   }
+};
+
+export const deleteAllChats = async (req: Request, res: Response) => {
+
+  await Chat.deleteMany(
+    {
+
+    },
+  ).then((val) => {
+    res.status(200).json({ message: "Matches were rest and chats were deleted successfuly" });
+  }).catch((err) => {
+    res.status(500).send(err);
+  });
 };
 
 export const deleteChatsOfUser = async (req: Request, res: Response) => {

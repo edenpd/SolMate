@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { CallbackError } from "mongoose";
 import Match, { IMatch, IMatchModel } from "../modules/matchModel";
 import { IChat } from "../modules/chatModel";
-import { addChatAfterMatch } from "../controllers/chatController";
+import { addChatAfterMatch, deleteAllChats } from "../controllers/chatController";
 import { decrypt, spotifyApi } from "../Util/spotifyAccess";
 import User, { IArtist, IUser, IUserModel } from "../modules/userModel";
 import { getUsersDistance } from "../Util/general";
@@ -782,8 +782,8 @@ export const resetMatches = async (req: Request, res: Response) => {
       "Approve1": "waiting",
       "Approve2": "waiting"
     }
-  ).then((val) => {
-    res.status(200).json({ message: "All Matches were reset successfuly" });
+  ).then(async (val) => {
+    await deleteAllChats(req, res);
   }).catch((err) => {
     res.status(500).send(err);
   });
