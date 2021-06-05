@@ -40,7 +40,6 @@ export const startServer = async () => {
   // schedule
   var CronJob = require("cron").CronJob;
   var cronJob1 = new CronJob({
-    // cronTime: "00 14 18 * * * ",
     cronTime: "00 59 23 * * * ",
     onTick: function () {
       //Your code that is to be executed on every midnight
