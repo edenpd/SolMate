@@ -72,7 +72,7 @@ export default function App({ navigation }) {
       // For usage in managed apps using the proxy
       redirectUri: makeRedirectUri({
         // For usage in bare and standalone
-        native: `solmate://`,
+        native: `exp://${EXPO_ADDRESS}:${EXPO_PORT}`,
       }),
     },
     discovery
