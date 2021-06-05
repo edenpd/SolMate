@@ -7,34 +7,14 @@ import {
   Alert,
   TouchableOpacity,
 } from "react-native";
-import {
-  ActivityIndicator,
-  Avatar,
-  TextInput,
-  Button,
-} from "react-native-paper";
-import {
-  CheckBox,
-  Image,
-  SearchBar,
-  Input,
-  Divider,
-  ListItem,
-} from "react-native-elements";
+import { ActivityIndicator, Button } from "react-native-paper";
+import { CheckBox, Image, Input } from "react-native-elements";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import useDate, { LOCALE } from "../hooks/useDate";
 import { SERVER_ADDRESS, SERVER_PORT } from "@env";
 import axios from "axios";
-import useToken from "../hooks/useToken";
-
-import {
-  FieldsContainer,
-  FormGroup,
-  //Input,
-  Label,
-} from "react-native-clean-form";
+import { Label } from "react-native-clean-form";
 import * as ImagePicker from "expo-image-picker";
-
 import RangeSlider from "rn-range-slider";
 import Thumb from "../components/RangeSlider/Thumb";
 import Rail from "../components/RangeSlider/Rail";
@@ -44,10 +24,6 @@ import { userContext } from "../contexts/userContext";
 import { tokenContext } from "../contexts/tokenContext";
 import { IUser } from "../util/Types";
 import { Container } from "../styles/ChatStyles";
-//import { ListItem } from "react-native-elements/dist/list/ListItem";
-import { black } from "react-native-paper/lib/typescript/styles/colors";
-import { Tile } from "react-native-elements/dist/tile/Tile";
-import { NavigationContainer } from "@react-navigation/native";
 
 const settings = StyleSheet.create({
   userImage: {
@@ -116,6 +92,36 @@ const settings = StyleSheet.create({
     alignItems: "center",
     flexWrap: "wrap",
   },
+  SpotifyButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#1ed65f",
+    opacity: 0.3,
+    alignSelf: "center",
+    paddingHorizontal: 10,
+    justifyContent: "space-between",
+    width: 300,
+    borderColor: "#fff",
+    height: 50,
+    borderRadius: 50,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 6,
+    },
+    shadowOpacity: 0.37,
+    shadowRadius: 7.49,
+    elevation: 12,
+    margin: 5,
+  },
+  buttonImageIconStyle: {
+    marginRight: 18,
+    height: 30,
+    width: 30,
+    backgroundColor: "transparent",
+    alignSelf: "center",
+    borderRadius: 200,
+  },
 });
 
 const SettingsRout = () => {
@@ -127,7 +133,7 @@ const SettingsRout = () => {
   const renderRailSelected = useCallback(() => <RailSelected />, []);
   const renderLabel = useCallback((value) => <Label text={value} />, []);
   const renderNotch = useCallback(() => <Notch />, []);
-  const [user, setUser] = useState();
+  //const [user, setUser] = useState();
   const { state } = useContext(userContext);
   const [formData, setFormData] = useState<IUser>();
   const [isLoading, setIsLoading] = useState(true);
@@ -136,6 +142,7 @@ const SettingsRout = () => {
   const [mediaArr, setMediaArr] = useState([]);
   const [errors, setErrors] = useState({});
   const { token } = useContext(tokenContext);
+  const [useSpotify, setUseSpotify] = useState(false);
 
   useEffect(() => {
     const loadUser = async () => {
@@ -155,6 +162,10 @@ const SettingsRout = () => {
       )
       .then((res) => {
         setFormData(res.data.user);
+        if (res.data.user.Artists.length === 0) {
+          setUseSpotify(true);
+        }
+
         setIsLoading(false);
       })
       .catch((err) => {
@@ -216,14 +227,8 @@ const SettingsRout = () => {
           headers: { "Content-Type": "application/json" },
         })
         .then(async (response) => {
-          //console.log(res);
-          // Alert.alert("Success", "Changes Saved Successfully", [
-          //   { text: "OK", onPress: () => console.log("OK Pressed") },
-          // ]);
           dispatch({ type: "SET_USER", payload: response.data.user });
-          console.log(state.user);
 
-          // dispatchToken({ type: "SET_TOKEN", payload: response.data.token });
           if (image != null) {
             await uploadPic({
               email: response.data.user.email,
@@ -246,8 +251,6 @@ const SettingsRout = () => {
             { text: "OK", onPress: () => console.log("OK Pressed") },
           ]);
           setIsLoading(true);
-          //fetchUser();
-          //renderMedia();
         })
         .catch((err) => {
           Alert.alert("Error", "error", [
@@ -409,7 +412,6 @@ const SettingsRout = () => {
       }
     }
     setMediaArr(mediaDOM);
-    //return mediaDOM;
   };
 
   var currentDateMoreThan18 = new Date();
@@ -484,14 +486,12 @@ const SettingsRout = () => {
                 onChangeText={(value) => handleChange("email", value)}
                 errorMessage={errors["email"]}
               />
-
               <Input
                 label='Birthday'
                 value={date.toLocaleDateString(LOCALE)}
                 onTouchStart={showDatepicker}
                 errorMessage={errors["birthday"]}
               />
-
               {show && (
                 <DateTimePicker
                   maximumDate={currentDateMoreThan18}
@@ -660,6 +660,26 @@ const SettingsRout = () => {
                 </ScrollView>
                 <Button onPress={pickMedia}>Upload Media</Button>
               </View>
+              <View>
+                {useSpotify ? (
+                  <View>
+                    <TouchableOpacity>
+                      <Text>change to connect without spotify</Text>
+                    </TouchableOpacity>
+                  </View>
+                ) : (
+                  <View>
+                    <TouchableOpacity style={settings.SpotifyButton}>
+                      <Text>Use Spotify</Text>
+                      <Image
+                        source={require("../assets/spotify-logo-black.png")}
+                        containerStyle={settings.buttonImageIconStyle}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                )}
+              </View>
+              <View>{!useSpotify && <Button>change artists</Button>}</View>
               <View
                 style={{
                   marginVertical: 10,
