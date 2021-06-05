@@ -187,8 +187,9 @@ export default function Register({ navigation }): JSX.Element {
       errors["acceptTerms"] = "Please accept our terms to register.";
     }
 
-    if (!checkedArtistList[1] && !response ) {
-      errors["SpotifyOrArtist"] = "Please connect to spotify or Choose your favorite artists"
+    if (!checkedArtistList[1] && !response) {
+      errors["SpotifyOrArtist"] =
+        "Please connect to spotify or Choose your favorite artists";
     }
 
     if (
@@ -406,6 +407,7 @@ export default function Register({ navigation }): JSX.Element {
       <View style={registerStyle.registerContainer}>
         {show && (
           <DateTimePicker
+            style={{ width: "100%", flex: 1 }}
             maximumDate={currentDateMoreThan18}
             testID="dateTimePicker"
             value={currentDateMoreThan18}
@@ -787,7 +789,7 @@ export default function Register({ navigation }): JSX.Element {
               </View>
             </>
           )}
-          <Text style={{ color: "red", paddingHorizontal: 40,paddingTop: 20 }}>
+          <Text style={{ color: "red", paddingHorizontal: 40, paddingTop: 20 }}>
             {errors["SpotifyOrArtist"]}
           </Text>
           <View

@@ -21,6 +21,7 @@ const ProfileRoute = (props) => {
   }, []);
 
   const getUser = async () => {
+    console.log("RENDER");
     if (userId === undefined) {
       if (props.route.params === undefined) {
         userId = state.user._id;
@@ -46,7 +47,7 @@ const ProfileRoute = (props) => {
   return (
     <Container>
       {isLoading ? (
-        <ActivityIndicator size='small' color='#dee2ff' />
+        <ActivityIndicator size="small" color="#dee2ff" />
       ) : (
         <View>{<Profile user={user} />}</View>
       )}

@@ -7,6 +7,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Modal,
+  RefreshControl,
 } from "react-native";
 import {
   Paragraph,
@@ -31,6 +32,19 @@ const Profile = (props) => {
   const [index, setIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const [image, setImage] = useState();
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  useEffect(() => {
+    return () => {
+      console.log("end");
+    };
+  }, []);
+  // returned function will be called on component unmount return () => { window.removeEventListener('mousemove', () => {}) } }, [])
+
+  useEffect(() => {
+    console.log("begin", props.user);
+    setRefreshing(true);
+  }, [props.user]);
 
   const styles = StyleSheet.create({
     root: {
@@ -218,14 +232,14 @@ const Profile = (props) => {
       <View style={styles.tabs}>
         <Button
           style={styles.button}
-          mode='contained'
+          mode="contained"
           onPress={() => setIndex(0)}
         >
           Top Artists
         </Button>
         <Button
           style={styles.button}
-          mode='contained'
+          mode="contained"
           onPress={() => setIndex(1)}
         >
           Media
