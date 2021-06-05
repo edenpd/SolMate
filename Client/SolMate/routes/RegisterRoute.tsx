@@ -411,7 +411,7 @@ export default function Register({ navigation }): JSX.Element {
           date={currentDateMoreThan18}
           isVisible={show}
           mode={"date"}
-          display="default"
+          display="spinner"
           onCancel={() => {
             setShow(false);
           }}
