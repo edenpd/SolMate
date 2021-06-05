@@ -6,6 +6,7 @@ import {
   ScrollView,
   Alert,
   TouchableOpacity,
+  DevSettings,
 } from "react-native";
 import {
   ActivityIndicator,
@@ -48,6 +49,7 @@ import { Container } from "../styles/ChatStyles";
 import { black } from "react-native-paper/lib/typescript/styles/colors";
 import { Tile } from "react-native-elements/dist/tile/Tile";
 import { NavigationContainer } from "@react-navigation/native";
+import { Restart } from 'fiction-expo-restart';
 
 const settings = StyleSheet.create({
   userImage: {
@@ -678,6 +680,8 @@ const SettingsRout = () => {
                   onPress={() => {
                     dispatchToken({ type: "LOGOUT" });
                     dispatch({ type: "LOGOUT" });
+                    // DevSettings.reload();
+                    Restart();
                   }}
                   style={settings.logOutButton}
                   mode='contained'
