@@ -69,7 +69,7 @@ const Chat = (props) => {
         })));
 
         setMessages(newMsg);
-        setOtherUser(chat.UserId1 === user._id ? chat.UserId1 : chat.UserId2);
+        setOtherUser(chat.UserId1 === user._id ? chat.UserId2 : chat.UserId1);
     }, [chat]);
 
     useEffect(() => {
