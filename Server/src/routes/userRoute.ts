@@ -30,7 +30,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 5000000 },
+  limits: { fileSize: 50000000 },
 }).single("myImage");
 
 const router = Router();

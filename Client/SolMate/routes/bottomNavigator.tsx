@@ -1,7 +1,10 @@
 import { StatusBar } from "expo-status-bar";
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { StyleSheet, Text, View, Dimensions, BackHandler } from "react-native";
-import { BottomNavigation, Appbar } from "react-native-paper";
+// import { BottomNavigation, Appbar } from "react-native-paper";
+import BottomNavigation, {
+  FullTab,
+} from "react-native-material-bottom-navigation";
 import ChatRoute from "../routes/ChatRoute";
 import EventsRoute from "../routes/EventsRoute";
 import ProfileRoute from "../routes/ProfileRoute";
@@ -29,6 +32,7 @@ import {
 } from "expo-auth-session";
 import { EXPO_ADDRESS, EXPO_PORT } from "@env";
 import { userContext } from "../contexts/userContext";
+import { Icon } from "react-native-elements";
 
 const customFonts = {
   Poppins_100Thin,
@@ -42,15 +46,76 @@ WebBrowser.maybeCompleteAuthSession();
 export default function App({ navigation }) {
   const [index, setIndex] = React.useState(0);
   const { token } = useContext(tokenContext);
-  const [routes] = React.useState([
-    { key: "matches", title: "Matches", icon: "account-multiple" },
-    { key: "events", title: "Events", icon: "calendar-blank" },
-    { key: "chat", title: "Chat", icon: "chat" },
-    { key: "profile", title: "Profile", icon: "account" },
-    { key: "setting", title: "Setting", icon: "cog" },
-  ]);
-
+  const [activeTab, setActiveTab] = useState<number | string>("matches");
   // the same as Font.loadAsync , the hook returns  true | error
+
+  const renderPage = (key: string | number) => {
+    switch (key) {
+      case "matches":
+        return <MatchesRoute></MatchesRoute>;
+      case "events":
+        return <EventsRoute></EventsRoute>;
+      case "chat":
+        return <ChatRoute></ChatRoute>;
+      case "profile":
+        return <ProfileRoute></ProfileRoute>;
+      case "setting":
+        return <SettingRoute></SettingRoute>;
+    }
+  };
+
+  const tabs = [
+    {
+      key: "matches",
+      icon: "gamepad-variant",
+      label: "matches",
+      barColor: "#388E3C",
+      pressColor: "rgba(255, 255, 255, 0.16)",
+    },
+    {
+      key: "events",
+      icon: "movie",
+      label: "events",
+      barColor: "#B71C1C",
+      pressColor: "rgba(255, 255, 255, 0.16)",
+    },
+    {
+      key: "chat",
+      icon: "music-note",
+      label: "chat",
+      barColor: "#E64A19",
+      pressColor: "rgba(255, 255, 255, 0.16)",
+    },
+    {
+      key: "profile",
+      icon: "music-note",
+      label: "profile",
+      barColor: "#E64A19",
+      pressColor: "rgba(255, 255, 255, 0.16)",
+    },
+    {
+      key: "setting",
+      icon: "music-note",
+      label: "setting",
+      barColor: "#E64A19",
+      pressColor: "rgba(255, 255, 255, 0.16)",
+    },
+  ];
+
+  const renderIcon =
+    (icon) =>
+    ({ isActive }) =>
+      <Icon size={24} color="white" name={icon} />;
+
+  const renderTab = ({ tab, isActive }) => (
+    <FullTab
+      isActive={isActive}
+      key={tab.key}
+      label={tab.label}
+      renderIcon={renderIcon(tab.icon)}
+    />
+  );
+
   const [isLoaded] = useFonts(customFonts);
   const discovery = {
     authorizationEndpoint: "https://accounts.spotify.com/authorize",
@@ -86,13 +151,13 @@ export default function App({ navigation }) {
     BackHandler.addEventListener("hardwareBackPress", handleBackButton);
   }, []);
 
-  const renderScene = BottomNavigation.SceneMap({
-    matches: MatchesRoute,
-    events: EventsRoute,
-    chat: ChatRoute,
-    profile: ProfileRoute,
-    setting: SettingRoute,
-  });
+  // const renderScene = BottomNavigation.SceneMap({
+  //   matches: MatchesRoute,
+  //   events: EventsRoute,
+  //   chat: ChatRoute,
+  //   profile: ProfileRoute,
+  //   setting: SettingRoute,
+  // });
 
   const navigationStyle = {
     backgroundColor: "white",
@@ -159,12 +224,12 @@ export default function App({ navigation }) {
           style={styles.logoImage}
         />
       </View>
+      <View style={{ flex: 1 }}>{renderPage(activeTab)}</View>
       <BottomNavigation
-        activeColor={"#8860D0"}
-        barStyle={navigationStyle}
-        navigationState={{ index, routes }}
-        onIndexChange={setIndex}
-        renderScene={renderScene}
+        activeTab={activeTab}
+        onTabPress={(newTab) => setActiveTab(newTab.key)}
+        renderTab={renderTab}
+        tabs={tabs}
       />
     </View>
   );
