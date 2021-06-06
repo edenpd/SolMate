@@ -6,10 +6,19 @@ import {
   ScrollView,
   Alert,
   TouchableOpacity,
+  FlatList,
 } from "react-native";
 import { ActivityIndicator, Button } from "react-native-paper";
-import { CheckBox, Image, Input } from "react-native-elements";
-import DateTimePicker from "@react-native-community/datetimepicker";
+import {
+  CheckBox,
+  Image,
+  Input,
+  ListItem,
+  Avatar,
+  SearchBar,
+  Divider,
+} from "react-native-elements";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 import useDate, { LOCALE } from "../hooks/useDate";
 import {
   SERVER_ADDRESS,
@@ -91,6 +100,7 @@ const settings = StyleSheet.create({
     flexWrap: "wrap",
   },
   SpotifyButton: {
+    marginTop: 20,
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#1ed65f",
@@ -98,7 +108,7 @@ const settings = StyleSheet.create({
     alignSelf: "center",
     paddingHorizontal: 10,
     justifyContent: "space-between",
-    width: 300,
+    width: 250,
     borderColor: "#fff",
     height: 50,
     borderRadius: 50,
@@ -111,6 +121,11 @@ const settings = StyleSheet.create({
     shadowRadius: 7.49,
     elevation: 12,
     margin: 5,
+  },
+  noSpotifyButton: {
+    fontFamily: "Poppins_500Medium_Italic",
+    fontSize: 17,
+    marginTop: 20,
   },
   buttonImageIconStyle: {
     marginRight: 18,
@@ -161,7 +176,13 @@ const SettingsRout = () => {
   const [errors, setErrors] = useState({});
   const { token } = useContext(tokenContext);
   const [useSpotify, setUseSpotify] = useState(false);
+  const [artistList, setArtistList] = useState([]);
+  const [checkedArtistList, setCheckedArtistList] = useState([
+    { id: "", name: "", images: [{ url: "" }] },
+  ]);
+  const [search, setSearch] = useState("");
 
+  // connect to spotify functions
   WebBrowser.maybeCompleteAuthSession();
 
   // Endpoint
@@ -191,6 +212,73 @@ const SettingsRout = () => {
     },
     discovery
   );
+
+  // Artists Search functions
+  const updateSearch = async (search) => {
+    setSearch(search);
+    if (search !== "") {
+      await axios
+        .post(
+          `${SERVER_ADDRESS}:${SERVER_PORT}/spotify/search/artist`,
+          { artistName: search },
+          {
+            headers: { "Content-Type": "application/json" },
+          }
+        )
+        .then((response) => {
+          setArtistList(response.data.items);
+        })
+        .catch((err) => {
+          Alert.alert(JSON.stringify(err));
+        });
+    } else {
+      setArtistList([]);
+    }
+  };
+
+  const updateChecked = (item) => {
+    if (checkedArtistList.find((x) => x.id == item.id) == undefined) {
+      setCheckedArtistList((state) => {
+        return [...state, item];
+      });
+    } else {
+      setCheckedArtistList((state) =>
+        state.filter((item2) => item2.id !== item.id)
+      );
+    }
+  };
+
+  const keyExtractor = (item, index) => index.toString();
+
+  const renderItem = ({ item }) => {
+    if (item && item.images && item.name) {
+      return (
+        <ListItem
+          bottomDivider
+          containerStyle={{
+            borderRadius: 20,
+            backgroundColor: "#333333",
+          }}
+        >
+          <CheckBox
+            onPress={() => updateChecked(item)}
+            checkedColor={"purple"}
+            checked={
+              checkedArtistList.find((x) => x.id == item.id) ? true : false
+            }
+          />
+          {item.images[0] && (
+            <Avatar rounded source={{ uri: item.images[0].url }} />
+          )}
+          <ListItem.Content>
+            <ListItem.Title style={{ color: "white", fontWeight: "bold" }}>
+              {item.name}
+            </ListItem.Title>
+          </ListItem.Content>
+        </ListItem>
+      );
+    }
+  };
 
   useEffect(() => {
     const loadUser = async () => {
@@ -270,6 +358,18 @@ const SettingsRout = () => {
 
   const onSave = async () => {
     if (validate()) {
+      console.log(checkedArtistList + " " + search + " " + artistList);
+
+      if (checkedArtistList.length > 0) formData.Artists = [];
+      for (var i = 0; i < checkedArtistList.length; i++) {
+        if (checkedArtistList[i].id) {
+          formData.Artists.push({
+            id: checkedArtistList[i].id,
+            name: checkedArtistList[i].name,
+            images: checkedArtistList[i].images,
+          });
+        }
+      }
       await axios
         .put(`${SERVER_ADDRESS}:${SERVER_PORT}/user`, formData, {
           headers: { "Content-Type": "application/json" },
@@ -316,10 +416,10 @@ const SettingsRout = () => {
     });
   };
 
-  const onChangeDateInput = (event, selectedDate) => {
+  const onChangeDateInput = (selectedDate) => {
     const currentDate = selectedDate || date;
     setShow(false);
-    onChangeDate(event, currentDate);
+    onChangeDate(currentDate);
     setFormData((prevstate) => {
       return {
         ...prevstate,
@@ -328,6 +428,7 @@ const SettingsRout = () => {
     });
   };
 
+  // Media functions
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -537,13 +638,17 @@ const SettingsRout = () => {
                 errorMessage={errors["birthday"]}
               />
               {show && (
-                <DateTimePicker
+                <DateTimePickerModal
                   maximumDate={currentDateMoreThan18}
                   testID='dateTimePicker'
-                  value={currentDateMoreThan18}
+                  date={currentDateMoreThan18}
+                  isVisible={show}
                   mode={"date"}
-                  display='default'
-                  onChange={onChangeDateInput}
+                  display='spinner'
+                  onCancel={() => {
+                    setShow(false);
+                  }}
+                  onConfirm={onChangeDateInput}
                 />
               )}
               <Text
@@ -680,6 +785,7 @@ const SettingsRout = () => {
                   onValueChanged={handleValueChange}
                 />
               </View>
+              <Divider style={{ backgroundColor: "#8860D0", width: "100%" }} />
               <View
                 style={{
                   marginVertical: 10,
@@ -704,15 +810,19 @@ const SettingsRout = () => {
                 </ScrollView>
                 <Button onPress={pickMedia}>Upload Media</Button>
               </View>
+              <Divider style={{ backgroundColor: "#8860D0", width: "100%" }} />
               <View>
                 {useSpotify ? (
                   <View>
                     <TouchableOpacity
                       onPress={() => {
                         formData.connectWithoutSpotify = true;
+                        setUseSpotify(false);
                       }}
                     >
-                      <Text>change to connect without spotify</Text>
+                      <Text style={settings.noSpotifyButton}>
+                        connect without spotify
+                      </Text>
                     </TouchableOpacity>
                   </View>
                 ) : (
@@ -757,7 +867,7 @@ const SettingsRout = () => {
                         formData.connectSpotify = true;
                       }}
                     >
-                      <Text>Use Spotify</Text>
+                      <Text style={settings.noSpotifyButton}>Use Spotify</Text>
                       <Image
                         source={require("../assets/spotify-logo-black.png")}
                         containerStyle={settings.buttonImageIconStyle}
@@ -766,12 +876,64 @@ const SettingsRout = () => {
                   </View>
                 )}
               </View>
-              <View>{!useSpotify && <Button>change artists</Button>}</View>
+              <View>
+                {!useSpotify && (
+                  <View style={{ padding: 20 }}>
+                    <Text
+                      style={{
+                        alignSelf: "flex-start",
+                        fontSize: 17,
+                        color: "#333333",
+                        marginTop: 20,
+                      }}
+                    >
+                      Change Favorite Artists:
+                    </Text>
+                    <SearchBar
+                      platform='default'
+                      inputContainerStyle={{
+                        borderRadius: 40,
+                        backgroundColor: "#333333",
+                        width: 300,
+                        height: 50,
+                      }}
+                      inputStyle={{
+                        borderRadius: 20,
+                      }}
+                      containerStyle={{
+                        borderRadius: 20,
+                        backgroundColor: "#333333",
+                        marginTop: 20,
+                      }}
+                      onChangeText={updateSearch}
+                      value={search}
+                    />
+                    <View
+                      style={{
+                        width: "100%",
+                      }}
+                    >
+                      <FlatList
+                        keyExtractor={keyExtractor}
+                        data={checkedArtistList.concat(
+                          artistList.filter(
+                            (item) =>
+                              !checkedArtistList.find((x) => x.id == item.id)
+                          )
+                        )}
+                        renderItem={renderItem}
+                      />
+                    </View>
+                  </View>
+                )}
+              </View>
+
               <View
                 style={{
                   marginVertical: 10,
                   width: "100%",
                   alignSelf: "center",
+                  marginTop: 30,
                 }}
               >
                 <Button
