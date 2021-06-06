@@ -29,9 +29,10 @@ import {
   SPOTIFY_CLIENT_ID,
 } from "@env";
 import axios from "axios";
-import { Label } from "react-native-clean-form";
+//import { Label } from "react-native-clean-form";
 import * as ImagePicker from "expo-image-picker";
 import RangeSlider from "rn-range-slider";
+import Label from "../components/RangeSlider/Label";
 import Thumb from "../components/RangeSlider/Thumb";
 import Rail from "../components/RangeSlider/Rail";
 import RailSelected from "../components/RangeSlider/RailSelected";
@@ -65,9 +66,8 @@ const settings = StyleSheet.create({
     fontSize: 12,
   },
   SettingsContainer: {
-    width: "100%",
+    width: "92%",
     color: "#fff",
-
     alignItems: "center",
     alignContent: "center",
     display: "flex",
@@ -108,7 +108,7 @@ const settings = StyleSheet.create({
     alignSelf: "center",
     paddingHorizontal: 10,
     justifyContent: "space-between",
-    width: 250,
+    width: 280,
     borderColor: "#fff",
     height: 50,
     borderRadius: 50,
@@ -125,7 +125,7 @@ const settings = StyleSheet.create({
   noSpotifyButton: {
     fontFamily: "Poppins_500Medium_Italic",
     fontSize: 17,
-    marginTop: 20,
+    marginTop: 10,
   },
   buttonImageIconStyle: {
     marginRight: 18,
@@ -867,7 +867,9 @@ const SettingsRout = () => {
                         formData.connectSpotify = true;
                       }}
                     >
-                      <Text style={settings.noSpotifyButton}>Use Spotify</Text>
+                      <Text style={settings.noSpotifyButton}>
+                        connect with Spotify
+                      </Text>
                       <Image
                         source={require("../assets/spotify-logo-black.png")}
                         containerStyle={settings.buttonImageIconStyle}
@@ -881,9 +883,12 @@ const SettingsRout = () => {
                   <View style={{ padding: 20 }}>
                     <Text
                       style={{
-                        alignSelf: "flex-start",
+                        width: "77%",
+                        //alignSelf: "center",
+                        textAlign: "left",
+                        color: "#87949f",
+                        fontWeight: "bold",
                         fontSize: 17,
-                        color: "#333333",
                         marginTop: 20,
                       }}
                     >

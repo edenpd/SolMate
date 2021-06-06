@@ -128,7 +128,7 @@ export const getMatchesById = async (req: Request, res: Response) => {
 
           for (let i = 0; i < matches.length; i++) {
             const otherUser =
-              matches[i].firstUser._id === userID
+              matches[i].firstUser._id.toString() === userID
                 ? matches[i]._doc.secondUser
                 : matches[i]._doc.firstUser;
 
