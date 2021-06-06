@@ -164,10 +164,10 @@ export default function LoginRoute({ navigation }) {
       >
         <Image
           style={{
-            width: "40%",
+            width: "30%",
             height: undefined,
             aspectRatio: 1,
-            marginHorizontal: "1%",
+            marginHorizontal: "3%",
           }}
           source={require("../assets/giphy.gif")}
         />

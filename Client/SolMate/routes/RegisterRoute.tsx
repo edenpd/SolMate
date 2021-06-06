@@ -431,27 +431,50 @@ export default function Register({ navigation }): JSX.Element {
             style={{
               borderRadius: 30,
             }}
-            disabled={image}
             onPress={pickImage}
           >
             <View
               style={{
-                alignItems: "center",
-                justifyContent: "center",
+                flexDirection: "row",
                 marginVertical: 20,
+                display: "flex",
+                alignItems: "center",
               }}
             >
               {image && (
                 <Image
                   source={{ uri: image }}
-                  style={{ width: 200, height: 200, borderRadius: 100 }}
-                />
+                  style={{
+                    width: 200,
+                    height: 200,
+                    borderRadius: 100,
+                    alignItems: "flex-end",
+                    justifyContent: "flex-end",
+                    display: "flex",
+                  }}
+                >
+                  <Image
+                    source={require("../assets/plus.png")}
+                    style={{ width: 50, height: 50 }}
+                  />
+                </Image>
               )}
               {!image && (
                 <Image
-                  source={require("../assets/user-icon.png")}
-                  style={{ width: 200, height: 200 }}
-                />
+                  source={require("../assets/user-icon-no-plus.png")}
+                  style={{
+                    width: 200,
+                    height: 200,
+                    alignItems: "flex-end",
+                    justifyContent: "flex-end",
+                    display: "flex",
+                  }}
+                >
+                  <Image
+                    source={require("../assets/plus.png")}
+                    style={{ width: 50, height: 50 }}
+                  />
+                </Image>
               )}
             </View>
           </TouchableOpacity>
