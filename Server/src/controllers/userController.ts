@@ -31,7 +31,7 @@ export const registerUser = async (req: Request, res: Response) => {
   var userBody: IUser = req.body;
   console.log(userBody.Artists);
   const user = await User.create({
-    email: userBody.email,
+    email: userBody.email.toLocaleLowerCase(),
     password: hashedPassword,
     iv: iv.toString("hex"),
     spotifyAccessToken: encryptedAccessToken,
@@ -56,11 +56,11 @@ export const registerUser = async (req: Request, res: Response) => {
     location: userBody.location,
   });
 
-  const token = jwt.sign({ email: userBody.email }, config.secret, {
+  const token = jwt.sign({ email: userBody.email.toLocaleLowerCase() }, config.secret, {
     expiresIn: 86400, // expires in 24 hours
   });
 
-  MatchAlgorithm(userBody.email);
+  MatchAlgorithm(userBody.email.toLocaleLowerCase());
   console.log("register end!!!!");
 
   res.status(200).send({ token: token, user: user });
@@ -82,7 +82,7 @@ export const authenticateUser = (
       if (!user) {
         return res.status(401).json({ status: "error", code: "unauthorized" });
       } else {
-        const token = jwt.sign({ email: user.email }, config.secret);
+        const token = jwt.sign({ email: user.email.toLocaleLowerCase() }, config.secret);
         res.status(200).send({ user: user, token: token });
       }
     }
@@ -90,7 +90,7 @@ export const authenticateUser = (
 };
 
 export const uploadMedia = async (req: Request, res: Response) => {
-  const userId = req.body.userId;
+  const userId = req.body.userId.toLocaleLowerCase();
   const pic = req.file.filename;
   console.log("try", pic, userId);
   await User.updateOne(
@@ -114,7 +114,7 @@ export const uploadProfile = async (req: Request, res: Response) => {
   // const userId = req.body._id;
   // const picture = req.body.picture;
   const pic = req.body.myImage;
-  const userEmail = req.body.userId;
+  const userEmail = req.body.userId.toLocaleLowerCase();
   console.log("here", req, req.file, req.body);
   await User.updateOne(
     {
@@ -142,7 +142,7 @@ export const uploadProfile = async (req: Request, res: Response) => {
 };
 export const updateLocation = async (req: Request, res: Response) => {
   const userId = req.body._id;
-  const email = req.body.email;
+  const email = req.body.email.toLocaleLowerCase();
   const location = req.body.location;
   try {
     await User.updateOne(
@@ -172,7 +172,7 @@ export const updateUser = async (req: Request, res: Response) => {
   const userId = req.body._id;
   const firstName = req.body.firstName;
   const lastName = req.body.lastName;
-  const email = req.body.email;
+  const email = req.body.email.toLocaleLowerCase();
   const Songs = req.body.Songs;
   const description = req.body.description;
   const interestedAgeMin = req.body.interestedAgeMin;
@@ -333,7 +333,7 @@ export const updateUserWithNoResponse = async (req: Request) => {
 };
 
 export const getUserByEmail = async (req: Request, res: Response) => {
-  let userEmail = req.query.UserEmail?.toString();
+  let userEmail = req.query.UserEmail?.toString().toLocaleLowerCase();
   await User.find({ email: userEmail }, (err: CallbackError, user: IUser) => {
     if (err) {
       res.status(500).send(err);
