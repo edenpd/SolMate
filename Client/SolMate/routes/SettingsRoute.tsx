@@ -53,7 +53,7 @@ const settings = StyleSheet.create({
   Title: {
     alignItems: "center",
     alignContent: "center",
-    color: "purple",
+    color: "#8860D0",
     textAlign: "center",
     alignSelf: "center",
     fontSize: 20,
@@ -62,7 +62,7 @@ const settings = StyleSheet.create({
     fontSize: 12,
   },
   label: {
-    color: "purple",
+    color: "#8860D0",
     fontSize: 12,
   },
   SettingsContainer: {
@@ -257,12 +257,14 @@ const SettingsRout = () => {
           bottomDivider
           containerStyle={{
             borderRadius: 20,
-            backgroundColor: "#333333",
+            backgroundColor: "#8860D0",
+            marginBottom: 5,
+            padding: 5
           }}
         >
           <CheckBox
             onPress={() => updateChecked(item)}
-            checkedColor={"purple"}
+            checkedColor={"white"}
             checked={
               checkedArtistList.find((x) => x.id == item.id) ? true : false
             }
@@ -676,7 +678,7 @@ const SettingsRout = () => {
                   title='Male'
                   checkedIcon='dot-circle-o'
                   uncheckedIcon='circle-o'
-                  checkedColor='purple'
+                  checkedColor='#8860D0'
                   checked={formData.sex == 0}
                   onPress={(value) => handleChange("sex", 0)}
                   containerStyle={{
@@ -690,7 +692,7 @@ const SettingsRout = () => {
                   title='Female'
                   checkedIcon='dot-circle-o'
                   uncheckedIcon='circle-o'
-                  checkedColor='purple'
+                  checkedColor='#8860D0'
                   checked={formData.sex == 1}
                   onPress={(value) => handleChange("sex", 1)}
                   containerStyle={{
@@ -725,7 +727,7 @@ const SettingsRout = () => {
                   title='Male'
                   checkedIcon='dot-circle-o'
                   uncheckedIcon='circle-o'
-                  checkedColor='purple'
+                  checkedColor='#8860D0'
                   onPress={(value) => handleChange("interestedSex", 0)}
                   checked={formData.interestedSex == 0}
                   containerStyle={{
@@ -738,7 +740,7 @@ const SettingsRout = () => {
                   title='Female'
                   checkedIcon='dot-circle-o'
                   uncheckedIcon='circle-o'
-                  checkedColor='purple'
+                  checkedColor='#8860D0'
                   checked={formData.interestedSex == 1}
                   onPress={(value) => handleChange("interestedSex", 1)}
                   containerStyle={{
@@ -898,18 +900,21 @@ const SettingsRout = () => {
                       platform='default'
                       inputContainerStyle={{
                         borderRadius: 40,
-                        backgroundColor: "#333333",
+                        backgroundColor: "#8860D0",
                         width: 300,
-                        height: 50,
+                        height: 50
                       }}
                       inputStyle={{
                         borderRadius: 20,
+                        color: 'white'
                       }}
                       containerStyle={{
                         borderRadius: 20,
-                        backgroundColor: "#333333",
-                        marginTop: 20,
+                        backgroundColor: "#8860D0",
+                        marginTop: 20
                       }}
+                      searchIcon={{color: 'white'}}
+                      clearIcon={{color: 'white'}}
                       onChangeText={updateSearch}
                       value={search}
                     />
@@ -927,6 +932,7 @@ const SettingsRout = () => {
                           )
                         )}
                         renderItem={renderItem}
+                        style={{marginTop: 5}}
                       />
                     </View>
                   </View>

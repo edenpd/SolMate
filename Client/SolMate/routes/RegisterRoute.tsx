@@ -375,11 +375,11 @@ export default function Register({ navigation }): JSX.Element {
       return (
         <ListItem
           bottomDivider
-          containerStyle={{ borderRadius: 20, backgroundColor: "#333333" }}
+          containerStyle={{ borderRadius: 20, backgroundColor: "#8860D0", marginBottom: 5, padding: 5 }}
         >
           <CheckBox
             onPress={() => updateChecked(item)}
-            checkedColor={"purple"}
+            checkedColor={"white"}
             checked={
               checkedArtistList.find((x) => x.id == item.id) ? true : false
             }
@@ -542,7 +542,7 @@ export default function Register({ navigation }): JSX.Element {
             title="Male"
             checkedIcon="dot-circle-o"
             uncheckedIcon="circle-o"
-            checkedColor="purple"
+            checkedColor="#8860D0"
             checked={formData.sex == 0}
             onPress={(value) => handleChange("sex", 0)}
             containerStyle={{
@@ -556,7 +556,7 @@ export default function Register({ navigation }): JSX.Element {
             title="Female"
             checkedIcon="dot-circle-o"
             uncheckedIcon="circle-o"
-            checkedColor="purple"
+            checkedColor="#8860D0"
             checked={formData.sex == 1}
             onPress={(value) => handleChange("sex", 1)}
             containerStyle={{
@@ -591,7 +591,7 @@ export default function Register({ navigation }): JSX.Element {
             title="Male"
             checkedIcon="dot-circle-o"
             uncheckedIcon="circle-o"
-            checkedColor="purple"
+            checkedColor="#8860D0"
             onPress={(value) => handleChange("interestedSex", 0)}
             checked={formData.interestedSex == 0}
             containerStyle={{
@@ -604,7 +604,7 @@ export default function Register({ navigation }): JSX.Element {
             title="Female"
             checkedIcon="dot-circle-o"
             uncheckedIcon="circle-o"
-            checkedColor="purple"
+            checkedColor="#8860D0"
             checked={formData.interestedSex == 1}
             onPress={(value) => handleChange("interestedSex", 1)}
             containerStyle={{
@@ -779,25 +779,29 @@ export default function Register({ navigation }): JSX.Element {
                       platform="default"
                       inputContainerStyle={{
                         borderRadius: 40,
-                        backgroundColor: "#333333",
+                        backgroundColor: "#8860D0",
                       }}
                       inputStyle={{
                         borderRadius: 20,
+                        color: 'white'
                       }}
                       containerStyle={{
                         borderRadius: 20,
-                        backgroundColor: "#333333",
+                        backgroundColor: "#8860D0",
                         marginTop: 20,
                       }}
+                      searchIcon={{color: 'white'}}
+                      clearIcon={{color: 'white'}}
                       onChangeText={updateSearch}
                       value={search}
                     />
                     <View
                       style={{
-                        width: "100%",
+                        width: "100%"
                       }}
                     >
                       <FlatList
+                        style={{marginTop: 5}}
                         keyExtractor={keyExtractor}
                         data={checkedArtistList.concat(
                           artistList.filter(
@@ -828,7 +832,7 @@ export default function Register({ navigation }): JSX.Element {
           >
             <CheckBox
               onPress={() => setAcceptTerms((prev) => !prev)}
-              checkedColor={"purple"}
+              checkedColor={"#8860D0"}
               containerStyle={{ paddingHorizontal: 0 }}
               checked={acceptTerms}
             />
@@ -849,7 +853,7 @@ export default function Register({ navigation }): JSX.Element {
               loading={isLoading}
               onPress={() => onSubmit()}
               buttonStyle={{
-                backgroundColor: "purple",
+                backgroundColor: "#8860D0",
                 width: "100%",
                 borderRadius: 50,
               }}
