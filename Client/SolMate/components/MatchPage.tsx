@@ -90,7 +90,8 @@ const MatchPage = ({ navigation }) => {
               style={{
                 fontFamily: "Poppins_300Light",
                 color: "#8860D0",
-                marginBottom: 20,
+                // marginBottom: 0,
+                marginTop: 200,
                 fontSize: 25,
                 textAlign: "center",
               }}
