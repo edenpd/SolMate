@@ -102,7 +102,7 @@ const ChatList = ({ navigation }) => {
               fontSize: 25,
             }}
           >
-            no chats yet... waiting for your first match 😍
+            no chats yet... {"\n"}waiting for your first match 😍
           </Text>
         </Container>
       )}
