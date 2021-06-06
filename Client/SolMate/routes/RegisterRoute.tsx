@@ -379,7 +379,7 @@ export default function Register({ navigation }): JSX.Element {
         >
           <CheckBox
             onPress={() => updateChecked(item)}
-            checkedColor={"purple"}
+            checkedColor={"#8860D0"}
             checked={
               checkedArtistList.find((x) => x.id == item.id) ? true : false
             }
@@ -519,7 +519,7 @@ export default function Register({ navigation }): JSX.Element {
             title="Male"
             checkedIcon="dot-circle-o"
             uncheckedIcon="circle-o"
-            checkedColor="purple"
+            checkedColor="#8860D0"
             checked={formData.sex == 0}
             onPress={(value) => handleChange("sex", 0)}
             containerStyle={{
@@ -533,7 +533,7 @@ export default function Register({ navigation }): JSX.Element {
             title="Female"
             checkedIcon="dot-circle-o"
             uncheckedIcon="circle-o"
-            checkedColor="purple"
+            checkedColor="#8860D0"
             checked={formData.sex == 1}
             onPress={(value) => handleChange("sex", 1)}
             containerStyle={{
@@ -568,7 +568,7 @@ export default function Register({ navigation }): JSX.Element {
             title="Male"
             checkedIcon="dot-circle-o"
             uncheckedIcon="circle-o"
-            checkedColor="purple"
+            checkedColor="#8860D0"
             onPress={(value) => handleChange("interestedSex", 0)}
             checked={formData.interestedSex == 0}
             containerStyle={{
@@ -581,7 +581,7 @@ export default function Register({ navigation }): JSX.Element {
             title="Female"
             checkedIcon="dot-circle-o"
             uncheckedIcon="circle-o"
-            checkedColor="purple"
+            checkedColor="#8860D0"
             checked={formData.interestedSex == 1}
             onPress={(value) => handleChange("interestedSex", 1)}
             containerStyle={{
@@ -805,7 +805,7 @@ export default function Register({ navigation }): JSX.Element {
           >
             <CheckBox
               onPress={() => setAcceptTerms((prev) => !prev)}
-              checkedColor={"purple"}
+              checkedColor={"#8860D0"}
               containerStyle={{ paddingHorizontal: 0 }}
               checked={acceptTerms}
             />
@@ -826,7 +826,7 @@ export default function Register({ navigation }): JSX.Element {
               loading={isLoading}
               onPress={() => onSubmit()}
               buttonStyle={{
-                backgroundColor: "purple",
+                backgroundColor: "#8860D0",
                 width: "100%",
                 borderRadius: 50,
               }}
