@@ -285,7 +285,7 @@ const SettingsRout = () => {
   useEffect(() => {
     const loadUser = async () => {
       await fetchUser();
-      renderMedia();
+      // renderMedia();
     };
     loadUser();
   }, [isLoading]);
@@ -712,7 +712,7 @@ const SettingsRout = () => {
                   color: "#87949f",
                 }}
               >
-                Intrested Sex
+                Interested Sex
               </Text>
               <View
                 style={{

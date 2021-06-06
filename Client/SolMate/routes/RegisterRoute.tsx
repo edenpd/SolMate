@@ -576,7 +576,7 @@ export default function Register({ navigation }): JSX.Element {
             color: "#87949f",
           }}
         >
-          Intrested Sex
+          Interested Sex
         </Text>
         <View
           style={{
