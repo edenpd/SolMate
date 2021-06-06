@@ -911,9 +911,10 @@ const SettingsRout = () => {
                       containerStyle={{
                         borderRadius: 20,
                         backgroundColor: "#8860D0",
-                        marginTop: 20,
-                        marginBottom: 5
+                        marginTop: 20
                       }}
+                      searchIcon={{color: 'white'}}
+                      clearIcon={{color: 'white'}}
                       onChangeText={updateSearch}
                       value={search}
                     />
@@ -931,6 +932,7 @@ const SettingsRout = () => {
                           )
                         )}
                         renderItem={renderItem}
+                        style={{marginTop: 5}}
                       />
                     </View>
                   </View>

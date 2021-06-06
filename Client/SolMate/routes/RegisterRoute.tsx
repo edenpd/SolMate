@@ -375,11 +375,11 @@ export default function Register({ navigation }): JSX.Element {
       return (
         <ListItem
           bottomDivider
-          containerStyle={{ borderRadius: 20, backgroundColor: "#333333" }}
+          containerStyle={{ borderRadius: 20, backgroundColor: "#8860D0", marginBottom: 5, padding: 5 }}
         >
           <CheckBox
             onPress={() => updateChecked(item)}
-            checkedColor={"#8860D0"}
+            checkedColor={"white"}
             checked={
               checkedArtistList.find((x) => x.id == item.id) ? true : false
             }
@@ -756,25 +756,29 @@ export default function Register({ navigation }): JSX.Element {
                       platform="default"
                       inputContainerStyle={{
                         borderRadius: 40,
-                        backgroundColor: "#333333",
+                        backgroundColor: "#8860D0",
                       }}
                       inputStyle={{
                         borderRadius: 20,
+                        color: 'white'
                       }}
                       containerStyle={{
                         borderRadius: 20,
-                        backgroundColor: "#333333",
+                        backgroundColor: "#8860D0",
                         marginTop: 20,
                       }}
+                      searchIcon={{color: 'white'}}
+                      clearIcon={{color: 'white'}}
                       onChangeText={updateSearch}
                       value={search}
                     />
                     <View
                       style={{
-                        width: "100%",
+                        width: "100%"
                       }}
                     >
                       <FlatList
+                        style={{marginTop: 5}}
                         keyExtractor={keyExtractor}
                         data={checkedArtistList.concat(
                           artistList.filter(
