@@ -55,7 +55,7 @@ export const encryptTokens = (
   const cipherRefresh = crypto.createCipheriv(algorithm, secretKey, iv);
 
   const encryptedRefToken = Buffer.concat([
-    cipherRefresh.update(spotifyRefreshToken, "utf8"),
+    cipherRefresh.update(spotifyRefreshToken),
     cipherRefresh.final(),
   ]);
 
