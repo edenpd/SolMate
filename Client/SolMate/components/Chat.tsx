@@ -17,7 +17,15 @@ const Chat = (props) => {
     // State Declaration
     const { state } = useContext(userContext);
     const [messages, setMessages] = useState<Array<any>>([]);
-    const [chat, setChat] = useState({ Messages: [] } as IChat);
+    const [chat, setChat] = useState({
+        Messages: [],
+        UserId1: {
+            _id: ""
+        },
+        UserId2: {
+            _id: ""
+        }
+    } as IChat);
     const [recEvents, setRecEvents] = useState([]);
     const [recArtists, setRecArtists] = useState([]);
     const [recAreOpen, setRecAreOpen] = useState(false);
@@ -69,6 +77,8 @@ const Chat = (props) => {
         })));
 
         setMessages(newMsg);
+        console.log("TT");
+        console.log(chat);
         setOtherUser(chat.UserId1._id === user._id ? chat.UserId2 : chat.UserId1);
     }, [chat]);
 
