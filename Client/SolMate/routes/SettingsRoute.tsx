@@ -172,7 +172,7 @@ const SettingsRout = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [image, setImage] = useState(null);
   const [media, setMedia] = useState([]);
-  const [mediaArr, setMediaArr] = useState([]);
+  // const [mediaArr, setMediaArr] = useState([]);
   const [errors, setErrors] = useState({});
   const { token } = useContext(tokenContext);
   const [useSpotify, setUseSpotify] = useState(false);
@@ -285,7 +285,7 @@ const SettingsRout = () => {
   useEffect(() => {
     const loadUser = async () => {
       await fetchUser();
-      renderMedia();
+      // renderMedia();
     };
     loadUser();
   }, [isLoading]);
@@ -530,36 +530,36 @@ const SettingsRout = () => {
       let newMedia = media;
       newMedia.push(result.uri);
       await setMedia(newMedia);
-      renderMedia();
+      // renderMedia();
     }
   };
 
-  const renderMedia = () => {
-    const mediaDOM = [];
+  // const renderMedia = () => {
+  //   const mediaDOM = [];
 
-    for (let i = 0; i < formData.Media.length; i++) {
-      mediaDOM.push(
-        <View key={"media" + i}>
-          <Image
-            style={settings.media}
-            source={{
-              uri: `${SERVER_ADDRESS}:${SERVER_PORT}/static/${formData.Media[i]}`,
-            }}
-          />
-        </View>
-      );
-    }
-    if (media.length !== 0) {
-      for (let i = 0; i < media.length; i++) {
-        mediaDOM.push(
-          <View key={"uploadMedia" + i}>
-            <Image style={settings.media} source={{ uri: media[i] }} />
-          </View>
-        );
-      }
-    }
-    setMediaArr(mediaDOM);
-  };
+  //   for (let i = 0; i < formData.Media.length; i++) {
+  //     mediaDOM.push(
+  //       <View key={"media" + i}>
+  //         <Image
+  //           style={settings.media}
+  //           source={{
+  //             uri: `${SERVER_ADDRESS}:${SERVER_PORT}/static/${formData.Media[i]}`,
+  //           }}
+  //         />
+  //       </View>
+  //     );
+  //   }
+  //   if (media.length !== 0) {
+  //     for (let i = 0; i < media.length; i++) {
+  //       mediaDOM.push(
+  //         <View key={"uploadMedia" + i}>
+  //           <Image style={settings.media} source={{ uri: media[i] }} />
+  //         </View>
+  //       );
+  //     }
+  //   }
+  //   setMediaArr(mediaDOM);
+  // };
 
   var currentDateMoreThan18 = new Date();
   currentDateMoreThan18.setFullYear(new Date().getFullYear() - 18);
@@ -712,7 +712,7 @@ const SettingsRout = () => {
                   color: "#87949f",
                 }}
               >
-                Intrested Sex
+                Interested Sex
               </Text>
               <View
                 style={{
@@ -808,7 +808,19 @@ const SettingsRout = () => {
                   Media
                 </Text>
                 <ScrollView>
-                  <View style={settings.mediaView}>{mediaArr}</View>
+                  {/* <View style={settings.mediaView}>{mediaArr}</View> */}
+                  <FlatList
+                    data={formData.Media}
+                    numColumns={2}
+                    renderItem={({item}) =>
+                      <View key={item}>
+                        <Image
+                          style={settings.media}
+                          source={{
+                            uri: `${SERVER_ADDRESS}:${SERVER_PORT}/static/${item}`,
+                          }}
+                        />
+                      </View>} />
                 </ScrollView>
                 <Button onPress={pickMedia}>Upload Media</Button>
               </View>
@@ -913,8 +925,8 @@ const SettingsRout = () => {
                         backgroundColor: "#8860D0",
                         marginTop: 20
                       }}
-                      searchIcon={{color: 'white'}}
-                      clearIcon={{color: 'white'}}
+                      searchIcon={{ color: 'white' }}
+                      clearIcon={{ color: 'white' }}
                       onChangeText={updateSearch}
                       value={search}
                     />
@@ -932,7 +944,7 @@ const SettingsRout = () => {
                           )
                         )}
                         renderItem={renderItem}
-                        style={{marginTop: 5}}
+                        style={{ marginTop: 5 }}
                       />
                     </View>
                   </View>
