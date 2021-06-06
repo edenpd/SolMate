@@ -6,13 +6,19 @@ import {
   ScrollView,
   Alert,
   TouchableOpacity,
-  DevSettings,
 } from "react-native";
 import { ActivityIndicator, Button } from "react-native-paper";
 import { CheckBox, Image, Input } from "react-native-elements";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import useDate, { LOCALE } from "../hooks/useDate";
-import { SERVER_ADDRESS, SERVER_PORT } from "@env";
+import {
+  SERVER_ADDRESS,
+  SERVER_PORT,
+  EXPO_ADDRESS,
+  EXPO_PORT,
+  SPOTIFY_CLIENT_SECRET,
+  SPOTIFY_CLIENT_ID,
+} from "@env";
 import axios from "axios";
 import { Label } from "react-native-clean-form";
 import * as ImagePicker from "expo-image-picker";
@@ -25,11 +31,10 @@ import { userContext } from "../contexts/userContext";
 import { tokenContext } from "../contexts/tokenContext";
 import { IUser } from "../util/Types";
 import { Container } from "../styles/ChatStyles";
-//import { ListItem } from "react-native-elements/dist/list/ListItem";
-import { black } from "react-native-paper/lib/typescript/styles/colors";
-import { Tile } from "react-native-elements/dist/tile/Tile";
-import { NavigationContainer } from "@react-navigation/native";
 import { Restart } from "fiction-expo-restart";
+import * as WebBrowser from "expo-web-browser";
+import { useAuthRequest, ResponseType } from "expo-auth-session";
+import { encode as btoa } from "base-64";
 
 const settings = StyleSheet.create({
   userImage: {
@@ -51,19 +56,6 @@ const settings = StyleSheet.create({
     fontSize: 12,
   },
   SettingsContainer: {
-    // width: "100%",
-    // color: "#fff",
-    // //paddingTop: 50,
-    // alignItems: "center",
-    // alignContent: "center",
-    // display: "flex",
-    // justifyContent: "center",
-    // flexDirection: "column",
-    // marginTop: 30,
-    // //flexDirection: "row",
-    // //justifyContent: "center",
-    // //alignItems: "center",
-    // flexWrap: "wrap",
     width: "100%",
     color: "#fff",
 
@@ -130,6 +122,26 @@ const settings = StyleSheet.create({
   },
 });
 
+export interface IUserForm {
+  email: string;
+  firstName: string;
+  lastName: string;
+  spotifyAccessToken: string;
+  spotifyRefreshToken: string;
+  expiresIn: number;
+  description: string;
+  sex: number;
+  birthday: Date;
+  picture: string;
+  interestedSex: number;
+  interestedAgeMin: number;
+  interestedAgeMax: number;
+  Artists: Array<Object>;
+  Media: Array<string>;
+  connectSpotify: boolean;
+  connectWithoutSpotify: boolean;
+}
+
 const SettingsRout = () => {
   const { date, show, showDatepicker, onChangeDate, setShow } = useDate();
   const { dispatch } = useContext(userContext);
@@ -141,7 +153,7 @@ const SettingsRout = () => {
   const renderNotch = useCallback(() => <Notch />, []);
   //const [user, setUser] = useState();
   const { state } = useContext(userContext);
-  const [formData, setFormData] = useState<IUser>();
+  const [formData, setFormData] = useState<IUserForm>();
   const [isLoading, setIsLoading] = useState(true);
   const [image, setImage] = useState(null);
   const [media, setMedia] = useState([]);
@@ -149,6 +161,36 @@ const SettingsRout = () => {
   const [errors, setErrors] = useState({});
   const { token } = useContext(tokenContext);
   const [useSpotify, setUseSpotify] = useState(false);
+
+  WebBrowser.maybeCompleteAuthSession();
+
+  // Endpoint
+  const discovery = {
+    authorizationEndpoint: "https://accounts.spotify.com/authorize",
+    tokenEndpoint: "https://accounts.spotify.com/api/token",
+  };
+  const [request, response, promptAsync] = useAuthRequest(
+    {
+      clientId: SPOTIFY_CLIENT_ID,
+      scopes: [
+        "user-read-private",
+        "user-read-email",
+        "user-top-read",
+        "user-read-recently-played",
+        "user-follow-read",
+        "user-library-read",
+        "playlist-modify",
+        "user-read-private",
+      ],
+      // responseType: ResponseType.Token,
+      // In order to follow the "Authorization Code Flow" to fetch token after authorizationEndpoint
+      // this must be set to false
+      usePKCE: false,
+      // For usage in managed apps using the proxy
+      redirectUri: `exp://${EXPO_ADDRESS}:${EXPO_PORT}`,
+    },
+    discovery
+  );
 
   useEffect(() => {
     const loadUser = async () => {
@@ -168,7 +210,7 @@ const SettingsRout = () => {
       )
       .then((res) => {
         setFormData(res.data.user);
-        if (res.data.user.Artists.length === 0) {
+        if (res.data.user.spotifyAccessToken !== "") {
           setUseSpotify(true);
         }
 
@@ -242,8 +284,6 @@ const SettingsRout = () => {
             });
           }
           if (media != []) {
-            console.log("Save Media");
-            console.log(media.length);
             for (let index = 0; index < media.length; index++) {
               await uploadMedia({
                 email: response.data.user.email,
@@ -259,6 +299,8 @@ const SettingsRout = () => {
           setIsLoading(true);
         })
         .catch((err) => {
+          console.log(err);
+
           Alert.alert("Error", "error", [
             { text: "OK", onPress: () => console.log("OK Pressed") },
           ]);
@@ -269,11 +311,9 @@ const SettingsRout = () => {
     setFormData((prevstate) => {
       return {
         ...prevstate,
-        [name]: value as Pick<IUser, keyof IUser>,
+        [name]: value as Pick<IUserForm, keyof IUserForm>,
       };
     });
-    //console.log(formData);
-    // console.log(value);
   };
 
   const onChangeDateInput = (event, selectedDate) => {
@@ -314,7 +354,6 @@ const SettingsRout = () => {
       type,
     });
     formData.append("userId", credentials.email);
-    console.log("hey");
 
     const config = {
       headers: {
@@ -346,7 +385,6 @@ const SettingsRout = () => {
     let type = match ? `image/${match[1]}` : `image`;
 
     formData.append("userId", credentials.email);
-    console.log("hey");
 
     const config = {
       headers: {
@@ -669,13 +707,56 @@ const SettingsRout = () => {
               <View>
                 {useSpotify ? (
                   <View>
-                    <TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => {
+                        formData.connectWithoutSpotify = true;
+                      }}
+                    >
                       <Text>change to connect without spotify</Text>
                     </TouchableOpacity>
                   </View>
                 ) : (
                   <View>
-                    <TouchableOpacity style={settings.SpotifyButton}>
+                    <TouchableOpacity
+                      style={settings.SpotifyButton}
+                      onPress={() => {
+                        promptAsync().then(async (response) => {
+                          if (response) {
+                            if (response?.type === "success") {
+                              const { code } = response.params;
+                              const credsB64 = btoa(
+                                `${SPOTIFY_CLIENT_ID}:${SPOTIFY_CLIENT_SECRET}`
+                              );
+                              const tokenResponse = await fetch(
+                                "https://accounts.spotify.com/api/token",
+                                {
+                                  method: "POST",
+                                  headers: {
+                                    Authorization: `Basic ${credsB64}`,
+                                    "Content-Type":
+                                      "application/x-www-form-urlencoded",
+                                  },
+                                  body: `grant_type=authorization_code&code=${code}&redirect_uri=${`exp://${EXPO_ADDRESS}:${EXPO_PORT}`}`,
+                                }
+                              );
+                              const responseJson = await tokenResponse.json();
+                              // destructure the response and rename the properties to be in camelCase to satisfy my linter ;)
+                              const {
+                                access_token: accessToken,
+                                refresh_token: refreshToken,
+                                expires_in: expiresIn,
+                              } = responseJson;
+
+                              formData.spotifyAccessToken = accessToken;
+                              formData.spotifyRefreshToken = refreshToken;
+                              formData.expiresIn = expiresIn;
+                            }
+                          }
+                        });
+                        setUseSpotify(true);
+                        formData.connectSpotify = true;
+                      }}
+                    >
                       <Text>Use Spotify</Text>
                       <Image
                         source={require("../assets/spotify-logo-black.png")}
