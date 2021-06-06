@@ -15,7 +15,7 @@ export const getUsersDistance = (
       Math.sin(dLon / 2);
   var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   var d = R * c; // Distance in km
-  return d;
+  return d * 10000;
 };
 const deg2rad = (deg: number) => {
   return deg * (Math.PI / 180);
