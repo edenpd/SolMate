@@ -44,6 +44,7 @@ import * as ImagePicker from "expo-image-picker";
 import { encode as btoa } from "base-64";
 import * as Location from "expo-location";
 import * as Permissions from "expo-permissions";
+import Slider from "@react-native-community/slider";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -66,6 +67,7 @@ export interface IUserForm {
   interestedAgeMax: number;
   Artists: Array<Object>;
   location: Object;
+  radiusSearch: number;
 }
 
 export default function Register({ navigation }): JSX.Element {
@@ -104,6 +106,7 @@ export default function Register({ navigation }): JSX.Element {
     interestedAgeMax: 24,
     Artists: [],
     location: "",
+    radiusSearch: 1,
   });
 
   WebBrowser.maybeCompleteAuthSession();
@@ -375,7 +378,12 @@ export default function Register({ navigation }): JSX.Element {
       return (
         <ListItem
           bottomDivider
-          containerStyle={{ borderRadius: 20, backgroundColor: "#8860D0", marginBottom: 5, padding: 5 }}
+          containerStyle={{
+            borderRadius: 20,
+            backgroundColor: "#8860D0",
+            marginBottom: 5,
+            padding: 5,
+          }}
         >
           <CheckBox
             onPress={() => updateChecked(item)}
@@ -651,6 +659,46 @@ export default function Register({ navigation }): JSX.Element {
             onValueChanged={handleValueChange}
           />
         </View>
+        <View
+          style={{
+            width: "100%",
+            flex: 1,
+            margin: 15,
+            alignContent: "center",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Text
+            style={{
+              width: "77%",
+              alignSelf: "center",
+              textAlign: "left",
+              color: "#87949f",
+              fontWeight: "bold",
+              fontSize: 17,
+            }}
+          >
+            What the range of ages you are looking for :
+          </Text>
+          <Slider
+            style={{ width: "80%", marginVertical: 20 }}
+            thumbTintColor="#8860D0"
+            minimumTrackTintColor="#8860D0"
+            minimumValue={0}
+            maximumValue={120}
+            step={1}
+            value={formData.radiusSearch}
+            onValueChange={(value) =>
+              setFormData((prevstate) => {
+                return {
+                  ...prevstate,
+                  radiusSearch: value,
+                };
+              })
+            }
+          />
+        </View>
         <View style={{ marginVertical: 8, width: "100%" }}>
           <TouchableOpacity
             style={[
@@ -783,25 +831,25 @@ export default function Register({ navigation }): JSX.Element {
                       }}
                       inputStyle={{
                         borderRadius: 20,
-                        color: 'white'
+                        color: "white",
                       }}
                       containerStyle={{
                         borderRadius: 20,
                         backgroundColor: "#8860D0",
                         marginTop: 20,
                       }}
-                      searchIcon={{color: 'white'}}
-                      clearIcon={{color: 'white'}}
+                      searchIcon={{ color: "white" }}
+                      clearIcon={{ color: "white" }}
                       onChangeText={updateSearch}
                       value={search}
                     />
                     <View
                       style={{
-                        width: "100%"
+                        width: "100%",
                       }}
                     >
                       <FlatList
-                        style={{marginTop: 5}}
+                        style={{ marginTop: 5 }}
                         keyExtractor={keyExtractor}
                         data={checkedArtistList.concat(
                           artistList.filter(
