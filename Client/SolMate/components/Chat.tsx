@@ -69,7 +69,7 @@ const Chat = (props) => {
         })));
 
         setMessages(newMsg);
-        setOtherUser(chat.UserId1 === user._id ? chat.UserId2 : chat.UserId1);
+        setOtherUser(chat.UserId1._id === user._id ? chat.UserId2 : chat.UserId1);
     }, [chat]);
 
     useEffect(() => {
@@ -332,7 +332,7 @@ const Chat = (props) => {
                 renderSend={renderSend}
                 listViewProps={{ style: { backgroundColor: '#f6f6f6' } }}
                 renderComposer={renderComposer}
-                renderFooter={renderFooter} 
+                renderFooter={renderFooter}
                 renderChatEmpty={renderChatEmpty}
             />
 
