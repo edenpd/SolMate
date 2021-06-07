@@ -45,6 +45,7 @@ import { Restart } from "fiction-expo-restart";
 import * as WebBrowser from "expo-web-browser";
 import { useAuthRequest, ResponseType } from "expo-auth-session";
 import { encode as btoa } from "base-64";
+import Slider from "@react-native-community/slider";
 
 const settings = StyleSheet.create({
   userImage: {
@@ -155,6 +156,7 @@ export interface IUserForm {
   Media: Array<string>;
   connectSpotify: boolean;
   connectWithoutSpotify: boolean;
+  radiusSearch: number;
 }
 
 const SettingsRout = () => {
@@ -789,6 +791,48 @@ const SettingsRout = () => {
                   onValueChanged={handleValueChange}
                 />
               </View>
+              <Divider style={{ backgroundColor: "#8860D0", width: "100%" }} />
+              <View
+                style={{
+                  width: "100%",
+                  flex: 1,
+                  margin: 15,
+                  alignContent: "center",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Text
+                  style={{
+                    width: "77%",
+                    alignSelf: "center",
+                    textAlign: "left",
+                    color: "#87949f",
+                    fontWeight: "bold",
+                    fontSize: 17,
+                  }}
+                >
+                  How far should we search for you?
+          </Text>
+                <Slider
+                  style={{ width: "80%", marginVertical: 20 }}
+                  thumbTintColor="#8860D0"
+                  minimumTrackTintColor="#8860D0"
+                  minimumValue={0}
+                  maximumValue={120}
+                  step={1}
+                  value={formData.radiusSearch}
+                  onValueChange={(value) =>
+                    setFormData((prevstate) => {
+                      return {
+                        ...prevstate,
+                        radiusSearch: value,
+                      };
+                    })
+                  }
+                />
+              </View>
+
               <Divider style={{ backgroundColor: "#8860D0", width: "100%" }} />
               <View
                 style={{
