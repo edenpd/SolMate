@@ -167,11 +167,11 @@ export const getChatsByUser = async (req: Request, res: Response) => {
 
             return prevChat.Messages.reduce((prev, cur) =>
               prev.msgDate > cur.msgDate ? prev : cur)
-                .msgDate.localeCompare(prevChat.Messages
-                  .reduce((prev, cur) =>prev.msgDate > cur.msgDate ? prev : cur
+              .msgDate.localeCompare(prevChat.Messages
+                .reduce((prev, cur) => prev.msgDate > cur.msgDate ? prev : cur
 
-                  ).msgDate)
-                });
+                ).msgDate)
+          });
         res.status(200).json(chatsRes);
       }
     });

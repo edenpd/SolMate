@@ -641,7 +641,7 @@ export default function Register({ navigation }): JSX.Element {
               fontSize: 17,
             }}
           >
-            What the range of ages you are looking for :
+            What agesare you looking for?
           </Text>
           <RangeSlider
             style={{ width: "80%", marginVertical: 20 }}
@@ -679,7 +679,7 @@ export default function Register({ navigation }): JSX.Element {
               fontSize: 17,
             }}
           >
-            What the range of ages you are looking for :
+            How far should we search for you?
           </Text>
           <Slider
             style={{ width: "80%", marginVertical: 20 }}
