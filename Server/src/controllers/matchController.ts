@@ -89,30 +89,40 @@ export const getMatchesById = async (req: Request, res: Response) => {
 
   // Find matches in
   if (userID !== undefined) {
-    Match.find({
-      $or: [
-        {
-          $and: [
-            {
-              firstUser: userID,
-            },
-            {
-              Approve1: "waiting",
-            },
-          ],
-        },
-        {
-          $and: [
-            {
-              secondUser: userID,
-            },
-            {
-              Approve2: "waiting",
-            },
-          ],
-        },
-      ],
-    })
+    Match.find(
+      {
+        $and: [
+          {
+            $or: [
+              {
+                $and: [
+                  {
+                    firstUser: userID,
+                  },
+                  {
+                    Approve1: "waiting",
+                  },
+                ],
+              },
+              {
+                $and: [
+                  {
+                    secondUser: userID,
+                  },
+                  {
+                    Approve2: "waiting",
+                  },
+                ],
+              },
+            ]
+          },
+          {
+            $ne: {
+              grade: 0
+            }
+          }
+        ]
+      })
       .sort({ grade: -1 })
       .limit(50)
       .populate({
@@ -723,9 +733,9 @@ const bothWithSpotify = (
   ) {
     artistsGrade =
       similarArtists /
-        (user1RelatedArtists.length + user2RelatedArtists.length) +
+      (user1RelatedArtists.length + user2RelatedArtists.length) +
       similarFollowArtists /
-        (user1FollowArtists.length + user2FollowArtists.length);
+      (user1FollowArtists.length + user2FollowArtists.length);
   }
 
   // similar album amount
