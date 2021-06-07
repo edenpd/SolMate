@@ -286,7 +286,7 @@ export const updateUserSpotifyToken = async (req: Request, res: Response) => {
         },
       }
     );
-    res.status(200).json("Success");
+    res.status(200).json({ user: req.body });
   } catch (err) {
     res.status(500).json(err);
   }
