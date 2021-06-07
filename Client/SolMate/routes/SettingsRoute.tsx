@@ -181,7 +181,7 @@ const SettingsRout = () => {
     { id: "", name: "", images: [{ url: "" }] },
   ]);
   const [search, setSearch] = useState("");
-
+  const [birthday, setBirthday] = useState(currentDateMoreThan18);
   // connect to spotify functions
   WebBrowser.maybeCompleteAuthSession();
 
@@ -331,6 +331,11 @@ const SettingsRout = () => {
       errors["email"] = "Please enter your email Address.";
     }
 
+    if (formData.connectWithoutSpotify && !checkedArtistList[1]) {
+      isValid = false;
+      errors["SpotifyOrArtist"] = "Please choose your favorite artists";
+    }
+
     if (typeof input["email"] !== "undefined") {
       var pattern = new RegExp(
         /^(("[\w-\s]+")|([\w-]+(?:\.[\w-]+)*)|("[\w-\s]+")([\w-]+(?:\.[\w-]+)*))(@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$)|(@\[?((25[0-5]\.|2[0-4][0-9]\.|1[0-9]{2}\.|[0-9]{1,2}\.))((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){2}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\]?$)/i
@@ -421,6 +426,8 @@ const SettingsRout = () => {
   };
 
   const onChangeDateInput = (selectedDate) => {
+    console.log(selectedDate);
+
     const currentDate = selectedDate || date;
     setShow(false);
     onChangeDate(currentDate);
@@ -910,6 +917,11 @@ const SettingsRout = () => {
                   </View>
                 )}
               </View>
+              <Text
+                style={{ color: "red", paddingHorizontal: 40, paddingTop: 20 }}
+              >
+                {errors["SpotifyOrArtist"]}
+              </Text>
               <View>
                 {!useSpotify && (
                   <View style={{ padding: 20 }}>
