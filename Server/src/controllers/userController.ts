@@ -189,7 +189,8 @@ export const updateUser = async (req: Request, res: Response) => {
   const birthday = req.body.birthday;
   const interestedSex = req.body.interestedSex;
   const Artists = req.body.Artists;
-
+  const connectSpotify = req.body.connectSpotify;
+  const connectWithoutSpotify = req.body.connectWithoutSpotify;
   try {
     const user = await User.updateOne(
       {
@@ -213,23 +214,15 @@ export const updateUser = async (req: Request, res: Response) => {
       }
     );
 
-    if (req.body.spotifyAccessToken) {
+    if (connectSpotify) {
       if (!(await connectToSpotify(req.body))) {
         res.send(500).json("error");
       }
-    } else if (req.body.artists[1]) {
+    } else if (connectWithoutSpotify) {
       if (!(await connectNoSpotify(userId))) {
         res.send(500).json("error");
       }
     }
-    // ).exec((err: CallbackError, user: any) => {
-    //   if (err) {
-    //     res.status(500).json(err);
-    //     console.log(err);
-    //   } else {
-    //     res.status(200).send({ user: req.body });
-    //   }
-    // });
     res.status(200).send({ user: req.body });
   } catch (e) {
     console.log(e);

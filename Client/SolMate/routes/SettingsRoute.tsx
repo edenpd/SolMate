@@ -166,7 +166,6 @@ const SettingsRout = () => {
   const renderRailSelected = useCallback(() => <RailSelected />, []);
   const renderLabel = useCallback((value) => <Label text={value} />, []);
   const renderNotch = useCallback(() => <Notch />, []);
-  //const [user, setUser] = useState();
   const { state } = useContext(userContext);
   const [formData, setFormData] = useState<IUserForm>();
   const [isLoading, setIsLoading] = useState(true);
@@ -181,7 +180,7 @@ const SettingsRout = () => {
     { id: "", name: "", images: [{ url: "" }] },
   ]);
   const [search, setSearch] = useState("");
-  const [birthday, setBirthday] = useState(currentDateMoreThan18);
+
   // connect to spotify functions
   WebBrowser.maybeCompleteAuthSession();
 
@@ -333,7 +332,7 @@ const SettingsRout = () => {
 
     if (formData.connectWithoutSpotify && !checkedArtistList[1]) {
       isValid = false;
-      errors["SpotifyOrArtist"] = "Please choose your favorite artists";
+      errors["NoArtist"] = "Please choose your favorite artists";
     }
 
     if (typeof input["email"] !== "undefined") {
@@ -365,8 +364,6 @@ const SettingsRout = () => {
 
   const onSave = async () => {
     if (validate()) {
-      console.log(checkedArtistList + " " + search + " " + artistList);
-
       if (checkedArtistList.length > 1) {
         formData.Artists = [];
         for (var i = 0; i < checkedArtistList.length; i++) {
@@ -816,37 +813,7 @@ const SettingsRout = () => {
                 >
                   Media
                 </Text>
-                {/* <ScrollView> */}
                 <View style={settings.mediaView}>{mediaArr}</View>
-                {/* <FlatList
-                    data={formData.Media}
-                    numColumns={2}
-                    renderItem={({ item }) => (
-                      <View key={item}>
-                        <Image
-                          style={settings.media}
-                          source={{
-                            uri: `${SERVER_ADDRESS}:${SERVER_PORT}/static/${item}`,
-                          }}
-                        />
-                      </View>
-                    )}
-                  />
-                  <FlatList
-                    data={media}
-                    numColumns={2}
-                    renderItem={({ item }) => (
-                      <View key={item}>
-                        <Image
-                          style={settings.media}
-                          source={{
-                            uri: item,
-                          }}
-                        />
-                      </View>
-                    )}
-                  /> */}
-                {/* </ScrollView> */}
                 <Button onPress={pickMedia}>Upload Media</Button>
               </View>
               <Divider style={{ backgroundColor: "#8860D0", width: "100%" }} />
@@ -920,7 +887,7 @@ const SettingsRout = () => {
               <Text
                 style={{ color: "red", paddingHorizontal: 40, paddingTop: 20 }}
               >
-                {errors["SpotifyOrArtist"]}
+                {errors["NoArtist"]}
               </Text>
               <View>
                 {!useSpotify && (
