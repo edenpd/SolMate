@@ -40,9 +40,13 @@ export default function authNavigator({ navigation }) {
       const location = await Location.getCurrentPositionAsync();
       console.log("location is ", location);
       //  response.data.user.location = location;
+      const cuur_location = {
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      };
       axios.put(
         `${SERVER_ADDRESS}:${SERVER_PORT}/user/updateLocation`,
-        { ...state.user, location: location },
+        { ...state.user, location: cuur_location },
         {
           headers: { "Content-Type": "application/json" },
         }
