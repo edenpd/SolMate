@@ -56,9 +56,13 @@ export const registerUser = async (req: Request, res: Response) => {
     location: userBody.location,
   });
 
-  const token = jwt.sign({ email: userBody.email.toLocaleLowerCase() }, config.secret, {
-    expiresIn: 86400, // expires in 24 hours
-  });
+  const token = jwt.sign(
+    { email: userBody.email.toLocaleLowerCase() },
+    config.secret,
+    {
+      expiresIn: 86400, // expires in 24 hours
+    }
+  );
 
   MatchAlgorithm(userBody.email.toLocaleLowerCase());
   console.log("register end!!!!");
@@ -82,7 +86,10 @@ export const authenticateUser = (
       if (!user) {
         return res.status(401).json({ status: "error", code: "unauthorized" });
       } else {
-        const token = jwt.sign({ email: user.email.toLocaleLowerCase() }, config.secret);
+        const token = jwt.sign(
+          { email: user.email.toLocaleLowerCase() },
+          config.secret
+        );
         res.status(200).send({ user: user, token: token });
       }
     }
@@ -182,7 +189,7 @@ export const updateUser = async (req: Request, res: Response) => {
   const birthday = req.body.birthday;
   const interestedSex = req.body.interestedSex;
   const Artists = req.body.Artists;
-  
+
   try {
     const user = await User.updateOne(
       {
@@ -257,6 +264,34 @@ const connectToSpotify = async (user: any) => {
     return false;
   }
 };
+
+export const updateUserSpotifyToken = async (req: Request, res: Response) => {
+  const userId = req.body._id;
+  const { encryptedAccessToken, encryptedRefreshToken, iv } = encryptTokens(
+    req.body.spotifyAccessToken,
+    req.body.spotifyRefreshToken
+  );
+  const expirationDate = req.body.expirationDate;
+  try {
+    await User.updateOne(
+      {
+        _id: userId,
+      },
+      {
+        $set: {
+          iv: iv.toString("hex"),
+          spotifyAccessToken: encryptedAccessToken,
+          spotifyRefreshToken: encryptedRefreshToken,
+          spotifyTokenExpiryDate: expirationDate,
+        },
+      }
+    );
+    res.status(200).json("Success");
+  } catch (err) {
+    res.status(500).json(err);
+  }
+};
+
 const connectNoSpotify = async (userId: string) => {
   //const userId = user._id;
   try {
