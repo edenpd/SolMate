@@ -160,7 +160,18 @@ export const getChatsByUser = async (req: Request, res: Response) => {
       } else {
 
         // Sort the chats accorcding tot he last message senet.
-        const chatsRes = (chats as IChat[]).sort((prevChat, curChat) => prevChat.Messages.reduce((prev, cur) => prev.msgDate > cur.msgDate ? prev : cur).msgDate.localeCompare(prevChat.Messages.reduce((prev, cur) => prev.msgDate > cur.msgDate ? prev : cur).msgDate));
+        const chatsRes = (chats as IChat[])
+          .sort((prevChat, curChat) => {
+            if (prevChat.Messages.length === 0 || curChat.Messages.length === 0)
+              return prevChat.Messages.length - curChat.Messages.length;
+
+            return prevChat.Messages.reduce((prev, cur) =>
+              prev.msgDate > cur.msgDate ? prev : cur)
+                .msgDate.localeCompare(prevChat.Messages
+                  .reduce((prev, cur) =>prev.msgDate > cur.msgDate ? prev : cur
+
+                  ).msgDate)
+                });
         res.status(200).json(chatsRes);
       }
     });
