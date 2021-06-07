@@ -91,32 +91,37 @@ export const getMatchesById = async (req: Request, res: Response) => {
   if (userID !== undefined) {
     Match.find(
       {
-
-        $or: [
+        $and: [
           {
-            $and: [
+            $or: [
               {
-                firstUser: userID,
+                $and: [
+                  {
+                    firstUser: userID,
+                  },
+                  {
+                    Approve1: "waiting",
+                  },
+                ],
               },
               {
-                Approve1: "waiting",
+                $and: [
+                  {
+                    secondUser: userID,
+                  },
+                  {
+                    Approve2: "waiting",
+                  },
+                ],
               },
-            ],
+            ]
           },
           {
-            $and: [
-              {
-                secondUser: userID,
-              },
-              {
-                Approve2: "waiting",
-              },
-            ],
-          },
-        ],
-        $ne: {
-          grade: 0
-        }
+            $ne: {
+              grade: 0
+            }
+          }
+        ]
       })
       .sort({ grade: -1 })
       .limit(50)
