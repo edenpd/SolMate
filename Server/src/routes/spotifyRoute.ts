@@ -8,7 +8,7 @@ import {
 } from "../controllers/spotifyController";
 import { encode as btoa } from "base-64";
 import fetch from 'node-fetch';
-import { updateUser } from "../controllers/userController";
+import { updateUser, updateUserSpotifyToken } from "../controllers/userController";
 import { decrypt } from "../Util/spotifyAccess";
 
 export const checkAccessToken = async (
@@ -52,7 +52,7 @@ export const checkAccessToken = async (
           }
           user.spotifyAccessToken = newAccessToken;
           user.spotifyTokenExpiryDate = expirationDate;
-          const userupdRes = await updateUser(user,res);
+          const userupdRes = await updateUserSpotifyToken(user,res);
           req.body.token = newAccessToken;
           next(req);
         }
