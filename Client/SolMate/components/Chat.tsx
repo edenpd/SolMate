@@ -284,6 +284,10 @@ const Chat = (props) => {
     const renderChatEmpty = () => {
         var msg = "You can talk about ";
 
+        if(recArtists.length == 0) {
+            msg = msg.concat('the weather beacuse your solmate didn\'t chose any favorite artists :(')
+        }
+
         for (let i = 0; i < 3 && i < recArtists.length; i++) {
             if (i == 2 || i == recArtists.length - 1) {
                 msg = msg.slice(0, -2);
