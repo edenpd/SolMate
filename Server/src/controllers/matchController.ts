@@ -2,7 +2,10 @@ import { Request, Response } from "express";
 import { CallbackError } from "mongoose";
 import Match, { IMatch, IMatchModel } from "../modules/matchModel";
 import { IChat } from "../modules/chatModel";
-import { addChatAfterMatch, deleteAllChats } from "../controllers/chatController";
+import {
+  addChatAfterMatch,
+  deleteAllChats,
+} from "../controllers/chatController";
 import { decrypt, spotifyApi } from "../Util/spotifyAccess";
 import User, { IArtist, IUser, IUserModel } from "../modules/userModel";
 import { getUsersDistance } from "../Util/general";
@@ -601,8 +604,8 @@ const withVsWithoutSpotify = (
   // let user1TotalSongs: string[] = [];
   let user1TotalArtists: IArtist[] = [];
 
-  // user1TotalSongs.concat(user1TopSongs, user1SavedSongs);
-  user1TotalArtists.concat(user1FollowArtists, user1RelatedArtists);
+  user1TotalArtists = user1TotalArtists.concat(user1FollowArtists);
+  user1TotalArtists = user1TotalArtists.concat(user1RelatedArtists);
   // distinct
   // user1TotalSongs = [...new Set(user1TotalSongs)];
   user1TotalArtists = [...new Set(user1TotalArtists)];
@@ -720,9 +723,9 @@ const bothWithSpotify = (
   ) {
     artistsGrade =
       similarArtists /
-      (user1RelatedArtists.length + user2RelatedArtists.length) +
+        (user1RelatedArtists.length + user2RelatedArtists.length) +
       similarFollowArtists /
-      (user1FollowArtists.length + user2FollowArtists.length);
+        (user1FollowArtists.length + user2FollowArtists.length);
   }
 
   // similar album amount
@@ -775,16 +778,16 @@ export const deleteMatchesOfUser = async (req: Request, res: Response) => {
 
 export const resetMatches = async (req: Request, res: Response) => {
   await Match.updateMany(
+    {},
     {
-
-    },
-    {
-      "Approve1": "waiting",
-      "Approve2": "waiting"
+      Approve1: "waiting",
+      Approve2: "waiting",
     }
-  ).then(async (val) => {
-    await deleteAllChats(req, res);
-  }).catch((err) => {
-    res.status(500).send(err);
-  });
-}
+  )
+    .then(async (val) => {
+      await deleteAllChats(req, res);
+    })
+    .catch((err) => {
+      res.status(500).send(err);
+    });
+};
