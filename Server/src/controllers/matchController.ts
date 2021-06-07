@@ -117,11 +117,11 @@ export const getMatchesById = async (req: Request, res: Response) => {
             ]
           },
           {
-            $ne: {
-              grade: 0
+            grade: {
+              $ne: 0
             }
           }
-        ]
+        ],
       })
       .sort({ grade: -1 })
       .limit(50)
@@ -138,6 +138,8 @@ export const getMatchesById = async (req: Request, res: Response) => {
           res.status(500).send(err);
         } else {
           const matchesData = [];
+          console.log("Matches");
+          console.log(matches);
 
           for (let i = 0; i < matches.length; i++) {
             const otherUser =
