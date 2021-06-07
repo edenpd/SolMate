@@ -23,6 +23,7 @@ import { userContext } from "../contexts/userContext";
 import { IUser } from "../util/Types";
 import { SERVER_ADDRESS, SERVER_PORT } from "@env";
 import { Divider, ListItem } from "react-native-elements";
+import { FlatList } from "react-native-gesture-handler";
 
 interface ProfileProps {
   user: any;
@@ -68,6 +69,7 @@ const Profile = (props) => {
     },
     content: {
       marginTop: 30,
+      display: 'flex',
       flexDirection: "row",
       justifyContent: "center",
       alignItems: "center",
@@ -154,26 +156,29 @@ const Profile = (props) => {
   };
 
   const renderMedia = () => {
-    const mediaDOM = [];
+    return (
+      <FlatList
+      contentContainerStyle={{flexGrow: 1, justifyContent: 'center'}}
+        data={props.user.user.Media as Array<string>}
+        numColumns={2}
+        renderItem={({ item, index }) => {
+          console.log("Index " + index);
+          return (<View key={"media" + index}>
+            <TouchableOpacity
+              onPress={() => onImagePress(item)}
+            >
+              <Image
+                style={styles.image}
+                source={{
+                  uri: `${SERVER_ADDRESS}:${SERVER_PORT}/static/${item}`,
+                }}
+              />
+            </TouchableOpacity>
+          </View>);
+        }}>
 
-    for (let i = 0; i < props.user.user.Media.length; i++) {
-      mediaDOM.push(
-        <View key={"media" + i}>
-          <TouchableOpacity
-            onPress={() => onImagePress(props.user.user.Media[i])}
-          >
-            <Image
-              style={styles.image}
-              source={{
-                uri: `${SERVER_ADDRESS}:${SERVER_PORT}/static/${props.user.user.Media[i]}`,
-              }}
-            />
-          </TouchableOpacity>
-        </View>
-      );
-    }
-
-    return mediaDOM;
+      </FlatList>
+    );
   };
 
   const calcAge = (date: Date) => {
