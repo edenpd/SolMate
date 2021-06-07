@@ -152,32 +152,34 @@ const Profile = (props) => {
       }
     }
     //}
-    return artistsDOM;
+    return <ScrollView>
+      {artistsDOM}
+    </ScrollView>;
   };
 
   const renderMedia = () => {
     return (
-      <FlatList
-      contentContainerStyle={{flexGrow: 1, justifyContent: 'center'}}
-        data={props.user.user.Media as Array<string>}
-        numColumns={2}
-        renderItem={({ item, index }) => {
-          console.log("Index " + index);
-          return (<View key={"media" + index}>
-            <TouchableOpacity
-              onPress={() => onImagePress(item)}
-            >
-              <Image
-                style={styles.image}
-                source={{
-                  uri: `${SERVER_ADDRESS}:${SERVER_PORT}/static/${item}`,
-                }}
-              />
-            </TouchableOpacity>
-          </View>);
-        }}>
-
-      </FlatList>
+      <View>
+        <FlatList
+          contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}
+          data={props.user.user.Media as Array<string>}
+          numColumns={2}
+          renderItem={({ item, index }) => {
+            return (<View key={"media" + index}>
+              <TouchableOpacity
+                onPress={() => onImagePress(item)}
+              >
+                <Image
+                  style={styles.image}
+                  source={{
+                    uri: `${SERVER_ADDRESS}:${SERVER_PORT}/static/${item}`,
+                  }}
+                />
+              </TouchableOpacity>
+            </View>);
+          }}>
+        </FlatList>
+      </View>
     );
   };
 
@@ -251,9 +253,7 @@ const Profile = (props) => {
         </Button>
       </View>
 
-      <ScrollView>
-        <View style={styles.content}>{content}</View>
-      </ScrollView>
+      <View style={styles.content}>{content}</View>
     </View>
   );
 };
