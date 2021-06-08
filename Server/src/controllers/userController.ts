@@ -264,7 +264,7 @@ export const updateUserSpotifyTokenNoResponse = async (req: Request) => {
     req.body.spotifyAccessToken,
     req.body.spotifyRefreshToken
   );
-  const expirationDate = req.body.expirationDate;
+  const expirationDate = req.body.spotifyTokenExpiryDate;
   try {
     await User.updateOne(
       {
@@ -291,7 +291,7 @@ export const updateUserSpotifyToken = async (req: Request, res: Response) => {
     req.body.spotifyAccessToken,
     req.body.spotifyRefreshToken
   );
-  const expirationDate = req.body.expirationDate;
+  const expirationDate = req.body.spotifyTokenExpiryDate;
   try {
     await User.updateOne(
       {
