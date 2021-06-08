@@ -69,7 +69,7 @@ const Profile = (props) => {
     },
     content: {
       marginTop: 30,
-      display: 'flex',
+      display: "flex",
       flexDirection: "row",
       justifyContent: "center",
       alignItems: "center",
@@ -152,33 +152,31 @@ const Profile = (props) => {
       }
     }
     //}
-    return <ScrollView>
-      {artistsDOM}
-    </ScrollView>;
+    return <ScrollView>{artistsDOM}</ScrollView>;
   };
 
   const renderMedia = () => {
     return (
       <View>
         <FlatList
-          contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}
+          contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}
           data={props.user.user.Media as Array<string>}
           numColumns={2}
           renderItem={({ item, index }) => {
-            return (<View key={"media" + index}>
-              <TouchableOpacity
-                onPress={() => onImagePress(item)}
-              >
-                <Image
-                  style={styles.image}
-                  source={{
-                    uri: `${SERVER_ADDRESS}:${SERVER_PORT}/static/${item}`,
-                  }}
-                />
-              </TouchableOpacity>
-            </View>);
-          }}>
-        </FlatList>
+            return (
+              <View key={"media" + index}>
+                <TouchableOpacity onPress={() => onImagePress(item)}>
+                  <Image
+                    style={styles.image}
+                    source={{
+                      uri: `${SERVER_ADDRESS}:${SERVER_PORT}/static/${item}`,
+                    }}
+                  />
+                </TouchableOpacity>
+              </View>
+            );
+          }}
+        ></FlatList>
       </View>
     );
   };
@@ -239,21 +237,28 @@ const Profile = (props) => {
       <View style={styles.tabs}>
         <Button
           style={styles.button}
-          mode="contained"
+          mode='contained'
           onPress={() => setIndex(0)}
         >
           Top Artists
         </Button>
         <Button
           style={styles.button}
-          mode="contained"
+          mode='contained'
           onPress={() => setIndex(1)}
         >
           Media
         </Button>
       </View>
-
-      <View style={styles.content}>{content}</View>
+      <ScrollView
+        contentContainerStyle={{
+          flexGrow: 1,
+          display: "flex",
+          paddingTop: 5,
+        }}
+      >
+        <View style={styles.content}>{content}</View>
+      </ScrollView>
     </View>
   );
 };

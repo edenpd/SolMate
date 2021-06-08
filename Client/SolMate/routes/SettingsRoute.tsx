@@ -304,8 +304,11 @@ const SettingsRout = () => {
         if (res.data.user.spotifyAccessToken !== "") {
           setUseSpotify(true);
         }
-
         setIsLoading(false);
+        if (!isLoading) {
+          var x = new Date(formData.birthday);
+          onChangeDate(x);
+        }
       })
       .catch((err) => {
         console.log("Error");
@@ -817,11 +820,11 @@ const SettingsRout = () => {
                   }}
                 >
                   How far should we search for you?
-          </Text>
+                </Text>
                 <Slider
                   style={{ width: "80%", marginVertical: 20 }}
-                  thumbTintColor="#8860D0"
-                  minimumTrackTintColor="#8860D0"
+                  thumbTintColor='#8860D0'
+                  minimumTrackTintColor='#8860D0'
                   minimumValue={0}
                   maximumValue={120}
                   step={1}
