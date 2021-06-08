@@ -258,6 +258,33 @@ const connectToSpotify = async (user: any) => {
   }
 };
 
+export const updateUserSpotifyTokenNoResponse = async (req: Request) => {
+  const userId = req.body._id;
+  const { encryptedAccessToken, encryptedRefreshToken, iv } = encryptTokens(
+    req.body.spotifyAccessToken,
+    req.body.spotifyRefreshToken
+  );
+  const expirationDate = req.body.expirationDate;
+  try {
+    await User.updateOne(
+      {
+        _id: userId,
+      },
+      {
+        $set: {
+          iv: iv.toString("hex"),
+          spotifyAccessToken: encryptedAccessToken,
+          spotifyRefreshToken: encryptedRefreshToken,
+          spotifyTokenExpiryDate: expirationDate,
+        },
+      }
+    );
+    return req.body;
+  } catch (err) {
+    return err;
+  }
+};
+
 export const updateUserSpotifyToken = async (req: Request, res: Response) => {
   const userId = req.body._id;
   const { encryptedAccessToken, encryptedRefreshToken, iv } = encryptTokens(
