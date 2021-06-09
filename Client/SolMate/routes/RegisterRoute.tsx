@@ -133,7 +133,7 @@ export default function Register({ navigation }): JSX.Element {
       // this must be set to false
       usePKCE: false,
       // For usage in managed apps using the proxy
-      redirectUri: `exp://${EXPO_ADDRESS}:${EXPO_PORT}`,
+      redirectUri: `solmate://`,
     },
     discovery
   );
@@ -731,7 +731,7 @@ export default function Register({ navigation }): JSX.Element {
                           Authorization: `Basic ${credsB64}`,
                           "Content-Type": "application/x-www-form-urlencoded",
                         },
-                        body: `grant_type=authorization_code&code=${code}&redirect_uri=${`exp://${EXPO_ADDRESS}:${EXPO_PORT}`}`,
+                        body: `grant_type=authorization_code&code=${code}&redirect_uri=${`solmate://`}`,
                       }
                     );
                     const responseJson = await tokenResponse.json();
