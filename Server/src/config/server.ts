@@ -61,7 +61,7 @@ export const startServer = async () => {
 };
 
 export const mongoSetup = async () => {
-  await connect("mongodb://localhost/solmate", {
+  await connect("mongodb://mongo/solmate", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useCreateIndex: true,
