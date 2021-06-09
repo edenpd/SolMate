@@ -469,6 +469,8 @@ export const MatchAlgorithm = async (email: String) => {
               return matchFound;
             }
           } catch (e) {
+            console.log("The e:", e);
+            console.log("The e stringfy:", JSON.stringify(e));
             return undefined;
           }
         })
@@ -543,7 +545,8 @@ export const MatchAlgorithm = async (email: String) => {
         });
     }
   } catch (e) {
-    console.log(e);
+    console.log("The e:", e);
+    console.log("The e stringfy:", JSON.stringify(e));
   }
 };
 
