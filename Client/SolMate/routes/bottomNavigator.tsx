@@ -99,8 +99,8 @@ export default function App() {
 
   const renderIcon =
     (icon) =>
-      ({ isActive }) =>
-        <Icon size={24} color={isActive ? "#8860D0" : "grey"} name={icon} />;
+    ({ isActive }) =>
+      <Icon size={24} color={isActive ? "#8860D0" : "grey"} name={icon} />;
 
   const renderTab = ({ tab, isActive }) => (
     <FullTab
@@ -133,7 +133,7 @@ export default function App() {
       // For usage in managed apps using the proxy
       redirectUri: makeRedirectUri({
         // For usage in bare and standalone
-        native: `solmate://`,
+        native: `exp://${EXPO_ADDRESS}:${EXPO_PORT}`,
       }),
     },
     discovery
