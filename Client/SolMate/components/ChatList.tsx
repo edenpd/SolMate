@@ -92,6 +92,7 @@ const ChatList = ({ navigation }) => {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            width: '100%'
           }}
         >
           <Text
@@ -100,9 +101,18 @@ const ChatList = ({ navigation }) => {
               color: "#8860D0",
               marginBottom: 20,
               fontSize: 25,
-            }}
-          >
-            no chats yet... {"\n"}waiting for your first match 😍
+              display: 'flex',
+              justifyContent: 'center',
+              width: '100%',
+              flexDirection: 'column',
+              alignItems: 'center',
+              alignSelf: 'center',
+              alignContent: 'center',
+              textAlign: 'center'
+
+            }}>
+            No chats found yet...{'\n'}
+            Waiting for your first match. 😍
           </Text>
         </Container>
       )}
