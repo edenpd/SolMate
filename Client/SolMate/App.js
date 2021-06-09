@@ -9,6 +9,8 @@ import { TokenStateProvider } from "./contexts/tokenContext";
 import { BottomNavigation } from "react-native-paper";
 
 export default function App() {
+  console.disableYellowBox = true;
+
   const [initialRoute, setInitialRoute] = useState("AuthNavigator");
   const RootStack = createStackNavigator(
     {

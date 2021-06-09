@@ -284,16 +284,19 @@ const Chat = (props) => {
     const renderChatEmpty = () => {
         var msg = "You can talk about ";
 
-        if(recArtists.length == 0) {
+        if (recArtists.length == 0) {
             msg = msg.concat('the weather beacuse your solmate didn\'t chose any favorite artists :(')
-        }
+        } else if (recArtists.length == 1) {
+            msg = msg.concat(recArtists[0].name)
+        } else {
 
-        for (let i = 0; i < 3 && i < recArtists.length; i++) {
-            if (i == 2 || i == recArtists.length - 1) {
-                msg = msg.slice(0, -2);
-                msg = msg.concat(' and ' + recArtists[i].name)
-            } else
-                msg = msg.concat(recArtists[i].name + ", ")
+            for (let i = 0; i < 3 && i < recArtists.length; i++) {
+                if (i == 2 || i == recArtists.length - 1) {
+                    msg = msg.slice(0, -2);
+                    msg = msg.concat(' and ' + recArtists[i].name)
+                } else
+                    msg = msg.concat(recArtists[i].name + ", ")
+            }
         }
         return (
             <View
