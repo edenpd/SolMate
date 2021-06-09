@@ -641,7 +641,7 @@ export default function Register({ navigation }): JSX.Element {
               fontSize: 17,
             }}
           >
-            What agesare you looking for?
+            What ages are you looking for?
           </Text>
           <RangeSlider
             style={{ width: "80%", marginVertical: 20 }}
