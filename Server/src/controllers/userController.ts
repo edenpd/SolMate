@@ -214,10 +214,7 @@ export const updateUser = async (req: Request, res: Response) => {
         },
       }
     );
-
-    // delete waiting matches
     deleteMatchesAfterUpd(userId);
-    // calc matches after user data updated
     MatchAlgorithm(email);
 
     if (connectSpotify) {
