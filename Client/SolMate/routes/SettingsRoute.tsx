@@ -173,7 +173,7 @@ const SettingsRout = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [image, setImage] = useState(null);
   const [media, setMedia] = useState([]);
-  const [mediaArr, setMediaArr] = useState([]);
+  const [mediaArr, setMediaArr] = useState<Array<View>>([]);
   const [errors, setErrors] = useState({});
   const { token } = useContext(tokenContext);
   const [useSpotify, setUseSpotify] = useState(false);
@@ -860,7 +860,13 @@ const SettingsRout = () => {
                 >
                   Media
                 </Text>
-                <View style={settings.mediaView}>{mediaArr}</View>
+                <View style={settings.mediaView}>
+                  <FlatList
+                    data={mediaArr}
+                    renderItem={({item, index}) => <View key={index}>{item}</View>}
+                    numColumns={2} /> 
+                  {/* {mediaArr} */}
+                  </View>
                 <Button onPress={pickMedia}>Upload Media</Button>
               </View>
               <Divider style={{ backgroundColor: "#8860D0", width: "100%" }} />
