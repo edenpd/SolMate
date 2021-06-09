@@ -75,6 +75,10 @@ const settings = StyleSheet.create({
     justifyContent: "center",
     flexDirection: "column",
   },
+  mediaItem: {
+    margin: 5,
+    borderRadius: 5
+  },
   button: {
     width: 200,
     backgroundColor: "#8860D0",
@@ -90,15 +94,18 @@ const settings = StyleSheet.create({
     alignSelf: "center",
   },
   media: {
-    width: 180,
-    height: 180,
+    width: 170,
+    height: 170,
+    borderRadius: 10
   },
   mediaView: {
     marginTop: 30,
     flexDirection: "row",
-    justifyContent: "center",
+    justifyContent: "space-evenly",
     alignItems: "center",
     flexWrap: "wrap",
+    display: 'flex',
+    width: '100%'
   },
   SpotifyButton: {
     marginTop: 20,
@@ -585,6 +592,8 @@ const SettingsRout = () => {
             flexGrow: 1,
             display: "flex",
             paddingTop: 30,
+            // width: '100%',
+            // justifyContent: 'center'
           }}
         >
           <View style={settings.SettingsContainer}>
@@ -863,7 +872,7 @@ const SettingsRout = () => {
                 <View style={settings.mediaView}>
                   <FlatList
                     data={mediaArr}
-                    renderItem={({item, index}) => <View key={index}>{item}</View>}
+                    renderItem={({item, index}) => <View style={settings.mediaItem} key={index}>{item}</View>}
                     numColumns={2} /> 
                   {/* {mediaArr} */}
                   </View>

@@ -65,7 +65,7 @@ const Profile = (props) => {
     },
     tabs: {
       marginTop: 10,
-      flexDirection: "row",
+      flexDirection: "row"
     },
     content: {
       marginTop: 30,
@@ -78,6 +78,7 @@ const Profile = (props) => {
     image: {
       width: 180,
       height: 180,
+      borderRadius: 10
     },
     modalView: {
       margin: 20,
@@ -125,6 +126,12 @@ const Profile = (props) => {
       backgroundColor: "#8860D0",
       fontFamily: "Poppins_300Light",
     },
+    mediaItem: {
+      margin: 5
+    },
+    mediaImage: {
+      borderRadius: 10
+    }
   });
 
   const renderArtists = () => {
@@ -164,7 +171,8 @@ const Profile = (props) => {
           numColumns={2}
           renderItem={({ item, index }) => {
             return (
-              <View key={"media" + index}>
+              <View key={"media" + index}
+                style={styles.mediaItem}>
                 <TouchableOpacity onPress={() => onImagePress(item)}>
                   <Image
                     style={styles.image}
