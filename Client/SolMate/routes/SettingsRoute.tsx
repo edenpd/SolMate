@@ -388,6 +388,7 @@ const SettingsRout = () => {
           }
         }
       }
+      
       await axios
         .put(`${SERVER_ADDRESS}:${SERVER_PORT}/user`, formData, {
           headers: { "Content-Type": "application/json" },
@@ -872,10 +873,26 @@ const SettingsRout = () => {
                 <View style={settings.mediaView}>
                   <FlatList
                     data={mediaArr}
-                    renderItem={({item, index}) => <View style={settings.mediaItem} key={index}>{item}</View>}
-                    numColumns={2} /> 
+                    renderItem={({ item, index }) =>
+                      <TouchableOpacity
+                        style={settings.mediaItem} key={index}
+                        onLongPress={(event) => {
+                          setMedia(prev => {
+                            prev.splice(index, 1);
+                            return [...prev];
+                          });
+                          setMediaArr(prev => {
+                            console.log(prev.length);
+                            prev.splice(index, 1);
+                            console.log(prev.length);
+                            return[...prev];
+                          });
+                        }}>
+                          {item}
+                      </TouchableOpacity>}
+                    numColumns={2} />
                   {/* {mediaArr} */}
-                  </View>
+                </View>
                 <Button onPress={pickMedia}>Upload Media</Button>
               </View>
               <Divider style={{ backgroundColor: "#8860D0", width: "100%" }} />
