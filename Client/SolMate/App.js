@@ -7,9 +7,10 @@ import BottomNavigator from "./routes/bottomNavigator";
 import { StateProvider } from "./contexts/userContext";
 import { TokenStateProvider } from "./contexts/tokenContext";
 import { BottomNavigation } from "react-native-paper";
+import { LogBox } from 'react-native';
 
 export default function App() {
-  console.disableYellowBox = true;
+  LogBox.ignoreAllLogs();
 
   const [initialRoute, setInitialRoute] = useState("AuthNavigator");
   const RootStack = createStackNavigator(
