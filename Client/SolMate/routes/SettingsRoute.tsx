@@ -77,7 +77,7 @@ const settings = StyleSheet.create({
   },
   mediaItem: {
     margin: 5,
-    borderRadius: 5
+    borderRadius: 5,
   },
   button: {
     width: 200,
@@ -96,7 +96,7 @@ const settings = StyleSheet.create({
   media: {
     width: 170,
     height: 170,
-    borderRadius: 10
+    borderRadius: 10,
   },
   mediaView: {
     marginTop: 30,
@@ -104,8 +104,8 @@ const settings = StyleSheet.create({
     justifyContent: "space-evenly",
     alignItems: "center",
     flexWrap: "wrap",
-    display: 'flex',
-    width: '100%'
+    display: "flex",
+    width: "100%",
   },
   SpotifyButton: {
     marginTop: 20,
@@ -388,7 +388,7 @@ const SettingsRout = () => {
           }
         }
       }
-      
+
       await axios
         .put(`${SERVER_ADDRESS}:${SERVER_PORT}/user`, formData, {
           headers: { "Content-Type": "application/json" },
@@ -873,24 +873,31 @@ const SettingsRout = () => {
                 <View style={settings.mediaView}>
                   <FlatList
                     data={mediaArr}
-                    renderItem={({ item, index }) =>
+                    renderItem={({ item, index }) => (
                       <TouchableOpacity
-                        style={settings.mediaItem} key={index}
+                        style={settings.mediaItem}
+                        key={index}
                         onLongPress={(event) => {
-                          setMedia(prev => {
+                          if (index < formData.Media.length) {
+                            formData.Media.splice(index, 1);
+                          } else if (formData.Media.length !== 0) {
+                            setMedia((prev) => {
+                              prev.splice(index - formData.Media.length, 1);
+                              return [...prev];
+                            });
+                          }
+
+                          setMediaArr((prev) => {
                             prev.splice(index, 1);
                             return [...prev];
                           });
-                          setMediaArr(prev => {
-                            console.log(prev.length);
-                            prev.splice(index, 1);
-                            console.log(prev.length);
-                            return[...prev];
-                          });
-                        }}>
-                          {item}
-                      </TouchableOpacity>}
-                    numColumns={2} />
+                        }}
+                      >
+                        {item}
+                      </TouchableOpacity>
+                    )}
+                    numColumns={2}
+                  />
                   {/* {mediaArr} */}
                 </View>
                 <Button onPress={pickMedia}>Upload Media</Button>

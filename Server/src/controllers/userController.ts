@@ -188,6 +188,7 @@ export const updateUser = async (req: Request, res: Response) => {
   const sex = req.body.sex;
   const birthday = req.body.birthday;
   const interestedSex = req.body.interestedSex;
+  const Media = req.body.Media;
   const Artists = req.body.Artists;
   const connectSpotify = req.body.connectSpotify;
   const connectWithoutSpotify = req.body.connectWithoutSpotify;
@@ -209,6 +210,7 @@ export const updateUser = async (req: Request, res: Response) => {
           sex: sex,
           birthday: birthday,
           interestedSex: interestedSex,
+          Media: Media,
           Artists: Artists,
         },
       }
