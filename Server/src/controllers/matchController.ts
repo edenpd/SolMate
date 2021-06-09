@@ -89,40 +89,39 @@ export const getMatchesById = async (req: Request, res: Response) => {
 
   // Find matches in
   if (userID !== undefined) {
-    Match.find(
-      {
-        $and: [
-          {
-            $or: [
-              {
-                $and: [
-                  {
-                    firstUser: userID,
-                  },
-                  {
-                    Approve1: "waiting",
-                  },
-                ],
-              },
-              {
-                $and: [
-                  {
-                    secondUser: userID,
-                  },
-                  {
-                    Approve2: "waiting",
-                  },
-                ],
-              },
-            ]
+    Match.find({
+      $and: [
+        {
+          $or: [
+            {
+              $and: [
+                {
+                  firstUser: userID,
+                },
+                {
+                  Approve1: "waiting",
+                },
+              ],
+            },
+            {
+              $and: [
+                {
+                  secondUser: userID,
+                },
+                {
+                  Approve2: "waiting",
+                },
+              ],
+            },
+          ],
+        },
+        {
+          grade: {
+            $ne: 0,
           },
-          {
-            grade: {
-              $ne: 0
-            }
-          }
-        ],
-      })
+        },
+      ],
+    })
       .sort({ grade: -1 })
       .limit(50)
       .populate({
@@ -735,9 +734,9 @@ const bothWithSpotify = (
   ) {
     artistsGrade =
       similarArtists /
-      (user1RelatedArtists.length + user2RelatedArtists.length) +
+        (user1RelatedArtists.length + user2RelatedArtists.length) +
       similarFollowArtists /
-      (user1FollowArtists.length + user2FollowArtists.length);
+        (user1FollowArtists.length + user2FollowArtists.length);
   }
 
   // similar album amount
@@ -759,6 +758,36 @@ const bothWithSpotify = (
   finalGrade = (2 * songGrade + 2 * artistsGrade + albumGrade) / 5;
 
   return finalGrade;
+};
+export const deleteMatchesAfterUpd = async (uId: String) => {
+  const matchesToDel = await Match.find(
+    {
+      $and: [
+        {
+          $or: [{ firstUser: uId }, { secondUser: uId }],
+        },
+        {
+          $or: [{ Approve1: "waiting" }, { Approve2: "waiting" }],
+        },
+      ],
+    },
+    (err: CallbackError, matches: IMatch[]) => {
+      if (err) {
+        console.log(err);
+      } else {
+        return matches;
+      }
+    }
+  );
+  //  Passes on exsiting matches
+  for (let match of matchesToDel) {
+    try {
+      const chatDeleted = await Match.findOneAndDelete({ _id: match._id });
+      console.log("Match deleted: " + chatDeleted?._id);
+    } catch (e) {
+      console.log(e);
+    }
+  }
 };
 
 export const deleteMatchesOfUser = async (req: Request, res: Response) => {

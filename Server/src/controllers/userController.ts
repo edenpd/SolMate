@@ -9,6 +9,7 @@ import { deleteChatsOfUser } from "../controllers/chatController";
 import {
   deleteMatchesOfUser,
   MatchAlgorithm,
+  deleteMatchesAfterUpd,
 } from "../controllers/matchController";
 import crypto from "crypto";
 import { decrypt, spotifyApi, encryptTokens } from "../Util/spotifyAccess";
@@ -213,6 +214,11 @@ export const updateUser = async (req: Request, res: Response) => {
         },
       }
     );
+
+    // delete waiting matches
+    deleteMatchesAfterUpd(userId);
+    // calc matches after user data updated
+    MatchAlgorithm(email);
 
     if (connectSpotify) {
       if (!(await connectToSpotify(req.body))) {
