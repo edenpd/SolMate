@@ -469,6 +469,8 @@ export const MatchAlgorithm = async (email: String) => {
               return matchFound;
             }
           } catch (e) {
+            console.log("The e:", e);
+            console.log("The e stringfy:", JSON.stringify(e));
             return undefined;
           }
         })
@@ -543,7 +545,8 @@ export const MatchAlgorithm = async (email: String) => {
         });
     }
   } catch (e) {
-    console.log(e);
+    console.log("The e:", e);
+    console.log("The e stringfy:", JSON.stringify(e));
   }
 };
 
@@ -592,7 +595,7 @@ const bothWithoutSpotify = (
 
   // finalGrade = (songGrade + artistsGrade) / 2;
   finalGrade = artistsGrade;
-
+  console.log("finalGrade is " + finalGrade + " artistsGrade" + artistsGrade);
   return finalGrade;
 };
 
@@ -653,7 +656,7 @@ const withVsWithoutSpotify = (
 
   finalGrade = artistsGrade;
   // finalGrade = (songGrade + artistsGrade) / 2;
-
+  console.log("finalGrade is " + finalGrade + " artistsGrade" + artistsGrade);
   return finalGrade;
 };
 
@@ -757,6 +760,16 @@ const bothWithSpotify = (
 
   finalGrade = (2 * songGrade + 2 * artistsGrade + albumGrade) / 5;
 
+  console.log(
+    "finalGrade is " +
+      finalGrade +
+      " songGrade: " +
+      songGrade +
+      " artistsGrade" +
+      artistsGrade +
+      " albumGrade: " +
+      albumGrade
+  );
   return finalGrade;
 };
 export const deleteMatchesAfterUpd = async (uId: String) => {
