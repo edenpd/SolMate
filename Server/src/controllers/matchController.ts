@@ -33,6 +33,10 @@ export const updateMatch = async (req: Request, res: Response) => {
   const userId = req.body.userId;
   const approve = req.body.approve;
 
+  for (let i = 0; i <= 10; i++) {
+    console.log("Hello Yoram");
+  }
+
   let modCount = 0;
   let updatedValue: IMatchModel | null = null;
 
